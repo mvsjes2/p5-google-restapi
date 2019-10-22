@@ -1,0 +1,31 @@
+/blib/
+/.build/
+_build/
+cover_db/
+inc/
+Build
+!Build/
+Build.bat
+.last_cover_stats
+/Makefile
+/Makefile.old
+/MANIFEST.bak
+/META.yml
+/META.json
+/MYMETA.*
+nytprof.out
+/pm_to_blib
+*.o
+*.bs
+
+# Mac Finder generated:
+.DS_Store
+
+# vim swap files:
+*.swp
+
+# random backup files:
+*.bak
+
+# Code::TidyAll Test::Code::TidyAll cache:
+/.tidyall.d/

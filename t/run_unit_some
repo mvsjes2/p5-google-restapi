@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# use Carp::Always;
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use lib "unit";
+use lib "lib/unit";
+
+use Test::Net::Google::RestApi::SheetsApi4::Worksheet;
+
+Test::Class->runtests();
