@@ -6,10 +6,10 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    NAME              => 'Net::Google::RestApi',
+    NAME              => 'Google::RestApi',
     AUTHOR            => 'Robin Murray <mvsjes@cpan.org>',
-    ABSTRACT_FROM     => 'lib/Net/Google/RestApi.pm',
-    VERSION_FROM      => 'lib/Net/Google/RestApi.pm',
+    ABSTRACT_FROM     => 'lib/Google/RestApi.pm',
+    VERSION_FROM      => 'lib/Google/RestApi.pm',
     PREREQ_PM         => {
 	'aliased'                         => 0,
 	'autodie'                         => 0,
@@ -46,8 +46,8 @@ WriteMakefile(
       resources   => {
         repository => {
           type => 'git',
-          url  => 'https://github.com/mvsjes2/p5-net-google-restapi.git',
-          web  => 'https://github.com/mvsjes2/p5-net-google-restapi',
+          url  => 'https://github.com/mvsjes2/p5-google-restapi.git',
+          web  => 'https://github.com/mvsjes2/p5-google-restapi',
         },
       },
     },

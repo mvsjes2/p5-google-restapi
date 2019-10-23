@@ -3,7 +3,7 @@ package Test::Mock::Worksheet;
 use strict;
 use warnings;
 
-use aliased 'Net::Google::RestApi::SheetsApi4::Worksheet';
+use aliased 'Google::RestApi::SheetsApi4::Worksheet';
 use Test::MockObject::Extends;
 
 use Test::Mock::Spreadsheet;

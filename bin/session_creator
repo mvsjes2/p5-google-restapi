@@ -51,7 +51,7 @@ use File::Basename;
 use Storable;
 use Term::Prompt;
 use YAML::Any qw(LoadFile Dump);
-use Net::Google::RestApi::OAuth2;
+use Google::RestApi::OAuth2;
 
 # set the scope for the project you are working one.
 # for this package, drive and spreadsheets are required.
@@ -64,7 +64,7 @@ my $config_file = $ARGV[0];
 my $config = LoadFile($config_file);
 print "Config used:\n", Dump($config);
 
-my $oauth2 = Net::Google::RestApi::OAuth2->new(
+my $oauth2 = Google::RestApi::OAuth2->new(
   %{$config->{login}},
   scope => \@scope,
 );

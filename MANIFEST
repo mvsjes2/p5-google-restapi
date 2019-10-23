@@ -1,6 +1,0 @@
-Changes
-Makefile.PL
-MANIFEST
-README
-t/Net-Google-RestApi.t
-lib/Net/Google/RestApi.pm

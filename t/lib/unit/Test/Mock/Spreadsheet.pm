@@ -6,7 +6,7 @@ use warnings;
 use Test::MockObject::Extends;
 
 use Test::Mock::SheetsApi4;
-use aliased 'Net::Google::RestApi::SheetsApi4::Spreadsheet';
+use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
  
 sub new {
   my $self = Spreadsheet->new(

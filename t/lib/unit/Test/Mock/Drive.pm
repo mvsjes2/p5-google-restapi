@@ -3,7 +3,7 @@ package Test::Mock::Drive;
 use strict;
 use warnings;
 
-use aliased 'Net::Google::RestApi::DriveApi3';
+use aliased 'Google::RestApi::DriveApi3';
 use Test::MockObject::Extends;
 
 use Test::Mock::RestApi;

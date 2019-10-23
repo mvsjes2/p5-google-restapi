@@ -12,16 +12,16 @@ use Storable;
 use Term::ANSIColor;
 use YAML::Any qw(Dump LoadFile);
 
-use aliased "Net::Google::RestApi";
-use aliased "Net::Google::RestApi::SheetsApi4";
+use aliased "Google::RestApi";
+use aliased "Google::RestApi::SheetsApi4";
 
 use Exporter qw(import);
 our @EXPORT = qw(init_logger message start end end_go show_api);
 
-our $spreadsheet_name = 'net_google_restapi_sheets_testing';
+our $spreadsheet_name = 'google_restapi_sheets_testing';
 
 sub init_logger {
-  my $logger_conf = $ENV{NET_GOOGLE_RESTAPI_LOGGER};
+  my $logger_conf = $ENV{GOOGLE_RESTAPI_LOGGER};
   Log::Log4perl->init($logger_conf) if defined $logger_conf;
   return;
 }
@@ -47,8 +47,8 @@ sub rest_api {
 }
 
 sub rest_api_config {
-  my $login_file = $ENV{NET_GOOGLE_RESTAPI_LOGIN}
-    or die "No testing login file found: set env var NET_GOOGLE_RESTAPI_LOGIN first";
+  my $login_file = $ENV{GOOGLE_RESTAPI_LOGIN}
+    or die "No testing login file found: set env var GOOGLE_RESTAPI_LOGIN first";
   my $login = eval { LoadFile($login_file); };
   die "Unable to load login file '$login_file': $@" if $@;
 

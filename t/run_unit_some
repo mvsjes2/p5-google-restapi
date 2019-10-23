@@ -9,6 +9,6 @@ use lib "$FindBin::RealBin/../lib";
 use lib "unit";
 use lib "lib/unit";
 
-use Test::Net::Google::RestApi::SheetsApi4::Worksheet;
+use Test::Google::RestApi::SheetsApi4::Worksheet;
 
 Test::Class->runtests();

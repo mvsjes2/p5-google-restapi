@@ -3,7 +3,7 @@ package Test::Mock::RestApi;
 use strict;
 use warnings;
 
-use aliased 'Net::Google::RestApi';
+use aliased 'Google::RestApi';
 use Test::MockObject::Extends;
  
 sub new {

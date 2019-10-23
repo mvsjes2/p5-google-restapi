@@ -24,7 +24,7 @@ use Test::MockObject::Extends;
 use Test::Mock::Drive;
 use Test::Mock::RestApi;
 use Test::Mock::Spreadsheet;
-use aliased 'Net::Google::RestApi::SheetsApi4';
+use aliased 'Google::RestApi::SheetsApi4';
 
 sub new {
   # TODO: need a way to load this from the parent script.
