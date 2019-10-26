@@ -65,7 +65,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Range::Iterator - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Range::Iterator - An iterator for an arbitrary Range.
 
 =head1 DESCRIPTION
 

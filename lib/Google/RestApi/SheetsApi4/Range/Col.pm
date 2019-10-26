@@ -98,7 +98,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Range::Col - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Range::Col - Represents a column within a Worksheet.
 
 =head1 DESCRIPTION
 

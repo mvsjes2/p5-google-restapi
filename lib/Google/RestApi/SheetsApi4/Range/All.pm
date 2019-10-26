@@ -36,7 +36,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Range::All - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Range::All - Represents an the Range of an entire Worksheet.
 
 =head1 DESCRIPTION
 

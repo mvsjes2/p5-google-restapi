@@ -33,8 +33,8 @@ sub new {
     client_secret => Str,
     refresh_token => Str,
     timeout       => Int, { default => 120 },
-    post_process  => CodeRef, { optional => 1 },
     throttle      => Int->where('$_ > -1'), { default => 0 },
+    post_process  => CodeRef, { optional => 1 },
   );
   my $self = $check->(@_);
 
@@ -215,7 +215,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi - Oauth2 connection to Google APIs (currently Drive and Sheets).
+Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
 
 =head1 SYNOPSIS
 
@@ -223,19 +223,18 @@ Google::RestApi - Oauth2 connection to Google APIs (currently Drive and Sheets).
 
   use Google::RestApi;
   $rest_api = Google::RestApi->new(
-    login => {
-      client_id     => <oauth2_client_id>,
-      client_secret => <oath2_secret>,
-    },
-    token => <token_file_path>,
+    client_id     => <oauth2_client_id>,
+    client_secret => <oath2_secret>,
+    refresh_token => <token_file_path>,
+    throttle      => <int>,
   );
 
   $response = $rest_api->api(
-      uri     => <google_api_url>,
-      method  => get|head|put|patch|post|delete,
-      headers => [],
-      params  => <query_params>,
-      content => <data_for_body>,
+    uri     => <google_api_url>,
+    method  => get|head|put|patch|post|delete,
+    headers => [],
+    params  => <query_params>,
+    content => <data_for_body>,
   );
 
   use Google::RestApi::SheetsApi4;
@@ -254,11 +253,11 @@ Google::RestApi - Oauth2 connection to Google APIs (currently Drive and Sheets).
 =head1 DESCRIPTION
 
 Google Rest API is the foundation class used by the included Drive
-and Sheets APIs. It is used to establish an Oauth2 handshake, and
+and Sheets APIs. It is used to establish an OAuth2 handshake, and
 send API requests to the Google API endpoint on behalf of the
 underlying API classes (Sheets and Drive).
 
-Once you have established the Oauth2 handshake, you would not
+Once you have established the OAuth2 handshake, you would not
 use this class much, it would be used indirectly by the Drive/Sheets
 API classes.
 
@@ -266,21 +265,22 @@ API classes.
 
 =over
 
-=item new(login => <hash>, token => <token_file_path>);
+=item new(client_id => <str>, client_secret => <str>, refresh_token => <token>, post_process => <coderef>, throttle => <int>);
 
- login:
-   client_id: The Oauth2 client id you got from Google.
-   client_secret: The Oauth2 client secret you got from Google.
- token: The file path to the previously saved token (see OAUTH2
+ client_id: The OAuth2 client id you got from Google.
+ client_secret: The OAuth2 client secret you got from Google.
+ refresh_token: The file path to the previously saved token (see OAUTH2
    SETUP below).
+ post_process: A coderef to call after each API call.
+ throttle: Used in development to sleep the number of seconds
+   specified between API calls to avoid threshhold errors from Google.
 
 =item api(uri => <uri_string>, method => <http_method_string>,
   headers => <headers_string_array>, params => <query_parameters_hash>,
   content => <body_hash>);
 
 The ultimate Google API call for the underlying classes. Handles timeouts
-and retries etc. You would not normally call this directly, unless you
-need to for some special purpose.=
+and retries etc.
 
  uri: The Google API endpoint such as https://www.googleapis.com/drive/v3
    along with any path segments added.
@@ -288,6 +288,10 @@ need to for some special purpose.=
  headers: Array ref of http headers.
  params: Http query params to be added to the uri.
  content: The body being sent for post/put etc. Will be encoded to JSON.
+
+You would not normally call this directly unless you were
+making a Google API call not currently supported by this API
+framework.
 
 =item stats();
 
@@ -298,7 +302,7 @@ Useful for performance tuning during development.
 
 =head1 OAUTH2 SETUP
 
-This class depends on first creating an Oauth2 token session file
+This class depends on first creating an OAuth2 token session file
 that you point to via the 'token' config param passed via 'new'.
 See bin/session_creator and follow the instructions to save your
 token file.

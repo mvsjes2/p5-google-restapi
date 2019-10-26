@@ -321,7 +321,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Worksheet - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Worksheet - Represents a Worksheet within a Google Spreadsheet.
 
 =head1 DESCRIPTION
 
