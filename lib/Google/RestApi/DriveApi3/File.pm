@@ -74,3 +74,30 @@ sub file_id { shift->{id}; }
 sub drive { shift->{drive}; }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::RestApi::DriveApi3::File - File object for Google Drive.
+
+=head1 DESCRIPTION
+
+Represents a Drive file. You may currently copy and delete the file.
+This needs further filling out.
+
+=head1 AUTHORS
+
+=over
+
+=item
+
+Test User mvsjes@cpan.org
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2019, Test User. All rights reserved.
+
+This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

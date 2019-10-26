@@ -60,7 +60,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator - An iterator for tied Ranges.
 
 =head1 DESCRIPTION
 

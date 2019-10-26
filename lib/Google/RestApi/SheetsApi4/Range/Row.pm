@@ -96,7 +96,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Range::Row - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Range::Row - Represents a row within a Worksheet.
 
 =head1 DESCRIPTION
 

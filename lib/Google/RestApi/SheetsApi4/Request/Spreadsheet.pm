@@ -40,7 +40,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Request::Spreadsheet - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Request::Spreadsheet - Build Google API's batchRequests for a Spreadsheet.
 
 =head1 DESCRIPTION
 

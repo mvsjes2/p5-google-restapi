@@ -105,7 +105,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Request - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Request - A base class to build Google API's batchRequest.
 
 =head1 DESCRIPTION
 
@@ -156,7 +156,7 @@ request of the same name.
 This is a pure virtual function that must be overridden in the derived
 class. The derived class must decide what to do when the queued requests
 are ready to be sumitted. It must eventually pass the requests to the
-parent SheetsApiV4 object.
+parent SheetsApi4 object.
 
 =back
 

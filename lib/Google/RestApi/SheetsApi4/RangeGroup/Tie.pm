@@ -159,7 +159,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::RangeGroup::Tie - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::RangeGroup::Tie - Makes Ranges addressible via a hash key.
 
 =head1 DESCRIPTION
 

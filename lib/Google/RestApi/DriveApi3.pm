@@ -68,7 +68,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::DriveApi3 - Perl API to Google Drive API V3.
+Google::RestApi::DriveApi3 - API to Google Drive API V3.
 
 =head1 DESCRIPTION
 

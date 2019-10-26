@@ -631,7 +631,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Range - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Range - Represents a range in a Worksheet.
 
 =head1 DESCRIPTION
 
@@ -662,8 +662,11 @@ methods to create the range object for you.
 =item api(%args);
 
 Calls the parent worksheet's 'api' routine with the range added into
-the URI or content appropriately. You would not normally need to call
-this directly.
+the URI or content appropriately.
+
+You would not normally call this directly unless you were
+making a Google API call not currently supported by this API
+framework.
 
 =item clear();
 
@@ -671,11 +674,11 @@ Clears the values using Google API's 'A1:clear' call.
 
 =item refresh_values();
 
-Refreshes the values from the spreadsheet.
+Immediately refreshes the values from the spreadsheet.
 
 =item values(values => <arrayref>, %args);
 
-Gets or sets the values immediately using Google API's 'get' or 'update'.
+Immediately gets or sets the values using Google API's 'get' or 'update'.
 
  values: The array ref of cells to update.
 

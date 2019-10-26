@@ -294,7 +294,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Spreadsheet - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Spreadsheet - Represents a Google Spreadsheet.
 
 =head1 DESCRIPTION
 
@@ -327,7 +327,8 @@ endpoint, along with any args to be passed such as content,
 params, headers, etc.
 
 You would not normally call this directly unless you were
-doing something not natively supported by this API framework.
+making a Google API call not currently supported by this API
+framework.
 
 =item spreadsheet_id();
 

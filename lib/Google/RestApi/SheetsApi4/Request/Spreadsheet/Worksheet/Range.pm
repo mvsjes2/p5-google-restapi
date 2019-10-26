@@ -312,7 +312,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range - Build Google API's batchRequests for a Range.
 
 =head1 DESCRIPTION
 
