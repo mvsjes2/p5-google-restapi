@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
