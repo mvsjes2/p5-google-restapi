@@ -1,4 +1,4 @@
-Google-RestApi version 0.1
+Google-RestApi version 0.2
 ==========================
 
 This a collection of modules that is used for interfacing with
@@ -10,6 +10,9 @@ VERSION
 0.1 Initial version, beta status, partial support for Drive
 and more comprehensive support for Sheets. New versions will
 continue to build out these two APIs to be more complete.
+
+0.2 Breaking change to OAuth2 login procedure. Minor updates
+to POD debug messages, comments etc.
 
 INSTALLATION
 
