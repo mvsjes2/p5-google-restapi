@@ -56,6 +56,7 @@ sub copy {
   $p->{method} = 'post';
 
   my $copy = $self->api(%$p);
+  DEBUG(sprintf("Copied file '%s' to '$copy->{id}'", $self->file_id()));
   return ref($self)->new(
     drive => $self->drive(),
     id    => $copy->{id},
@@ -64,6 +65,7 @@ sub copy {
 
 sub delete {
   my $self = shift;
+  DEBUG(sprintf("Deleting file '%s'", $self->file_id()));
   return $self->api(
     method => 'delete',
     uri    => $self->file_id(),

@@ -186,6 +186,8 @@ sub cell {
   return $range->values();
 }
 
+# call this before calling tie_rows or header_col. it's an
+# "are you sure you want to do this?" check.
 sub enable_header_col {
   my $self = shift;
   if (shift) {

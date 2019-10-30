@@ -1,4 +1,4 @@
-package Google::RestApi::SheetsApi4::Spreadsheet;
+  package Google::RestApi::SheetsApi4::Spreadsheet;
 
 use strict;
 use warnings;
@@ -208,6 +208,12 @@ sub tie {
   return \%tie;
 }
 
+# this is done simply to allow open_worksheet to return the
+# same worksheet instance each time it's called for the
+# same remote worksheet. this is to avoid working on multiple
+# local copies of the same remote worksheet.
+# TODO: if worksheet is renamed, registration should be
+# updated too.
 sub _register_worksheet {
   my $self = shift;
   state $check = compile(HasMethods['worksheet_name']);
