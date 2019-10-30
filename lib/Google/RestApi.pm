@@ -129,6 +129,7 @@ sub api {
   ) if $self->{post_process};
   DEBUG("Rest API response:\n", Dump($api_content));
 
+  # used for integration tests to avoid google 403's.
   sleep($self->{throttle}) if $self->{throttle};
 
   return wantarray ? ($api_content, $api_response, $p) : $api_content;
@@ -187,7 +188,7 @@ sub ua {
   if (!$self->{ua}) {
     my $access_token = $self->access_token();
     $self->{ua} = Furl->new(
-      headers => [ Authorization => sprintf('Bearer %s', $access_token) ],
+      headers => [ Authorization => "Bearer $access_token" ],
       timeout => $self->{timeout},
     );
   }
@@ -218,7 +219,7 @@ sub access_token {
   );
   $oauth2->refresh_token();
   $self->{access_token} = $oauth2->access_token()->access_token();
-    DEBUG("Successfully attained access token");
+  DEBUG("Successfully attained access token");
 
   return $self->{access_token};
 }

@@ -58,6 +58,7 @@ sub api {
 
 sub create_spreadsheet {
   my $self = shift;
+
   state $check = compile_named(
     title   => Str, { optional => 1 },
     name    => Str, { optional => 1 },
@@ -74,9 +75,9 @@ sub create_spreadsheet {
       properties => $p,
     },
   );
-  $result->{spreadsheetId} or die "No spreadsheet id returned from creating spreadsheet";
-  $result->{spreadsheetUrl} or die "No spreadsheet URL returned from creating spreadsheet";
-  $result->{properties} or die "No spreadsheet properties returned from creating spreadsheet";
+  for (qw(spreadsheetId spreadsheetUrl properties)) {
+    $result->{$_} or die "No '$_' returned from creating spreadsheet";
+  }
 
   return $self->open_spreadsheet(
     id  => $result->{spreadsheetId},
@@ -112,6 +113,7 @@ sub delete_all_spreadsheets {
   my ($name) = $check->(@_);
   my $spreadsheets = $self->spreadsheets();
   my @spreadsheets = grep { $_->{name} eq $name; } @{ $spreadsheets->{files} };
+  DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
   $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
   return;
 }

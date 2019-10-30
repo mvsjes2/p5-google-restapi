@@ -65,6 +65,7 @@ sub clear {
   my $self = shift;
   delete $self->{value_range};
   my $range = $self->range();
+  DEBUG("Clearing range '$range'");
   my %p = (
     uri    => "/values/$range:clear",
     method => 'post',
@@ -90,7 +91,12 @@ sub _value_range {
 
   my %p = @_;
   if ($p{range}) {
-    # comes from the api as a reply.
+    # comes from the api as a reply. this is to store the
+    # values for this range when includeValuesInResponse
+    # is added to the url or content on the original values
+    # call. you can replace the original values using the
+    # valueRenderOption to replace, say, formulas with their
+    # calculated value.
     state $check = compile_named(
       majorDimension => Dims,
       range          => StrMatch[qr/^\w+!/],
@@ -106,6 +112,9 @@ sub _value_range {
 
   return $self->{value_range} if $self->{value_range};
 
+  # used by iterators to use a 'parent' range to query
+  # the values for this 'child' range. this is to reduce
+  # network calls when iterating through a range.
   my $shared = $self->{shared};
   if ($shared && $shared->has_values()) {
     my $dim = $shared->{value_range}->{majorDimension};
@@ -335,10 +344,47 @@ sub range {
   $range .= ":$end_cell" if defined $end_cell;
   $range = "'$name'!$range";
 
-  # DEBUG("Range '$self->{range}' converted to '$range'");
+  DEBUG(sprintf("Range '%s' converted to '$range'", $self->_flattened_range($self->{range})));
   $self->{normalized_range} = $range;
 
   return $range;
+}
+
+# these are just used for debug message just above
+# to display the original range in a pretty format.
+sub _flattened_range {
+  my $self = shift;
+
+  my $range = shift;
+  return 'undef' if !$range;
+  return $range if !ref($range);
+
+  return _flattened_hash($range) if ref($range) eq 'HASH';
+  return _flattened_array($range)
+    if ref($range) eq 'ARRAY' && scalar @$range == 1;
+
+  # recursion... here be potential dragons.
+  return sprintf('[ %s, %s ]',
+    $self->_flattened_range($range->[0]),
+    $self->_flattened_range($range->[1]),
+  );
+}
+
+sub _flattened_hash {
+  my $hash = shift;
+  my $flat = '{ ';
+  $flat .= "$_ => " . ($hash->{$_} || 'undef') . ", "
+    foreach (keys %$hash);
+  $flat =~ s/, $/ \}/;
+  return $flat;
+}
+
+sub _flattened_array {
+  my $array = shift;
+  my $flat = '[ ';
+  $flat .= $_ || 'undef' . ", " foreach (@$array);
+  $flat =~ s/, $/ \]/;
+  return $flat;
 }
 
 sub _cell_to_a1 {
@@ -641,6 +687,30 @@ Keep in mind that the remote spreadsheet can be potentially updated by
 many people, so a compromise must always be reached between holding a copy
 of the local cell values and the number of network calls to the Google
 API to keep the values current.
+
+A range can be specified in whatever way is most convenient. For cells:
+
+ * A1 notation: A1
+ * Hash: { col => (A|1), row => 1 }
+ * Array: [ (A|1), 1 ]
+
+For ranges:
+
+ * A1 notation: A1:B2
+ * Hash: [ { col => (A|1), row => 1 }, { col => (B|2), row => 2 } ]
+ * Array: [ [ (A|1), 1 ], [ (B|2), 2 ] ]
+
+For columns:
+
+ * A1 notation: A or A:A
+ * Hash: { col => (A|1) }
+ * Array: [ A|1 ]
+
+For rows:
+
+ * A1 notation: 1 or 1:1
+ * Hash: { row => 1 }
+ * Array: [ <false>, 1 ]
 
 See the description and synopsis at Google::RestApi::SheetsApi4.
 

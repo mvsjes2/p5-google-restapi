@@ -69,6 +69,7 @@ sub merge_request {
   return $other_request;
 }
 
+# this is not private to the class, it's private to the overall framework.
 sub requests_response {
   my $self = shift;
 

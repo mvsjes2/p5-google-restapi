@@ -71,7 +71,7 @@ sub access_token {
     );
     my $p = $check->(@_);
     $p->{profile} = $self->oauth2_webserver();
-    # DEBUG("Building access token from:\n", Dump($p)); # this puts the secret into the logs.
+    # DEBUG("Building access token from:\n", Dump($p)); # shows secret in the logs.
     $self->{access_token} = Net::OAuth2::AccessToken->new(%$p);
   }
 
