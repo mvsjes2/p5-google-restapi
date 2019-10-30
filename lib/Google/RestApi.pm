@@ -3,7 +3,7 @@ package Google::RestApi;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -219,7 +219,7 @@ sub access_token {
   );
   $oauth2->refresh_token();
   $self->{access_token} = $oauth2->access_token()->access_token();
-  DEBUG("Successfully attained access token");
+  INFO("Successfully attained access token");
 
   return $self->{access_token};
 }
