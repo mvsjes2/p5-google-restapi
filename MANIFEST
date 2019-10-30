@@ -43,8 +43,8 @@ t/integration/Utils.pm
 t/run_integration
 t/run_unit_some
 t/run_unit_tests.t
-t/tutorial/10_spreadsheet.pl
-t/tutorial/20_worksheet.pl
+t/tutorial/Sheets/10_spreadsheet.pl
+t/tutorial/Sheets/20_worksheet.pl
 t/unit/Test/Google/RestApi.pm
 t/unit/Test/Google/RestApi/SheetsApi4.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Base.pm
