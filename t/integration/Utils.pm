@@ -43,16 +43,14 @@ sub sheets_api {
   return SheetsApi4->new(api => $api);
 }
 
-sub rest_api {
-  return RestApi->new(@_, config_file => rest_api_config(), throttle => 1);
-}
-
 sub rest_api_config {
   my $config_file = $ENV{GOOGLE_RESTAPI_LOGIN}
     or die "No testing config file found: set env var GOOGLE_RESTAPI_LOGIN first";
   return $config_file;
 }
 
+# set throttle to 1 if you start getting 403's back from google.
+sub rest_api { RestApi->new(@_, config_file => rest_api_config(), throttle => 0); }
 sub message { print color(shift), @_, color('reset'), "\n"; }
 sub start { message('yellow', @_, ".."); }
 sub end { message('green', @_, " Press enter to continue.\n"); <>; }

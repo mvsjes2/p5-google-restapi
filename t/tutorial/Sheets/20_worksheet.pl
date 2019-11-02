@@ -5,8 +5,8 @@ use warnings;
 
 # use Carp::Always;
 use FindBin;
-use lib "$FindBin::RealBin/../../lib";
-use lib "$FindBin::RealBin/../integration";
+use lib "$FindBin::RealBin/../../../lib";
+use lib "$FindBin::RealBin/../../integration";
 
 use YAML::Any qw(Dump);
 use Utils qw(init_logger message start end end_go show_api);

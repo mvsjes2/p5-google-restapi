@@ -12,7 +12,7 @@ and more comprehensive support for Sheets. New versions will
 continue to build out these two APIs to be more complete.
 
 0.2 Breaking change to OAuth2 login procedure. Minor updates
-to POD debug messages, comments etc.
+to POD, debug messages, comments etc.
 
 INSTALLATION
 
@@ -31,6 +31,7 @@ This module requires these other modules and libraries:
   autodie 
   autovivification
   constant
+  Cache::Memory::Simple
   Carp
   Exporter
   Furl 

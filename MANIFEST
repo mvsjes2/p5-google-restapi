@@ -29,6 +29,8 @@ MANIFEST			This list of files
 README
 t/etc/config.yaml
 t/etc/log4perl.conf
+t/etc/rest_config.token
+t/etc/rest_config.yaml
 t/integration/Google/restapi.t
 t/integration/Google/RestApi/sheetsapi.t
 t/integration/Google/RestApi/SheetsApi4/range.t

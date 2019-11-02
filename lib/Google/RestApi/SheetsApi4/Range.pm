@@ -40,6 +40,7 @@ use constant {
   Dim       => StrMatch[qr/^(col|row)/i],
   Dims      => StrMatch[qr/^(col|row)/i],
   DimsAll   => StrMatch[qr/^(col|row|all)/i],
+  RangeA1   => '^(?:.+!)*[A-Z]+\d+:[A-Z]+\d+$',
   ColA1     => '^(?:.+!)*([A-Z]+)\d*(?::\1\d*)?$',
   RowA1     => '^(?:.+!)*[A-Z]*(\d+)(?::[A-Z]*\1)?$',
   CellA1    => '^[A-Z]+/d+$',
@@ -119,7 +120,7 @@ sub _value_range {
   if ($shared && $shared->has_values()) {
     my $dim = $shared->{value_range}->{majorDimension};
     my $values = $shared->{value_range}->{values};
-  
+
     my ($top, $left, $bottom, $right) = $self->offsets($shared);
     my $data;
     if ($dim =~ /^col/i) {
@@ -241,12 +242,16 @@ sub is_named {
   my $range = $self->{range};
   return if ref($range);
   return if !$range;
-  return if $range !~ /^[a-zA-Z0-9_]+$/;
-  return if $range =~ /^\d/;
-  return if $range =~ /^(true|false)/;
   return if length($range) > 250;
-  return if $range =~ /^[A-Z]+\d+$/;
-  return if $range =~ /^R\d+C\d+$/;
+  for (
+    qr/^\d/,
+    qr/^(true|false)/,
+    qr/^R\d+C\d+$/,
+    qr/^[A-Z]+\d+$/,
+    RangeA1, ColA1, RowA1, CellA1,
+  ) {
+    return if $range =~ /$_/;
+  }
   return 1;
 }
 
@@ -344,7 +349,7 @@ sub range {
   $range .= ":$end_cell" if defined $end_cell;
   $range = "'$name'!$range";
 
-  DEBUG(sprintf("Range '%s' converted to '$range'", $self->_flattened_range($self->{range})));
+  DEBUG(sprintf("Range '%s' converted to '$range'", $self->_flatten_range($self->{range})));
   $self->{normalized_range} = $range;
 
   return $range;
@@ -352,25 +357,25 @@ sub range {
 
 # these are just used for debug message just above
 # to display the original range in a pretty format.
-sub _flattened_range {
+sub _flatten_range {
   my $self = shift;
 
   my $range = shift;
   return 'undef' if !$range;
   return $range if !ref($range);
 
-  return _flattened_hash($range) if ref($range) eq 'HASH';
-  return _flattened_array($range)
+  return _flatten_hash($range) if ref($range) eq 'HASH';
+  return _flatten_array($range)
     if ref($range) eq 'ARRAY' && scalar @$range == 1;
 
   # recursion... here be potential dragons.
   return sprintf('[ %s, %s ]',
-    $self->_flattened_range($range->[0]),
-    $self->_flattened_range($range->[1]),
+    $self->_flatten_range($range->[0]),
+    $self->_flatten_range($range->[1]),
   );
 }
 
-sub _flattened_hash {
+sub _flatten_hash {
   my $hash = shift;
   my $flat = '{ ';
   $flat .= "$_ => " . ($hash->{$_} || 'undef') . ", "
@@ -379,7 +384,7 @@ sub _flattened_hash {
   return $flat;
 }
 
-sub _flattened_array {
+sub _flatten_array {
   my $array = shift;
   my $flat = '[ ';
   $flat .= $_ || 'undef' . ", " foreach (@$array);
@@ -406,7 +411,8 @@ sub _cell_to_a1 {
     $row = $self->_row_to_a1($cell->{row});
   }
 
-  confess "Unable to translate cell '", Dump($cell), "' into a worksheet cell" if !$col && !$row;
+  confess sprintf("Unable to translate cell '%s' into a worksheet cell", $self->_flatten_range($cell))
+    if !$col && !$row;
   confess "Unable to translate col '$col' into a worksheet col" if looks_like_number($col);
   confess "Unable to translate row '$row' into a worksheet row" if looks_like_number($row) && $row < 1;
 

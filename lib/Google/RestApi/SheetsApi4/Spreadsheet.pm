@@ -8,10 +8,11 @@ our $VERSION = '0.2';
 use 5.010_000;
 
 use autodie;
+use Cache::Memory::Simple;
 use Carp qw(confess);
 use Scalar::Util qw(blessed);
 use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch ArrayRef HashRef HasMethods Any slurpy);
+use Types::Standard qw(Int Str StrMatch ArrayRef HashRef CodeRef HasMethods Any slurpy);
 use YAML::Any qw(Dump);
 
 no autovivification;
@@ -37,6 +38,7 @@ sub new {
     title     => Str, { optional => 1 },
     uri       => StrMatch[qr|$qr_uri/$qr_id/|], { optional => 1 },
     config_id => Str, { optional => 1 },
+    cache     => Int->where('$_ > -1'), { default => 5 },
   );
   my $self = $check->(@_);
 
@@ -110,9 +112,10 @@ sub spreadsheet_title { spreadsheet_name(@_); }
 
 sub attrs {
   my $self = shift;
-  state $check = compile(Str);
-  my ($fields) = $check->(@_);
-  return $self->api(params => { fields => $fields });
+  my $fields = shift;
+  return $self->_cache($fields, sub {
+    $self->api(params => { fields => $fields })
+  });
 }
 
 sub properties {
@@ -142,6 +145,25 @@ sub _fields {
     $fields .= ".$what";
   }
   return $fields;
+}
+
+sub _cache {
+  my $self = shift;
+
+  state $check = compile(Str, CodeRef);
+  my ($key, $code) = $check->(@_);
+  return $code->() if !$self->{cache};
+
+  $self->{_cache} ||= Cache::Memory::Simple->new();
+  return $self->{_cache}->get_or_set(
+    $key, $code, $self->{cache}  # cache for x seconds
+  );
+}
+
+sub purge_cache {
+  my $self = shift;
+  $self->{_cache}->delete_all() if $self->{_cache};
+  return;
 }
 
 # each worksheet has an entry:
