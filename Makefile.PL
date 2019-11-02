@@ -15,6 +15,7 @@ WriteMakefile(
 	'autodie'                         => 0,
 	'autovivification'                => 0,
 	'constant'                        => 0,
+        'Cache::Memory::Simple'           => 0,
 	'Carp'                            => 0,
 	'Exporter'                        => 0,
 	'Furl'                            => 0,
