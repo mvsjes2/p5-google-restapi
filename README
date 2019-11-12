@@ -54,13 +54,6 @@ This module requires these other modules and libraries:
   Test::Class::Load
   Test::MockObject::Extends
   Test::Most
-  Spreadsheet::Perl
-
-'make test' currently uses Spreadsheet::Perl. I tried using
-this to mock a Google Sheets spreadsheet in local memory,
-but it turned out to be not practical. I have to remove it
-and come up with some other method of mocking. It works for
-now but does require this for testing.
 
 COPYRIGHT AND LICENCE
 
