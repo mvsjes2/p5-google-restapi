@@ -14,6 +14,10 @@ continue to build out these two APIs to be more complete.
 0.2 Breaking change to OAuth2 login procedure. Minor updates
 to POD, debug messages, comments etc.
 
+0.2.1 Added an attrs cache, removed testing dependency for
+Spreadsheets::Perl, fixed and added more tests.
+
+
 INSTALLATION
 
 To install this module type the following:

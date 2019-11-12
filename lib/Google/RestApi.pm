@@ -3,7 +3,7 @@ package Google::RestApi;
 use strict;
 use warnings;
 
-our $VERSION = '0.2';
+our $VERSION = '0.2.1';
 
 use 5.010_000;
 

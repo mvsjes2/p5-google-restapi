@@ -19,7 +19,6 @@ lib/Google/RestApi/SheetsApi4/RangeGroup/Tie/Iterator.pm
 lib/Google/RestApi/SheetsApi4/Request.pm
 lib/Google/RestApi/SheetsApi4/Request/Spreadsheet.pm
 lib/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet.pm
-lib/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet/.Range.pm.kate-swp
 lib/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet/Range.pm
 lib/Google/RestApi/SheetsApi4/Spreadsheet.pm
 lib/Google/RestApi/SheetsApi4/Worksheet.pm
