@@ -41,8 +41,9 @@ WriteMakefile(
 	'Test::MockObject::Extends' => 0,
 	'Test::Most'                => 0,
     },
+    EXE_FILES         => [qw(bin/google_restapi_session_creator)],
     META_MERGE        => {
-      "meta-spec" => { version => 2 }, 
+      "meta-spec" => { version => 2 },
       resources   => {
         repository => {
           type => 'git',
