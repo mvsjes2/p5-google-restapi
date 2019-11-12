@@ -7,7 +7,7 @@ package Google::RestApi::OAuth2;
 use strict;
 use warnings;
 
-our $VERSION = '0.3.1';
+our $VERSION = '0.3';
 
 use 5.010_000;
 
