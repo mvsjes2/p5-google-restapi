@@ -7,6 +7,7 @@ use FindBin;
 use lib "$FindBin::RealBin/../../lib";
 
 use File::Basename;
+use File::Temp qw(tempdir);
 use Log::Log4perl qw(:easy);
 use Term::ANSIColor;
 use YAML::Any qw(Dump LoadFile);
@@ -26,7 +27,7 @@ sub init_logger {
 }
 
 # this is for log4perl.conf to call back to get the log file name.
-sub log_file_name { "/tmp/$ENV{USER}/google_restapi.log"; }
+sub log_file_name { tempdir() . "/google_restapi.log"; }
 
 sub delete_all_spreadsheets {
   shift->delete_all_spreadsheets($spreadsheet_name);

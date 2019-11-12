@@ -60,7 +60,7 @@ end("'Payroll' worksheet should now have headings.");
 # ranges can be specified in very flexible ways.
 start("Now we will format the column headings.");
 my $heading = $ws0->range([
-  ["A1"],                        # cell a1
+  "A1",                          # cell a1
   [ scalar(@{ $rows[0] }), 1 ]   # to D1
 ]);
 $heading->heading()->submit_requests();

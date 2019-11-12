@@ -37,7 +37,6 @@ WriteMakefile(
 	'YAML::Any'                       => 0,
     },
     TEST_REQUIRES     => {
-	'Spreadsheet::Perl'         => 0,
 	'Test::Class::Load'         => 0,
 	'Test::MockObject::Extends' => 0,
 	'Test::Most'                => 0,
