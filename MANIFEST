@@ -1,4 +1,4 @@
-bin/session_creator
+bin/google_restapi_session_creator
 Changes
 lib/Google/RestApi.pm
 lib/Google/RestApi/DriveApi3.pm

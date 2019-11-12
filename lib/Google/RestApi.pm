@@ -336,8 +336,8 @@ Useful for performance tuning during development.
 
 This class depends on first creating an OAuth2 token session file
 that you point to via the 'token_file' config param passed via 'new'.
-See bin/session_creator and follow the instructions to save your
-token file.
+See bin/google_restapi_session_creator and follow the instructions to
+save your token file.
 
 =head1 SEE ALSO
 
