@@ -1,5 +1,5 @@
-Google-RestApi version 0.3.1
-==========================--
+Google-RestApi version 0.3
+==========================
 
 This a collection of modules that is used for interfacing with
 Google's various APIs. Currenly only paritial Drive support is
@@ -14,7 +14,7 @@ continue to build out these two APIs to be more complete.
 0.2 Breaking change to OAuth2 login procedure. Minor updates
 to POD, debug messages, comments etc.
 
-0.3.1 Added an attrs cache, removed testing dependency for
+0.3 Added an attrs cache, removed testing dependency for
 Spreadsheets::Perl, fixed and added more tests.
 
 
