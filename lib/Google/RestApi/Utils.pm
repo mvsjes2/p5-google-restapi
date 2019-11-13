@@ -29,7 +29,7 @@ sub named_extra {
 }
 
 sub strip {
-  my $p = shift || '';
+  my $p = shift // '';
   $p =~ s/^\s+|\s+$//g;
   return $p;
 }
