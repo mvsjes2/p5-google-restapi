@@ -19,7 +19,7 @@ sub constructor : Tests(4) {
   return;
 }
 
-sub range : Tests(7) {
+sub range : Tests(6) {
   my $self = shift;
 
   my $x = "A1:B2";
@@ -153,7 +153,7 @@ sub range_cell : Tests(14) {
   return;
 }
 
-sub range_config : Tests(10) {
+sub range_config : Tests(9) {
   my $self = shift;
 
   my $x = 'B';
