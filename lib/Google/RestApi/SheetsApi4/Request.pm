@@ -96,7 +96,7 @@ sub requests_response {
 sub _can_merge {
   my $self = shift;
   my ($key, $request) = @_;
-  return 1 if $key =~ /^(repeatCell|mergeCells)$/;
+  return 1 if $key =~ /^(repeatCell|mergeCells|updateBorders)$/;
   return;
 }
 

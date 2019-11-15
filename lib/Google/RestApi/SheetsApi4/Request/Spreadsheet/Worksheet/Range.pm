@@ -8,6 +8,7 @@ our $VERSION = '0.3';
 use 5.010_000;
 
 use autodie;
+use Scalar::Util qw(looks_like_number);
 use Type::Params qw(compile_named);
 use Types::Standard qw(Str StrMatch Bool ArrayRef HashRef HasMethods);
 use YAML::Any qw(Dump);
@@ -48,19 +49,19 @@ sub red { shift->_red_blue_green_alpha('red' => shift); }
 sub blue { shift->_red_blue_green_alpha('blue' => shift); }
 sub green { shift->_red_blue_green_alpha('green' => shift); }
 sub alpha { shift->_red_blue_green_alpha('alpha' => shift); }
-sub _red_blue_green_alpha { shift->color({ (shift) => (shift || 1) }); }
+sub _red_blue_green_alpha { shift->color({ (shift) => (shift // 1) }); }
 sub black { shift->color({ red => 0, blue => 0, green => 0 }); }
 sub white { shift->color({ red => 1, blue => 1, green => 1 }); }
 sub color { shift->_repeat_cell(_text_format({ foregroundColor => shift }, 'foregroundColor')); }
 
-sub _background_color { _user_entered_format({ backgroundColor => shift }, 'backgroundColor'); }
-sub _background_red_blue_green { shift->background_color({ (shift) => (shift || 1) }); }
-sub background_red { shift->_background_red_blue_green('red' => shift); }
-sub background_blue { shift->_background_red_blue_green('blue' => shift); }
-sub background_green { shift->_background_red_blue_green('green' => shift); }
-sub background_black { shift->background_color({ red => 0, blue => 0, green => 0 }); }
-sub background_white { shift->background_color({ red => 1, blue => 1, green => 1 }); }
-sub background_color { shift->_repeat_cell(_background_color(shift)); }
+sub _bk_color { _user_entered_format({ backgroundColor => shift }, 'backgroundColor'); }
+sub _bk_red_blue_green { shift->bk_color({ (shift) => (shift // 1) }); }
+sub bk_red { shift->_bk_red_blue_green('red' => shift); }
+sub bk_blue { shift->_bk_red_blue_green('blue' => shift); }
+sub bk_green { shift->_bk_red_blue_green('green' => shift); }
+sub bk_black { shift->bk_color({ red => 0, blue => 0, green => 0 }); }
+sub bk_white { shift->bk_color({ red => 1, blue => 1, green => 1 }); }
+sub bk_color { shift->_repeat_cell(_bk_color(shift)); }
 
 # just dereferences the hash so it doesn't have to be done over and over above.
 sub _repeat_cell { my $self = shift; my $h = shift; $self->repeat_cell(%$h); }
@@ -90,7 +91,76 @@ sub repeat_cell {
 
 sub heading {
   my $self = shift;
-  $self->center()->bold()->white()->background_black()->font_size(12);
+  $self->center()->bold()->white()->bk_black()->font_size(12);
+  return $self;
+}
+
+sub _bd { shift->borders(properties => shift, border => (shift||'all')); };
+sub bd_red { shift->_bd_red_blue_green('red' => shift, @_); }
+sub bd_blue { shift->_bd_red_blue_green('blue' => shift, @_); }
+sub bd_green { shift->_bd_red_blue_green('green' => shift, @_); }
+sub bd_black { shift->bd_color({ red => 0, blue => 0, green => 0 }, @_); }
+sub bd_white { shift->bd_color({ red => 1, blue => 1, green => 1 }, @_); }
+sub bd_color { shift->_bd({ color => shift }, @_); }
+sub bd_dotted { shift->_bd_style('DOTTED', @_); }
+sub bd_dashed { shift->_bd_style('DASHED', @_); }
+sub bd_solid { shift->_bd_style('SOLID', @_); }
+sub bd_medium { shift->_bd_style('SOLID_MEDIUM', @_); }
+sub bd_thick { shift->_bd_style('SOLID_THICK', @_); }
+sub bd_double { shift->_bd_style('DOUBLE', @_); }
+sub bd_none { shift->_bd_style('NONE', @_); }
+sub _bd_style { shift->_bd({ style => shift }, @_); }
+
+# allows:
+#   bd_red()  turns it all on
+#   bd_red(0)  turns it all off
+#   bd_red(0.3, 'top')
+#   bd_red(0.3)
+#   bd_red('top')
+sub _bd_red_blue_green {
+  my $self = shift;
+  my $color = shift;
+  my $value;
+  $value = shift if looks_like_number($_[0]);
+  $value //= 1;
+  $self->bd_color({ $color => $value }, @_);
+  return $self;
+}
+
+sub borders {
+  my $self = shift;
+
+  state $check = compile_named(
+    border     =>
+      StrMatch[qr/^(top|bottom|left|right|all|vertical|horizontal|inner|)$/],
+      { default => 'all' },
+    properties => HashRef,
+  );
+  my $p = $check->(@_);
+  $p->{border} ||= 'all';
+
+  if ($p->{border} eq 'all') {
+    $self->borders(border => $_, properties => $p->{properties})
+      foreach (qw(top bottom left right));
+    return $self;
+  }
+
+  if ($p->{border} eq 'inner') {
+    $self->borders(border => $_, properties => $p->{properties})
+      foreach (qw(vertical horizontal));
+    return $self;
+  }
+
+  # change vertical to innerVertical.
+  $p->{border} =~ s/^(vertical|horizontal)$/"'inner' . '" . ucfirst($1) . "'"/ee;
+
+  $self->batch_requests(
+    updateBorders => {
+      range        => $self->range_to_index(),
+      $p->{border} => $p->{properties},
+    }
+  );
+
   return $self;
 }
 
