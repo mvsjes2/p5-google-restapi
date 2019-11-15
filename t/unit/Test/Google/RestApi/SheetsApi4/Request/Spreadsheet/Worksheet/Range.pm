@@ -13,7 +13,7 @@ my $index = {
   endRowIndex      => 1,
 };
 
-sub range_text_format : Tests(29) {
+sub range_text_format : Tests(31) {
   my $self = shift;
 
   my $cell = {
@@ -73,6 +73,11 @@ sub range_text_format : Tests(29) {
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Green should be staged";
 
+  is $range->alpha(.5), $range, "Alpha should return the same range";
+  $foreground_color->{alpha} = .5;
+  @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Alpha should be staged";
+
   is $range->font_family('joe'), $range, "Font family should return the same range";
   $text_format->{fontFamily} = 'joe'; _add_field($cell, 'userEnteredFormat.textFormat.fontFamily');
   @requests = $range->batch_requests();
@@ -89,12 +94,12 @@ sub range_text_format : Tests(29) {
   is_deeply $requests[0], $cell, "Build all should be same as previous build";
 
   lives_ok sub { _range_text_format_all($range)->white(); }, "Build all text white should succeed";
-  $foreground_color->{red} = $foreground_color->{blue} = $foreground_color->{green} = 1;
+  $foreground_color->{$_} = 1 foreach (qw(red blue green alpha));
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Text white should be built correctly";
 
   lives_ok sub { _range_text_format_all($range)->black(); }, "Build all text black should succeed";
-  $foreground_color->{red} = $foreground_color->{blue} = $foreground_color->{green} = 0;
+  $foreground_color->{$_} = 0 foreach (qw(red blue green));
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Text black should be built correctly";
 
@@ -104,7 +109,7 @@ sub range_text_format : Tests(29) {
   return;
 }
 
-sub range_background_color : Tests(14) {
+sub range_background_color : Tests(16) {
   my $self = shift;
 
   my $cell = {
@@ -140,13 +145,18 @@ sub range_background_color : Tests(14) {
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Background green should be staged";
 
+  is $range->bk_alpha(.5), $range, "Background alpha should return the same range";
+  $bk_color->{alpha} = .5;
+  @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Background alpha should be staged";
+
   lives_ok sub { $range->bk_white(); }, "Background white should succeed";
-  $bk_color->{red} = $bk_color->{blue} = $bk_color->{green} = 1;
+  $bk_color->{$_} = 1 foreach (qw(red blue green alpha));
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Background white request should be built correctly";
 
   lives_ok sub { $range->bk_black(); }, "Background black should succeed";
-  $bk_color->{red} = $bk_color->{blue} = $bk_color->{green} = 0;
+  $bk_color->{$_} = 0 foreach (qw(red blue green));
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Background black request should be built correctly";
 
@@ -284,7 +294,7 @@ sub range_border_style : Tests(14) {
   return;
 }
 
-sub range_border_colors : Tests(14) {
+sub range_border_colors : Tests(16) {
   my $self = shift;
 
   my $cell = {
@@ -316,13 +326,18 @@ sub range_border_colors : Tests(14) {
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Border green should be staged";
 
+  is $range->bd_alpha(.5, 'top'), $range, "Border alpha should return the same range";
+  $bd_color->{alpha} = .5;
+  @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Border alpha should be staged";
+
   lives_ok sub { $range->bd_white('top'); }, "Border white should succeed";
-  $bd_color->{red} = $bd_color->{blue} = $bd_color->{green} = 1;
+  $bd_color->{$_} = 1 foreach (qw(red blue green alpha));
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Border white request should be built correctly";
 
   lives_ok sub { $range->bd_black('top'); }, "Border black should succeed";
-  $bd_color->{red} = $bd_color->{blue} = $bd_color->{green} = 0;
+  $bd_color->{$_} = 0 foreach (qw(red blue green));
   @requests = $range->batch_requests();
   is_deeply $requests[0], $cell, "Border black request should be built correctly";
 
