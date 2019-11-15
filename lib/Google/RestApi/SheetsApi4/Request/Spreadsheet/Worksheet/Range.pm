@@ -102,6 +102,7 @@ sub bd_green { shift->_bd_red_blue_green('green' => shift, @_); }
 sub bd_black { shift->bd_color({ red => 0, blue => 0, green => 0 }, @_); }
 sub bd_white { shift->bd_color({ red => 1, blue => 1, green => 1 }, @_); }
 sub bd_color { shift->_bd({ color => shift }, @_); }
+
 sub bd_dotted { shift->_bd_style('DOTTED', @_); }
 sub bd_dashed { shift->_bd_style('DASHED', @_); }
 sub bd_solid { shift->_bd_style('SOLID', @_); }
@@ -123,7 +124,14 @@ sub _bd_red_blue_green {
   my $value;
   $value = shift if looks_like_number($_[0]);
   $value //= 1;
-  $self->bd_color({ $color => $value }, @_);
+  return $self->bd_color({ $color => $value }, @_);
+}
+
+sub bd_repeat_cell {
+  my $self = shift;
+  $self->{bd_repeat_cell} = shift;
+  $self->{bd_repeat_cell} //= 1; # bd_repeat_cell() turns it on, bd_repeat_cell(0) turns it off.
+  delete $self->{bd_repeat_cell} if !$self->{bd_repeat_cell};
   return $self;
 }
 
@@ -149,6 +157,18 @@ sub borders {
     $self->borders(border => $_, properties => $p->{properties})
       foreach (qw(vertical horizontal));
     return $self;
+  }
+
+  # if these borders are to be part of repeatCell request, redirect
+  # the borders to it.
+  if ($self->{bd_repeat_cell}) {
+    die "Cannot use vertical|horizontal|inner when bd_repeat_cell is turned on"
+      if $p->{border} =~ /^(vertical|horizontal|inner)$/;
+    return $self->_repeat_cell(
+      _user_entered_format(
+        { borders => { $p->{border} => $p->{properties} } }, 'borders',
+      ),
+    );
   }
 
   # change vertical to innerVertical.
