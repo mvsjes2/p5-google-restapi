@@ -136,7 +136,7 @@ sub requests {
   lives_ok sub { $range->
       bold()->bold(0)->red()->bk_blue(0.5)->merge_both()->
       bd_blue('top')->bd_red(0.3, 'bottom')->bd_green(0, 'left')->
-      bd_dashed()->bd_dashed('inner');
+      bd_dashed()->bd_dashed('inner')->bd_repeat_cell()->bd_red('bottom')->bd_dashed();
   }, "Range format batch should succeed";
   lives_ok sub { $range->submit_requests(); }, "Submitting batch requests should succeed";
 

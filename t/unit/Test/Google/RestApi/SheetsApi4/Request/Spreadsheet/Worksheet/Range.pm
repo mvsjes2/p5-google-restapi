@@ -30,10 +30,9 @@ sub range_text_format : Tests(29) {
 
   my $range = $self->new_range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
-  my @requests;
-
   my $text_format = $cell->{repeatCell}->{cell}->{userEnteredFormat}->{textFormat};
   my $fields = $cell->{repeatCell}->{fields};
+  my @requests;
 
   is $range->bold(), $range, "Bold should return the same range";
   @requests = $range->batch_requests();
@@ -333,6 +332,42 @@ sub range_border_colors : Tests(14) {
 
   lives_ok sub { $range->submit_requests(); }, "Submit format request should succeed";
   is scalar $range->batch_requests(), 0, "Batch requests should have been emptied";
+
+  return;
+}
+
+sub range_border_cells : Tests(7) {
+  my $self = shift;
+
+  my $cell = {
+    repeatCell => {
+      range => '',
+      cell => {
+        userEnteredFormat => {
+          borders => {}
+        },
+      },
+      fields => '',
+    },
+  };
+
+  my $range = $self->new_range("A1");
+  $cell->{repeatCell}->{range} = $range->range_to_index();
+  my $borders = $cell->{repeatCell}->{cell}->{userEnteredFormat}->{borders};
+  my $fields = $cell->{repeatCell}->{fields};
+  my @requests;
+
+  my $err = qr/when bd_repeat_cell is turned on/;
+  is $range->bd_repeat_cell(), $range, "Repeat cell should return the same range";
+  throws_ok { $range->bd_red('inner'); } $err, "Turning on inner when repeat cell is on should die";
+  throws_ok { $range->bd_red('vertical'); } $err, "Turning on vertical when repeat cell is on should die";
+  throws_ok { $range->bd_red('horizontal'); } $err, "Turning on horizontal when repeat cell is on should die";
+
+  lives_ok sub { $range->bd_red('top'); }, "Border red repeat cell should live";
+  @requests = $range->batch_requests();
+  is scalar $range->batch_requests(), 1, "Batch requests should have one entry.";
+  $borders->{top}->{color}->{red} = 1; _add_field($cell, "userEnteredFormat.borders");
+  is_deeply $requests[0], $cell, "Border red repeat cell should be staged";
 
   return;
 }
