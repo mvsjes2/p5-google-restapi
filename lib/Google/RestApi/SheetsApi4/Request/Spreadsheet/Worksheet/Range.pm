@@ -105,7 +105,7 @@ sub heading {
   return $self;
 }
 
-sub _bd { shift->borders(properties => shift, border => (shift||'all')); };
+sub _bd { shift->borders(properties => shift, border => (shift||'')); };
 sub bd_red { shift->_bd_rbga('red' => shift, @_); }
 sub bd_blue { shift->_bd_rbga('blue' => shift, @_); }
 sub bd_green { shift->_bd_rbga('green' => shift, @_); }
@@ -152,27 +152,37 @@ sub bd_repeat_cell {
 sub borders {
   my $self = shift;
 
+  # allow an array of borders to be passed, recurse with each one.
+  my %p = @_;
+  if ($p{border} && ref($p{border}) eq 'ARRAY') {
+    $self->borders(border => $_, properties => $p{properties})
+      foreach (@{ $p{border} });
+    return $self;
+  }
+
   state $check = compile_named(
     border     =>
-      StrMatch[qr/^(top|bottom|left|right|all|vertical|horizontal|inner|)$/],
-      { default => 'all' },
+      StrMatch[qr/^(top|bottom|left|right|around|vertical|horizontal|inner|all|)$/],
+      { default => 'around' },
     properties => HashRef,
   );
   my $p = $check->(@_);
-  $p->{border} ||= 'all';
+  $p->{border} ||= 'around';
 
-  if ($p->{border} eq 'all') {
+  # recurse with border groups.
+  my %groups = (
+    around => [qw(top bottom left right)],
+    inner  => [qw(vertical horizontal)],
+    all    => [qw(around inner)],
+  );
+  my $group = $groups{ $p->{border} };
+  if ($group) {
     $self->borders(border => $_, properties => $p->{properties})
-      foreach (qw(top bottom left right));
+      foreach (@$group);
     return $self;
   }
 
-  if ($p->{border} eq 'inner') {
-    $self->borders(border => $_, properties => $p->{properties})
-      foreach (qw(vertical horizontal));
-    return $self;
-  }
-
+  # now we finally get to the guts of the borders.
   # if these borders are to be part of repeatCell request, redirect
   # the borders to it.
   if ($self->{bd_repeat_cell}) {
@@ -185,7 +195,7 @@ sub borders {
     );
   }
 
-  # change vertical to innerVertical.
+  # change vertical to innerVertical. horizontal same same.
   $p->{border} =~ s/^(vertical|horizontal)$/"'inner' . '" . ucfirst($1) . "'"/ee;
 
   $self->batch_requests(
