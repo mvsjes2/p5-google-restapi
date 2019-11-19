@@ -21,6 +21,8 @@ use URI;
 use URI::QueryParam;
 use YAML::Any qw(Dump LoadFile);
 
+use WWW::Google::Cloud::Auth::ServiceAccount;
+
 use Google::RestApi::OAuth2;
 use Google::RestApi::Utils qw(named_extra);
 
@@ -32,32 +34,51 @@ sub new {
   my $class = shift;
 
   state $check = compile_named(
-    config_file => Str, { optional => 1 },
-    _extra_     => slurpy Any,
+    config_file          => Str, { optional => 1 },
+    service_account_file => Str, { optional => 1 },
+    _extra_              => slurpy Any,
   );
   my $self = named_extra($check->(@_));
+
 
   if ($self->{config_file}) {
     my $config = eval { LoadFile($self->{config_file}) };
     die "Unable to load config file '$self->{config_file}': $@" if $@;
     $self = Hash::Merge::merge($self, $config);
+  } elsif ($self->{service_account_file}) {
+    die "Unable to find Service Account JSON file at: $self->{service_account_file}" unless -e $self->{service_account_file};
   }
 
+
+
   state $check2 = compile_named(
-    config_file   => Str, { optional => 1 },
-    client_id     => Str,
-    client_secret => Str,
-    token_file    => Str,
-    timeout       => Int, { default => 120 },
-    throttle      => Int->where('$_ > -1'), { default => 0 },
-    post_process  => CodeRef, { optional => 1 },
+    config_file          => Str, { optional => 1 },
+    client_id            => Str, { optional => 1 },
+    client_secret        => Str, { optional => 1 },
+    token_file           => Str, { optional => 1 },
+    service_account_file => Str, { optional => 1 },
+    timeout              => Int, { default => 120 },
+    throttle             => Int->where('$_ > -1'), { default => 0 },
+    post_process         => CodeRef, { optional => 1 },
   );
   $self = $check2->(%$self);
 
-  $self->{token_file} = dirname($self->{config_file}) . "/$self->{token_file}"
-    if !-f $self->{token_file} && $self->{config_file};
-  die "Token file not found: '$self->{token_file}'"
-    if !-f $self->{token_file};
+  if ($self->{service_account_file}) {
+    my $auth = WWW::Google::Cloud::Auth::ServiceAccount->new(
+       credentials_path => $self->{service_account_file},
+       scope => join( ' ', # undocumented feature of WWW::Google::Cloud::Auth::ServiceAccount-
+        'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/spreadsheets',
+       ),
+    );
+    $self->{service_account_auth} = $auth;
+    die "Service Account Auth did not work" unless $self->{service_account_auth}->get_token();
+  } else {
+    $self->{token_file} = dirname($self->{config_file}) . "/$self->{token_file}"
+      if !-f $self->{token_file} && $self->{config_file};
+    die "Token file not found: '$self->{token_file}'"
+      if !-f $self->{token_file};
+  }
 
   return bless $self, $class;
 }
@@ -197,6 +218,7 @@ sub ua {
 
 sub access_token {
   my $self = shift;
+  return $self->{access_token} = $self->{service_account_auth}->get_token() if $self->{service_account_auth}; 
   return $self->{access_token} if $self->{access_token};
 
   state $check = compile_named(
@@ -245,13 +267,14 @@ Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
 
   use Google::RestApi;
   $rest_api = Google::RestApi->new(
-    config_file   => <path_to_config_file>,
-    client_id     => <oauth2_client_id>,
-    client_secret => <oath2_secret>,
-    token_file    => <path_to_token_file>,
-    timeout       => <int>,
-    throttle      => <int>,
-    post_process  => <coderef>,
+    config_file          => <path_to_config_file>,
+    client_id            => <oauth2_client_id>,
+    client_secret        => <oath2_secret>,
+    token_file           => <path_to_token_file>,
+    service_account_file => <path_to_service_account_file>,
+    timeout              => <int>,
+    throttle             => <int>,
+    post_process         => <coderef>,
   );
 
   $response = $rest_api->api(
@@ -300,6 +323,8 @@ API classes.
    SETUP below). If a config_file is passed, the dirname of the config
    file is tried to find the token_file (same directory) if only the
    token file name is passed.
+ service_account_file: Alternatively, a Google Service Account can be used.
+   This is the path to the provided JSON file.
  post_process: A coderef to call after each API call.
  throttle: Used in development to sleep the number of seconds
    specified between API calls to avoid threshhold errors from Google.
