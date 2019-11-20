@@ -19,9 +19,8 @@ use Type::Params qw(compile compile_named);
 use Types::Standard qw(Str StrMatch Int ArrayRef HashRef CodeRef slurpy Any);
 use URI;
 use URI::QueryParam;
-use YAML::Any qw(Dump LoadFile);
-
 use WWW::Google::Cloud::Auth::ServiceAccount;
+use YAML::Any qw(Dump LoadFile);
 
 use Google::RestApi::OAuth2;
 use Google::RestApi::Utils qw(named_extra);
