@@ -33,19 +33,16 @@ sub new {
   my $class = shift;
 
   state $check = compile_named(
-    config_file          => Str, { optional => 1 },
-    _extra_              => slurpy Any,
+    config_file => Str, { optional => 1 },
+    _extra_     => slurpy Any,
   );
   my $self = named_extra($check->(@_));
-
 
   if ($self->{config_file}) {
     my $config = eval { LoadFile($self->{config_file}) };
     die "Unable to load config file '$self->{config_file}': $@" if $@;
     $self = Hash::Merge::merge($self, $config);
   }
-
-
 
   state $check2 = compile_named(
     config_file          => Str, { optional => 1 },
