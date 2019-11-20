@@ -34,7 +34,6 @@ sub new {
 
   state $check = compile_named(
     config_file          => Str, { optional => 1 },
-    service_account_file => Str, { optional => 1 },
     _extra_              => slurpy Any,
   );
   my $self = named_extra($check->(@_));
@@ -44,8 +43,6 @@ sub new {
     my $config = eval { LoadFile($self->{config_file}) };
     die "Unable to load config file '$self->{config_file}': $@" if $@;
     $self = Hash::Merge::merge($self, $config);
-  } elsif ($self->{service_account_file}) {
-    die "Unable to find Service Account JSON file at: $self->{service_account_file}" unless -e $self->{service_account_file};
   }
 
 
@@ -56,6 +53,7 @@ sub new {
     client_secret        => Str, { optional => 1 },
     token_file           => Str, { optional => 1 },
     service_account_file => Str, { optional => 1 },
+    service_account_scope => ArrayRef, { optional => 1 },
     timeout              => Int, { default => 120 },
     throttle             => Int->where('$_ > -1'), { default => 0 },
     post_process         => CodeRef, { optional => 1 },
@@ -63,12 +61,13 @@ sub new {
   $self = $check2->(%$self);
 
   if ($self->{service_account_file}) {
+    die "Unable to find Service Account JSON file at: $self->{service_account_file}"
+      unless -e $self->{service_account_file};
+    die "A scope is required for the service account."
+      unless $self->{service_account_scope};
     my $auth = WWW::Google::Cloud::Auth::ServiceAccount->new(
        credentials_path => $self->{service_account_file},
-       scope => join( ' ', # undocumented feature of WWW::Google::Cloud::Auth::ServiceAccount-
-        'https://www.googleapis.com/auth/drive',
-        'https://www.googleapis.com/auth/spreadsheets',
-       ),
+       scope => join( ' ', @{$self->{service_account_scope}}) # undocumented feature of WWW::Google::Cloud::Auth::ServiceAccount
     );
     $self->{service_account_auth} = $auth;
     die "Service Account Auth did not work" unless $self->{service_account_auth}->get_token();
