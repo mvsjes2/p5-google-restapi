@@ -8,14 +8,15 @@ our $VERSION = '0.3';
 use 5.010_000;
 
 use autodie;
-use Type::Params qw(compile);
-use Types::Standard qw(StrMatch);
-use YAML::Any qw(Dump);
+use Hash::Merge;
+use Type::Params qw(compile_named compile);
+use Types::Standard qw(Str StrMatch Any slurpy);
+use YAML::Any qw(Dump LoadFile);
 
 no autovivification;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(named_extra strip bool dim dims dims_all);
+our @EXPORT_OK = qw(named_extra config_file strip bool dim dims dims_all);
 
 # similar to allow_extra in params::validate, simply returns the
 # extra key/value pairs we aren't interested in in the checked
@@ -26,6 +27,23 @@ sub named_extra {
     or die "No _extra_ key found in hash";
   @$p{ keys %$extra } = values %$extra;
   return $p;
+}
+
+sub config_file {
+  state $check = compile_named(
+    config_file => Str, { optional => 1 },
+    _extra_     => slurpy Any,
+  );
+  my $merged_config = named_extra($check->(@_));
+
+  my $config_file = $merged_config->{config_file};
+  if ($config_file) {
+    my $config = eval { LoadFile($config_file); };
+    die "Unable to load config file '$config_file': $@" if $@;
+    $merged_config = Hash::Merge::merge($merged_config, $config);
+  }
+
+  return $merged_config;
 }
 
 sub strip {
