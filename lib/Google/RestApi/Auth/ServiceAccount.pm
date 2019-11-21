@@ -102,13 +102,11 @@ Google::RestApi::Auth::ServiceAccount - Service Account support for Google Rest 
 
 =head1 AUTHOR
 
-Test User E<lt>mvsjes@cpan.ork<gt>, copied and modifed from Net::Google::DataAPI::Auth::OAuth2.
+Test User E<lt>mvsjes@cpan.ork<gt>.
 
 =head1 SEE ALSO
 
-L<OAuth2>
-
-L<Google::DataAPI::Auth::OAuth2>
+L<WWW::Google::Cloud::Auth::ServiceAccount>
 
 L<https://developers.google.com/accounts/docs/OAuth2> 
 

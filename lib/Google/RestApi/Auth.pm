@@ -32,5 +32,5 @@ when the time comes to add them to the calling URL. If the auth class
 expects to add an authorization header, it will be called via 'headers'
 to return the proper headers for that auth class.
 
-The default behaviour is to return nothing for each, so the base class
+The default behaviour is to return nothing for each, so the derived class
 has to return at least something for one of them to be functional.
