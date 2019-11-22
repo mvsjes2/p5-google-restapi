@@ -33,13 +33,20 @@ sub new {
     scope              => ArrayRef[Str],
   );
   $self = $check->(%$self);
+  $self = bless $self, $class;
 
-  return bless $self, $class;
+  my $auth = WWW::Google::Cloud::Auth::ServiceAccount->new(
+    credentials_path => $self->account_file(),
+    # undocumented feature of WWW::Google::Cloud::Auth::ServiceAccount
+    scope            => join(' ', @{ $self->{scope} }),
+  );
+  $self->{auth} = $auth;
+
+  return $self;
 }
 
 sub headers {
   my $self = shift;
-  return $self->{headers} if $self->{headers};
   my $access_token = $self->access_token();
   $self->{headers} = [ Authorization => "Bearer $access_token" ];
   return $self->{headers};
@@ -47,16 +54,8 @@ sub headers {
 
 sub access_token {
   my $self = shift;
-  return $self->{access_token} if $self->{access_token};
-
-  my $auth = WWW::Google::Cloud::Auth::ServiceAccount->new(
-    credentials_path => $self->account_file(),
-    # undocumented feature of WWW::Google::Cloud::Auth::ServiceAccount
-    scope            => join(' ', @{ $self->{scope} }),
-  );
-  $self->{access_token} = $auth->get_token()
+  $self->{access_token} = $self->{auth}->get_token()
     or die "Service Account Auth failed";
-
   return $self->{access_token};
 }
 
