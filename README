@@ -54,6 +54,7 @@ This module requires these other modules and libraries:
   Types::Standard
   URI 
   URI::QueryParam 
+  WWW::Google::Cloud::Auth::ServiceAccount
   YAML::Any
   Test::Class::Load
   Test::MockObject::Extends
