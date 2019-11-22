@@ -12,7 +12,6 @@ our $VERSION = '0.3';
 use 5.010_000;
 
 use autodie;
-use File::Basename;
 use Net::OAuth2::Client;
 use Net::OAuth2::Profile::WebServer;
 use Storable qw(retrieve);
@@ -23,7 +22,7 @@ use YAML::Any qw(Dump);
 
 no autovivification;
 
-use Google::RestApi::Utils qw(config_file);
+use Google::RestApi::Utils qw(config_file resolve_config_file);
 
 use parent 'Google::RestApi::Auth';
 
@@ -144,22 +143,8 @@ sub oauth2_webserver {
 
 sub token_file {
   my $self = shift;
-  return $self->{_token_file} if $self->{_token_file};
-
-  # if token_file is a simple file name (no path) then assume it's in the
-  # same directory as the config_file. if this has been constructed by
-  # RestApi 'auth' hash, then that class would have stored its config
-  # file as 'parent_config_file' to resolve the token file here.
-  if (!-e $self->{token_file}) {
-    my $config_file = $self->{config_file} || $self->{parent_config_file};
-    $self->{token_file} = dirname($config_file) . "/$self->{token_file}"
-      if $config_file;
-  }
-
-  die "Token file not found or is not readable: '$self->{token_file}'"
-    if !-f -r $self->{token_file};
-
-  $self->{_token_file} = $self->{token_file};
+  $self->{_token_file} = resolve_config_file('token_file', $self)
+    if !$self->{_token_file};
   return $self->{_token_file};
 }
 

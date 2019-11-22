@@ -8,6 +8,7 @@ our $VERSION = '0.3';
 use 5.010_000;
 
 use autodie;
+use File::Basename;
 use Hash::Merge;
 use Type::Params qw(compile_named compile);
 use Types::Standard qw(Str StrMatch Any slurpy);
@@ -16,7 +17,7 @@ use YAML::Any qw(Dump LoadFile);
 no autovivification;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(named_extra config_file strip bool dim dims dims_all);
+our @EXPORT_OK = qw(named_extra config_file resolve_config_file strip bool dim dims dims_all);
 
 # similar to allow_extra in params::validate, simply returns the
 # extra key/value pairs we aren't interested in in the checked
@@ -44,6 +45,29 @@ sub config_file {
   }
 
   return $merged_config;
+}
+
+# a standard way to store file names in a config and resolve them
+# to a full path. can be used in Auth configs, possibly others.
+# see sub RestApi::auth for more.
+sub resolve_config_file {
+  my ($file_key, $config) = @_;
+
+  my $file_path = $config->{$file_key}
+    or die "No config file name found for '$file_key':\n", Dump($config);
+
+  # if file name is a simple file name (no path) then assume it's in the
+  # same directory as the config file.
+  if (!-e $file_path) {
+    my $config_file = $config->{config_file} || $config->{parent_config_file};
+    $file_path = dirname($config_file) . "/$file_path"
+      if $config_file;
+  }
+
+  die "Config file '$file_key' not found or is not readable:\n", Dump($config)
+    if !-f -r $file_path;
+
+  return $file_path;
 }
 
 sub strip {
