@@ -8,7 +8,6 @@ our $VERSION = '0.3';
 use 5.010_000;
 
 use autodie;
-use File::Basename;
 use Type::Params qw(compile_named);
 use Types::Standard qw(Str ArrayRef);
 use WWW::Google::Cloud::Auth::ServiceAccount;
@@ -16,7 +15,7 @@ use YAML::Any qw(Dump);
 
 no autovivification;
 
-use Google::RestApi::Utils qw(config_file);
+use Google::RestApi::Utils qw(config_file resolve_config_file);
 
 use parent 'Google::RestApi::Auth';
 
@@ -61,22 +60,8 @@ sub access_token {
 
 sub account_file {
   my $self = shift;
-  return $self->{_account_file} if $self->{_account_file};
-
-  # if account_file is a simple file name (no path) then assume it's in the
-  # same directory as the config_file. if this has been constructed by
-  # RestApi 'auth' hash, then that class would have stored its config
-  # file as 'parent_config_file' to resolve the account file here.
-  if (!-e $self->{account_file}) {
-    my $config_file = $self->{config_file} || $self->{parent_config_file};
-    $self->{account_file} = dirname($config_file) . "/$self->{account_file}"
-      if $config_file;
-  }
-
-  die "Service account file not found or is not readable: '$self->{account_file}'"
-    if !-f -r $self->{account_file};
-
-  $self->{_account_file} = $self->{account_file};
+  $self->{_account_file} = resolve_config_file('account_file', $self)
+    if !$self->{_account_file};
   return $self->{_account_file};
 }
 

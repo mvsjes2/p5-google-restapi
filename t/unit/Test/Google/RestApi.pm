@@ -30,7 +30,7 @@ sub constructor : Tests(9) {
 
   my $api;
   lives_ok sub { $api = $class->new(%{ dclone(\%auth) }) }, 'Constructor with bad token file should succeed';
-  throws_ok sub { $api->auth()->token_file() }, qr/Token file not found/, 'Bad token file should fail';
+  throws_ok sub { $api->auth()->token_file() }, qr/not found or is not readable/, 'Bad token file should fail';
 
   $auth{auth}->{token_file} = token_file();
   $api = $class->new(%{ dclone(\%auth) });
@@ -50,9 +50,9 @@ sub constructor : Tests(9) {
       scope        => ['x'],
     },
   );
-  
+
   lives_ok sub { $api = $class->new(%{ dclone(\%auth) }) }, 'Constructor with bad account file should succeed';
-  throws_ok sub { $api->auth()->account_file() }, qr/Service account file not found/, 'Bad account file should fail';
+  throws_ok sub { $api->auth()->account_file() }, qr/not found or is not readable/, 'Bad account file should fail';
 
   return;
 }
