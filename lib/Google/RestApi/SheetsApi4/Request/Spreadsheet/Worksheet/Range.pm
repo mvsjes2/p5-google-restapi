@@ -28,32 +28,22 @@ my %black = ( red => 0, blue => 0, green => 0, alpha => 1 );
 
 sub range { die "Pure virtual function 'range' must be overridden"; }
 
-sub _user_entered_format {
-  {
-    cell => {
-      userEnteredFormat => shift,
-    },
-    fields => 'userEnteredFormat.' . shift
-  }
-}
+sub left { shift->horizontal_alignment('LEFT'); }
+sub center { shift->horizontal_alignment('CENTER'); }
+sub right { shift->horizontal_alignment('RIGHT'); }
+sub horizontal_alignment { shift->user_entered_format({ horizontalAlignment => shift }); }
 
-sub _horizontal_alignment { _user_entered_format({ horizontalAlignment => shift }, 'horizontalAlignment'); }
-sub left { shift->_repeat_cell(_horizontal_alignment('LEFT')); }
-sub center { shift->_repeat_cell(_horizontal_alignment('CENTER')); }
-sub right { shift->_repeat_cell(_horizontal_alignment('RIGHT')); }
+sub top { shift->vertical_alignment('TOP'); }
+sub middle { shift->vertical_alignment('MIDDLE'); }
+sub bottom { shift->vertical_alignment('BOTTOM'); }
+sub vertical_alignment { shift->user_entered_format({ verticalAlignment => shift }); }
 
-sub _vertical_alignment { _user_entered_format({ verticalAlignment => shift }, 'verticalAlignment'); }
-sub top { shift->_repeat_cell(_vertical_alignment('TOP')); }
-sub middle { shift->_repeat_cell(_vertical_alignment('MIDDLE')); }
-sub bottom { shift->_repeat_cell(_vertical_alignment('BOTTOM')); }
-
-sub _text_format { _user_entered_format({ textFormat => shift }, 'textFormat.' . shift); }
-sub font_family { shift->_repeat_cell(_text_format({ fontFamily => shift }, 'fontFamily')); }
-sub font_size { shift->_repeat_cell(_text_format({ fontSize => shift }, 'fontSize')); }
-sub bold { shift->_repeat_cell(_text_format({ bold => bool(shift) }, 'bold')); }
-sub italic { shift->_repeat_cell(_text_format({ italic => bool(shift) }, 'italic')); }
-sub strikethrough { shift->_repeat_cell(_text_format({ strikethrough => bool(shift) }, 'strikethrough')); }
-sub underline { shift->_repeat_cell(_text_format({ underline => bool(shift) }, 'underline')); }
+sub font_family { shift->text_format({ fontFamily => shift }); }
+sub font_size { shift->text_format({ fontSize => shift }); }
+sub bold { shift->text_format({ bold => bool(shift) }); }
+sub italic { shift->text_format({ italic => bool(shift) }); }
+sub strikethrough { shift->text_format({ strikethrough => bool(shift) }); }
+sub underline { shift->text_format({ underline => bool(shift) }); }
 
 sub _rgba { shift->color({ (shift) => (shift // 1) }); }
 sub red { shift->_rgba('red' => shift); }
@@ -62,7 +52,7 @@ sub green { shift->_rgba('green' => shift); }
 sub alpha { shift->_rgba('alpha' => shift); }
 sub black { shift->color(\%black); }
 sub white { shift->color(\%white); }
-sub color { shift->_repeat_cell(_text_format({ foregroundColor => shift }, 'foregroundColor')); }
+sub color { shift->text_format({ foregroundColor => shift }); }
 
 sub _bk_rgba { shift->bk_color({ (shift) => (shift // 1) }); }
 sub bk_red { shift->_bk_rgba('red' => shift); }
@@ -71,10 +61,65 @@ sub bk_green { shift->_bk_rgba('green' => shift); }
 sub bk_alpha { shift->_bk_rgba('alpha' => shift); }
 sub bk_black { shift->bk_color(\%black); }
 sub bk_white { shift->bk_color(\%white); }
-sub bk_color { shift->_repeat_cell(_user_entered_format({ backgroundColor => shift }, 'backgroundColor')); }
+sub bk_color { shift->user_entered_format({ backgroundColor => shift }); }
 
-# just dereferences the hash so it doesn't have to be done over and over above.
-sub _repeat_cell { shift->repeat_cell(%{ (shift) }); }
+sub text { shift->number_format('TEXT', @_); }
+sub number { shift->number_format('NUMBER', @_); }
+sub percent { shift->number_format('PERCENT', @_); }
+sub currency { shift->number_format('CURRENCY', @_); }
+sub date { shift->number_format('DATE', @_); }
+sub time { shift->number_format('TIME', @_); }
+sub date_time { shift->number_format('DATE_TIME', @_); }
+sub scientific { shift->number_format('SCIENTIFIC', @_); }
+sub number_format {
+  shift->user_entered_format(
+    {
+      numberFormat => {
+        type => shift,
+        defined $_[0] ? (pattern => shift) : ()
+      }
+    },
+  );
+}
+
+sub padding { my $s = shift; my %p = @_; $s->user_entered_format({ padding => \%p }); }
+
+sub overflow { shift->wrap_strategy('OVERFLOW_CELL'); }
+sub clip { shift->wrap_strategy('CLIP'); }
+sub wrap { shift->wrap_strategy('WRAP'); }
+sub wrap_strategy { shift->user_entered_format({ wrapStrategy => shift }); }
+
+sub left_to_right { shift->text_direction('LEFT_TO_RIGHT'); }
+sub right_to_left { shift->text_direction('RIGHT_TO_LEFT'); }
+sub text_direction { shift->user_entered_format({ textDirection => shift }); }
+
+sub hyper_linked { shift->user_entered_format({ hyperlinkDisplayType => 'LINKED' }); }
+sub hyper_plain { shift->user_entered_format({ hyperlinkDisplayType => 'PLAIN_TEXT' }); }
+
+sub rotation { shift->user_entered_format({ angle => shift, vertical => bool(shift) }); }
+
+sub text_format {
+  my $self = shift;
+  my ($format, $fields) = @_;
+  ($fields) = each %$format if !defined $fields;
+  $self->user_entered_format(
+     { textFormat => $format },
+    'textFormat.' . $fields,
+  );
+}
+
+sub user_entered_format {
+  my $self = shift;
+  my ($format, $fields) = @_;
+  ($fields) = each %$format if !defined $fields;
+  $self->repeat_cell(
+    cell => {
+      userEnteredFormat => $format,
+    },
+    fields => 'userEnteredFormat.' . $fields,
+  );
+  return $self;
+}
 
 sub repeat_cell {
   my $self = shift;
@@ -188,10 +233,12 @@ sub borders {
   if ($self->{bd_repeat_cell}) {
     die "Cannot use vertical|horizontal|inner when bd_repeat_cell is turned on"
       if $p->{border} =~ /^(vertical|horizontal|inner)$/;
-    return $self->_repeat_cell(
-      _user_entered_format(
-        { borders => { $p->{border} => $p->{properties} } }, 'borders',
-      ),
+    return $self->user_entered_format(
+      {
+        borders => {
+          $p->{border} => $p->{properties},
+        }
+      },
     );
   }
 

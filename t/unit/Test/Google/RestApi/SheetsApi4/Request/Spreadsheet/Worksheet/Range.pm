@@ -152,6 +152,32 @@ sub _range_background_color {
   return;
 }
 
+sub range_padding : Tests(2) {
+  my $self = shift;
+
+  my $cell = {
+    repeatCell => {
+      range => '',
+      cell => {
+        userEnteredFormat => {
+          padding => {
+            top => 1, bottom => 2, left => 3, right => 4,
+          },
+        },
+      },
+      fields => 'userEnteredFormat.padding',
+    },
+  };
+
+  my $range = $self->new_range("A1");
+  $cell->{repeatCell}->{range} = $range->range_to_index();
+  is $range->padding(top => 1, bottom => 2, left => 3, right => 4), $range, "Padding should return the same range";
+  my @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Padding should be staged";
+
+  return;
+}
+
 sub range_borders : Tests(22) {
   my $self = shift;
 
