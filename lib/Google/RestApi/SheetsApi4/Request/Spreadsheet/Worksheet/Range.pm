@@ -93,10 +93,12 @@ sub left_to_right { shift->text_direction('LEFT_TO_RIGHT'); }
 sub right_to_left { shift->text_direction('RIGHT_TO_LEFT'); }
 sub text_direction { shift->user_entered_format({ textDirection => shift }); }
 
+sub rotate { shift->text_rotation({ angle => shift }); }
+sub vertical { shift->text_rotation({ vertical => bool(shift) }); }
+sub text_rotation { shift->user_entered_format({ textRotation => shift }); }
+
 sub hyper_linked { shift->user_entered_format({ hyperlinkDisplayType => 'LINKED' }); }
 sub hyper_plain { shift->user_entered_format({ hyperlinkDisplayType => 'PLAIN_TEXT' }); }
-
-sub rotation { shift->user_entered_format({ angle => shift, vertical => bool(shift) }); }
 
 sub text_format {
   my $self = shift;
