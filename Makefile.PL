@@ -34,6 +34,7 @@ WriteMakefile(
 	'Types::Standard'                 => 0,
 	'URI'                             => 0,
 	'URI::QueryParam'                 => 0,
+	'WWW::Google::Cloud::Auth::ServiceAccount' => 0,
 	'YAML::Any'                       => 0,
     },
     TEST_REQUIRES     => {
