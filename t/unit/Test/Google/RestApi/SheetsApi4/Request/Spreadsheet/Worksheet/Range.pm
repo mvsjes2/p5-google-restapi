@@ -152,6 +152,70 @@ sub _range_background_color {
   return;
 }
 
+# we don't test for every possible option here, we test the basic
+# functionality for each type of format option.
+sub range_misc : Tests(12) {
+  my $self = shift;
+
+  my $cell = {
+    repeatCell => {
+      range => '',
+      cell => {
+        userEnteredFormat => {
+          padding => {
+            top => 1, bottom => 2, left => 3, right => 4,
+          },
+        },
+      },
+      fields => 'userEnteredFormat.padding',
+    },
+  };
+
+  my $range = $self->new_range("A1");
+  $cell->{repeatCell}->{range} = $range->range_to_index();
+  my $user = $cell->{repeatCell}->{cell}->{userEnteredFormat};
+
+  is $range->padding(top => 1, bottom => 2, left => 3, right => 4), $range, "Padding should return the same range";
+  my @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Padding should be staged";
+
+  is $range->clip(), $range, "Clip should return the same range";
+  $user->{wrapStrategy} = 'CLIP';
+  _add_field($cell, "userEnteredFormat.wrapStrategy");
+  @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Clip should be staged";
+
+  is $range->right_to_left(), $range, "Text direction should return the same range";
+  $user->{textDirection} = 'RIGHT_TO_LEFT';
+  _add_field($cell, "userEnteredFormat.textDirection");
+  @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Text direction should be staged";
+
+  is $range->hyper_linked(), $range, "Hyper link should return the same range";
+  $user->{hyperlinkDisplayType} = 'LINKED';
+  _add_field($cell, "userEnteredFormat.hyperlinkDisplayType");
+  @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Hyper link should be staged";
+
+  is $range->rotate(-90), $range, "Text rotation should return the same range";
+  $user->{textRotation}->{angle} = '-90';
+  _add_field($cell, "userEnteredFormat.textRotation");
+  @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Text rotation should be staged";
+
+  # textRotation is a union that allows either key 'angle' or 'vertical'.
+  # adding both in this framework is possible, but will build an illegal
+  # request and you will get an error when you send it to google. you
+  # will just have to know not to call both on the same range, you have
+  # to choose. we just test here that it builds both types properly.
+  is $range->vertical(1), $range, "Text vertical should return the same range";
+  $user->{textRotation}->{vertical} = 'true';
+  @requests = $range->batch_requests();
+  is_deeply $requests[0], $cell, "Text vertical should be staged";
+
+  return;
+}
+
 sub range_borders : Tests(22) {
   my $self = shift;
 
