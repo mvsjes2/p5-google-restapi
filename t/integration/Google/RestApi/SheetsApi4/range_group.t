@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::RealBin/../../..";
 use lib "$FindBin::RealBin/../../../../../lib";
 
-use Test::Most tests => 4;
+use Test::Most tests => 6;
 use YAML::Any qw(Dump);
 
 use Utils;
@@ -36,5 +36,7 @@ lives_ok sub { $range_group->batch_values(values => \@values_in), }, "Setting up
 lives_ok sub { $range_group->submit_values(); }, "Submitting mixed values should live";
 lives_ok sub { $range_group->refresh_values(); }, "Refresh values on range group should live";
 is_deeply $range_group->values(), \@values_out, "Range group values should be correct";
+lives_ok sub { $range_group->clear(); }, "Range group should clear successfully";
+is_deeply $range_group->values(), [undef, undef, undef], "Range group values after clear should be empty";
 
 Utils::delete_all_spreadsheets($spreadsheet->sheets());

@@ -1,9 +1,13 @@
-package Test::Google::RestApi::SheetsApi4::Range;
+package Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
 use YAML::Any qw(Dump);
 use Test::Most;
 
-use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Range::Base);
+use aliased 'Google::RestApi::SheetsApi4::Range';
+use Test::Mock::Worksheet;
+use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Base);
+
+sub class { 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range' }
 
 my $index = {
   sheetId          => 'mock_worksheet_id',
@@ -424,6 +428,13 @@ sub range_merge : Tests(6) {
 
   return;
 }
+
+sub new_range {
+  my $self = shift;
+  return Range->new(worksheet => $self->worksheet(), range => shift);
+}
+
+sub worksheet : Test(setup) { shift->{worksheet} = Test::Mock::Worksheet->new(); }
 
 sub _add_field {
   my ($cell, $field) = (@_);

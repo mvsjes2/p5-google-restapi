@@ -1,5 +1,10 @@
 package Google::RestApi::SheetsApi4::Range;
 
+# some private subroutines here are called by RangeGroup,
+# so think of RangeGroup as a friend of Range. the routines
+# RangeGroup calls are commented thusly:
+# "private range routine called here!"
+
 use strict;
 use warnings;
 
@@ -8,7 +13,7 @@ our $VERSION = '0.4';
 use 5.010_000;
 
 use autodie;
-use Carp qw(cluck confess);
+use Carp qw(confess);
 use List::Util qw(max);
 use List::MoreUtils qw(first_index);
 use Type::Params qw(compile compile_named);
@@ -64,19 +69,47 @@ sub new {
 
 sub clear {
   my $self = shift;
-  delete $self->{value_range};
   my $range = $self->range();
   DEBUG("Clearing range '$range'");
   my %p = (
     uri    => "/values/$range:clear",
     method => 'post',
   );
-  return $self->api(%p);
+  my $response = $self->api(%p);
+  $self->_clear_values();
+  return $response;
+}
+
+sub _clear_values {
+  delete shift->{value_range};
+  return;
+}
+
+sub append {
+  my $self = shift;
+
+  state $check = compile_named(
+    values  => ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
+    params  => HashRef, { default => {} },
+    content => HashRef, { default => {} },
+    _extra_ => slurpy Any,
+  );
+  my $p = named_extra($check->(@_));
+
+  my $range = $self->range();
+  $p->{content}->{range} = $range;
+  $p->{content}->{values} = delete $p->{values};
+  $p->{content}->{majorDimension} = $self->{dim};
+  $p->{params}->{valueInputOption} //= 'USER_ENTERED';
+  $p->{uri} = "/values/$range:append";
+  $p->{method} = 'post';
+
+  return $self->api(%$p);
 }
 
 sub refresh_values {
   my $self = shift;
-  delete $self->{value_range};
+  $self->_clear_values();
   return $self->values();
 }
 
@@ -140,11 +173,10 @@ sub _value_range {
     };
   }
 
-  my $range = $self->range();
-  $p{uri} = "/values/$range";
+  $p{uri} = sprintf("/values/%s", $self->range());
   $p{params}->{majorDimension} = $self->{dim};
 
-  $self->{value_range} = $self->api(\%p);
+  $self->{value_range} = $self->api(%p);
 
   return $self->{value_range};
 }
@@ -837,7 +869,7 @@ represents.
 
 Returns the 'named range' for this range, if any.
 
-=item is_named {
+=item is_named();
 
 Returns a true value if this range represents a 'named range'. See:
 https://support.google.com/docs/answer/63175?co=GENIE.Platform%3DDesktop&hl=en

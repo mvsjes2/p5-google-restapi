@@ -1,5 +1,10 @@
 package Google::RestApi::SheetsApi4::RangeGroup;
 
+# some private subroutines of Range are called from here,
+# so think of RangeGroup as a friend of Range. the routines
+# called are commented thusly:
+# "private range routine called here!"
+
 use strict;
 use warnings;
 
@@ -34,12 +39,29 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub append {
+sub push_ranges {
   my $self = shift;
   state $check = compile(slurpy ArrayRef[HasMethods['range']]);
   my ($ranges) = $check->(@_);
   push(@{ $self->{ranges} }, @$ranges);
   return;
+}
+
+sub clear {
+  my $self = shift;
+
+  my @ranges = map { $_->range(); } $self->ranges();
+  my %p = (
+    content => { ranges => \@ranges },
+    uri     => "/values:batchClear",
+    method  => "post",
+  );
+  my $response = $self->api(%p);
+
+  # private range routine called here!
+  $_->_clear_values() foreach $self->ranges();
+
+  return $response;
 }
 
 sub values {
@@ -86,9 +108,7 @@ sub _batch_get {
   my $response = $self->api(%$p);
 
   my $value_ranges = $response->{valueRanges};
-  # rangegroup and range work together, so call private
-  # method here. private so that users of this framework
-  # won't call it. but we know what we're doing, right?
+  # private range routine called here!
   $ranges->[$_]->_value_range(%{ $value_ranges->[$_] })
     foreach (0..$#$ranges);
 
@@ -194,7 +214,7 @@ Google::RestApi::SheetsApi4::RangeGroup - Represents a group of ranges in a Work
 
 =head1 DESCRIPTION
 
-A RangeGroup is a lightweight object represents a collection of ranges
+A RangeGroup is a lightweight object that represents a collection of ranges
 on which you can operate as one unit (e.g. RangeGroup::submit_values
 will submit all batch values for the underlying ranges).
 
@@ -223,10 +243,15 @@ You would not normally call this directly unless you were
 making a Google API call not currently supported by this API
 framework.
 
-=item append(<arrayref<Range>>);
+=item push_ranges(<arrayref<Range>>);
 
 Adds the extra ranges to this range group. No attempt is made to
 check for duplicate range objects.
+
+=item clear();
+
+Clears each range in the range group in one call using batchClear
+Google API call.
 
 =item values(%args);
 
