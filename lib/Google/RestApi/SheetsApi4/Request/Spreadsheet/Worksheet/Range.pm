@@ -13,18 +13,15 @@ use Type::Params qw(compile_named);
 use Types::Standard qw(Str StrMatch Bool ArrayRef HashRef HasMethods);
 use YAML::Any qw(Dump);
 
+use Google::RestApi::Utils qw(bool dim dims dims_all cl_black cl_white);
+
 no autovivification;
 
 use aliased "Google::RestApi::SheetsApi4::Range";
 
-use Google::RestApi::Utils qw(bool dim dims dims_all);
-
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
 
 do 'Google/RestApi/logger_init.pl';
-
-my %white = ( red => 1, blue => 1, green => 1, alpha => 1 );
-my %black = ( red => 0, blue => 0, green => 0, alpha => 1 );
 
 sub range { die "Pure virtual function 'range' must be overridden"; }
 
@@ -50,8 +47,8 @@ sub red { shift->_rgba('red' => shift); }
 sub blue { shift->_rgba('blue' => shift); }
 sub green { shift->_rgba('green' => shift); }
 sub alpha { shift->_rgba('alpha' => shift); }
-sub black { shift->color(\%black); }
-sub white { shift->color(\%white); }
+sub black { shift->color(cl_black()); }
+sub white { shift->color(cl_white()); }
 sub color { shift->text_format({ foregroundColor => shift }); }
 
 sub _bk_rgba { shift->bk_color({ (shift) => (shift // 1) }); }
@@ -59,8 +56,8 @@ sub bk_red { shift->_bk_rgba('red' => shift); }
 sub bk_blue { shift->_bk_rgba('blue' => shift); }
 sub bk_green { shift->_bk_rgba('green' => shift); }
 sub bk_alpha { shift->_bk_rgba('alpha' => shift); }
-sub bk_black { shift->bk_color(\%black); }
-sub bk_white { shift->bk_color(\%white); }
+sub bk_black { shift->bk_color(cl_black()); }
+sub bk_white { shift->bk_color(cl_white()); }
 sub bk_color { shift->user_entered_format({ backgroundColor => shift }); }
 
 sub text { shift->number_format('TEXT', @_); }
@@ -133,7 +130,7 @@ sub repeat_cell {
   my $p = $check->(@_);
 
   my $cell = $p->{cell};
-  my $fields = $p->{fields} || join(',', sort keys %{ $p->{cell} });
+  my $fields = $p->{fields} || join(',', sort keys %$cell);
 
   $self->batch_requests(
     repeatCell => {
@@ -157,8 +154,8 @@ sub bd_red { shift->_bd_rbga('red' => shift, @_); }
 sub bd_blue { shift->_bd_rbga('blue' => shift, @_); }
 sub bd_green { shift->_bd_rbga('green' => shift, @_); }
 sub bd_alpha { shift->_bd_rbga('alpha' => shift, @_); }
-sub bd_black { shift->bd_color(\%black, @_); }
-sub bd_white { shift->bd_color(\%white, @_); }
+sub bd_black { shift->bd_color(cl_black(), @_); }
+sub bd_white { shift->bd_color(cl_white(), @_); }
 sub bd_color { shift->_bd({ color => shift }, @_); }
 
 sub bd_dotted { shift->bd_style('DOTTED', @_); }

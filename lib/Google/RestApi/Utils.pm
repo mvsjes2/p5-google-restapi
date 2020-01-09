@@ -17,7 +17,7 @@ use YAML::Any qw(Dump LoadFile);
 no autovivification;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(named_extra config_file resolve_config_file strip bool dim dims dims_all);
+our @EXPORT_OK = qw(named_extra config_file resolve_config_file strip bool dim dims dims_all cl_black cl_white);
 
 # similar to allow_extra in params::validate, simply returns the
 # extra key/value pairs we aren't interested in in the checked
@@ -105,5 +105,8 @@ sub dims_all {
   ($dims) = $check->(@_);
   return "ALL";
 }
+
+sub cl_black { { red => 0, blue => 0, green => 0, alpha => 1 }; }
+sub cl_white { { red => 1, blue => 1, green => 1, alpha => 1 }; }
 
 1;
