@@ -73,6 +73,7 @@ sub api {
   my @headers;
   push(@headers, 'Content-Type' => 'application/json') if $content;
   push(@headers, @{ $p->{headers} });
+  push(@headers, @{ $self->auth()->headers() });
 
   # some (outdated) auth mechanisms may allow auth info in the params.
   my %params = (%{ $p->{params} }, %{ $self->auth()->params() });
@@ -170,7 +171,6 @@ sub ua {
   my $self = shift;
   if (!$self->{ua}) {
     $self->{ua} = Furl->new(
-      headers => $self->auth()->headers(),
       timeout => $self->{timeout},
     );
   }
