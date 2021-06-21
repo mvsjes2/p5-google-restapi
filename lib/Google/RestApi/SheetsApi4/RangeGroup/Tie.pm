@@ -1,25 +1,12 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Tie;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
 use Tie::Hash;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Int StrMatch ArrayRef HashRef HasMethods Any slurpy);
-use YAML::Any qw(Dump);
-
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
-
 use parent -norequire, 'Tie::StdHash';
-
-no autovivification;
-
-do 'Google/RestApi/logger_init.pl';
 
 sub iterator {
   my $self = shift;

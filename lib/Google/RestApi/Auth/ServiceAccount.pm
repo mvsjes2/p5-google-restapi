@@ -1,25 +1,11 @@
 package Google::RestApi::Auth::ServiceAccount;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
-use Type::Params qw(compile_named);
-use Types::Standard qw(Str ArrayRef);
 use WWW::Google::Cloud::Auth::ServiceAccount;
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-use Google::RestApi::Utils qw(config_file resolve_config_file);
-
 use parent 'Google::RestApi::Auth';
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;

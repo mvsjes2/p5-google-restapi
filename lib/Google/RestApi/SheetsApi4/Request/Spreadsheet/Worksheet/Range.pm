@@ -1,27 +1,12 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
 use Scalar::Util qw(looks_like_number);
-use Type::Params qw(compile_named);
-use Types::Standard qw(Str StrMatch Bool ArrayRef HashRef HasMethods);
-use YAML::Any qw(Dump);
-
-use Google::RestApi::Utils qw(bool dim dims dims_all cl_black cl_white);
-
-no autovivification;
-
 use aliased "Google::RestApi::SheetsApi4::Range";
-
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
-
-do 'Google/RestApi/logger_init.pl';
 
 sub range { die "Pure virtual function 'range' must be overridden"; }
 

@@ -5,27 +5,16 @@ package Google::RestApi::SheetsApi4::Range;
 # RangeGroup calls are commented thusly:
 # "private range routine called here!"
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
 use Carp qw(confess);
 use List::Util qw(max);
 use List::MoreUtils qw(first_index);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Int Str StrMatch Value HashRef ArrayRef HasMethods Maybe Defined Any slurpy);
 use Scalar::Util qw(blessed looks_like_number);
-use YAML::Any qw(Dump);
-
-no autovivification;
 
 use aliased 'Google::RestApi::SheetsApi4::Range::Iterator';
-
-use Google::RestApi::Utils qw(named_extra dim dims dims_all);
 
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range";
 
@@ -50,8 +39,6 @@ use constant {
   RowA1     => '^(?:.+!)*[A-Z]*(\d+)(?::[A-Z]*\1)?$',
   CellA1    => '^(?:.+!)*[A-Z]+\d+$',
 };
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;

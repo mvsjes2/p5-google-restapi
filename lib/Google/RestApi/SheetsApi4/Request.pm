@@ -1,23 +1,12 @@
 package Google::RestApi::SheetsApi4::Request;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
 use Hash::Merge;
 use List::MoreUtils qw(first_index);
 use Storable qw(dclone);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(ArrayRef HashRef);
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-do 'Google/RestApi/logger_init.pl';
 
 sub submit_requests { die "Pure virtual function 'submit_requests' must be overridden"; }
 

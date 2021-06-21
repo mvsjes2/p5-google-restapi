@@ -1,20 +1,8 @@
 package Google::RestApi::SheetsApi4;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch HashRef HasMethods Any slurpy);
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-use Google::RestApi::Utils qw(named_extra);
+use Google::RestApi::Setup;
 
 use aliased 'Google::RestApi::DriveApi3';
 use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
@@ -27,8 +15,6 @@ use constant {
   Worksheet_Id       => "[0-9]+",
   Worksheet_Uri      => "[#&]gid=([0-9]+)",
 };
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;

@@ -1,20 +1,9 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
-use Type::Params qw(compile compile_named multisig);
-use Types::Standard qw(Str StrMatch Int Bool HashRef ArrayRef HasMethods Maybe slurpy);
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-use Google::RestApi::Utils qw(strip);
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Col';
@@ -25,8 +14,6 @@ use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie';
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Iterator';
 
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;

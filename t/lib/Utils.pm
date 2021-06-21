@@ -20,9 +20,15 @@ our @EXPORT_OK = qw(init_logger message start end end_go show_api);
 
 our $spreadsheet_name = 'google_restapi_sheets_testing';
 
+# if you want your own logger, specify the logger config file in GOOGLE_RESTAPI_LOGGER env var.
+# else logger will be turned off.
 sub init_logger {
   my $logger_conf = $ENV{GOOGLE_RESTAPI_LOGGER};
-  Log::Log4perl->init($logger_conf) if defined $logger_conf;
+  if ($logger_conf) {
+    Log::Log4perl->init($logger_conf);
+  } else {
+    Log::Log4perl->easy_init(shift || $OFF);
+  }
   return;
 }
 
@@ -50,8 +56,9 @@ sub rest_api_config {
   return $config_file;
 }
 
-# set throttle to 1 if you start getting 403's back from google.
-sub rest_api { RestApi->new(@_, config_file => rest_api_config(), throttle => 0); }
+# set throttle to 1 if you start getting 403's or 429's back from google.
+sub rest_api { RestApi->new(@_, config_file => rest_api_config(), throttle => 1); }
+
 sub message { print color(shift), @_, color('reset'), "\n"; }
 sub start { message('yellow', @_, ".."); }
 sub end { message('green', @_, " Press enter to continue.\n"); <>; }
@@ -64,6 +71,7 @@ sub show_api {
     response_content => $p{content},
   );
   warn color('magenta'), "Sent request to api:\n", color('reset'), Dump(\%dump);
+
   return;
 }
 

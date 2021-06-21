@@ -1,32 +1,19 @@
 package Google::RestApi::Auth::OAuth2Client;
 
+our $VERSION = '0.4';
+
+use Google::RestApi::Setup;
+
 # this was taken from Net::Google::DataAPI::Auth::OAuth2 and had
 # a moose-ectomy. this will get rid of warnings about switching
 # to Moo instead of Moose::Any.
 
-use strict;
-use warnings;
-
-our $VERSION = '0.4';
-
-use 5.010_000;
-
-use autodie;
 use Net::OAuth2::Client;
 use Net::OAuth2::Profile::WebServer;
 use Storable qw(retrieve);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str Bool ArrayRef);
 use URI;
-use YAML::Any qw(Dump);
-
-no autovivification;
-
-use Google::RestApi::Utils qw(config_file resolve_config_file);
 
 use parent 'Google::RestApi::Auth';
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
