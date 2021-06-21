@@ -1,30 +1,17 @@
 package Google::RestApi;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
 use Furl;
 use JSON;
 use Scalar::Util qw(blessed);
 use Sub::Retry;
 use Storable qw(dclone);
 use Time::Out qw(timeout);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch Int ArrayRef HashRef CodeRef);
 use URI;
 use URI::QueryParam;
-use YAML::Any qw(Dump);
-
-use Google::RestApi::Utils qw(config_file);
-
-no autovivification;
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;
@@ -112,7 +99,7 @@ sub api {
   ) if $self->{post_process};
   DEBUG("Rest API response:\n", Dump($api_content));
 
-  # used for integration tests to avoid google 403's.
+  # used for integration tests to avoid google 403's and 429's.
   sleep($self->{throttle}) if $self->{throttle};
 
   return wantarray ? ($api_content, $api_response, $p) : $api_content;
@@ -149,7 +136,7 @@ sub _api {
       # timeout is in the ua too, but i've seen requests to spreadsheets
       # completely hang if the request isn't constructed correctly.
       timeout $self->{timeout} => sub {
-        $self->ua()->request($req);
+        return $self->ua()->request($req);
       };
     },
     sub {

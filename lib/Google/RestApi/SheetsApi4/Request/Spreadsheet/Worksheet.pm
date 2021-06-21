@@ -1,26 +1,11 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str Int Bool HashRef);
-use YAML::Any qw(Dump);
-
-use Google::RestApi::Utils qw(bool cl_black cl_white);
-
-no autovivification;
+use Google::RestApi::Setup;
 
 use aliased "Google::RestApi::SheetsApi4::Request";
-
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet";
-
-do 'Google/RestApi/logger_init.pl';
 
 sub worksheet_id { die "Pure virtual function 'worksheet_id' must be overridden"; }
 

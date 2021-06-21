@@ -5,28 +5,15 @@ package Google::RestApi::SheetsApi4::RangeGroup;
 # called are commented thusly:
 # "private range routine called here!"
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
+use Google::RestApi::Setup;
 
-use autodie;
 use Carp qw(cluck confess);
 use List::Util qw(first);
 use Scalar::Util qw(looks_like_number);
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str HashRef ArrayRef HasMethods Maybe Any slurpy);
-use YAML::Any qw(Dump);
-
-no autovivification;
 
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Iterator';
-
-use Google::RestApi::Utils qw(named_extra);
-
-do 'Google/RestApi/logger_init.pl';
 
 sub new {
   my $class = shift;

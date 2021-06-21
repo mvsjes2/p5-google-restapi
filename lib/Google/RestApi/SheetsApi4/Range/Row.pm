@@ -1,26 +1,13 @@
 package Google::RestApi::SheetsApi4::Range::Row;
 
-use strict;
-use warnings;
-
 our $VERSION = '0.4';
 
-use 5.010_000;
-
-use autodie;
-use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str Int ArrayRef Any slurpy);
-use YAML::Any qw(Dump);
-use Google::RestApi::Utils qw(named_extra);
-
-no autovivification;
+use Google::RestApi::Setup;
 
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 
 use parent 'Google::RestApi::SheetsApi4::Range';
-
-do 'Google/RestApi/logger_init.pl';
 
 sub range {
   my $self = shift;

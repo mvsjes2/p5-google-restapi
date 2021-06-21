@@ -3,9 +3,6 @@
 use strict;
 use warnings;
 
-use FindBin;
-use lib "$FindBin::RealBin/../../..";
-use lib "$FindBin::RealBin/../../../../../lib";
 
 use Test::Most tests => 6;
 use YAML::Any qw(Dump);
