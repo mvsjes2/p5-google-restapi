@@ -10,6 +10,7 @@ use 5.010_000;
 use autodie;
 use File::Basename;
 use Hash::Merge;
+use Log::Log4perl qw(:easy);
 use Type::Params qw(compile_named compile);
 use Types::Standard qw(Str StrMatch Any slurpy);
 use YAML::Any qw(Dump LoadFile);
@@ -25,7 +26,7 @@ our @EXPORT_OK = qw(named_extra config_file resolve_config_file strip bool dim d
 sub named_extra {
   my $p = shift;
   my $extra = delete $p->{_extra_}
-    or die "No _extra_ key found in hash";
+    or LOGDIE "No _extra_ key found in hash";
   @$p{ keys %$extra } = values %$extra;
   return $p;
 }
@@ -40,7 +41,7 @@ sub config_file {
   my $config_file = $merged_config->{config_file};
   if ($config_file) {
     my $config = eval { LoadFile($config_file); };
-    die "Unable to load config file '$config_file': $@" if $@;
+    LOGDIE "Unable to load config file '$config_file': $@" if $@;
     $merged_config = Hash::Merge::merge($merged_config, $config);
   }
 
@@ -54,7 +55,7 @@ sub resolve_config_file {
   my ($file_key, $config) = @_;
 
   my $file_path = $config->{$file_key}
-    or die "No config file name found for '$file_key':\n", Dump($config);
+    or LOGDIE "No config file name found for '$file_key':\n", Dump($config);
 
   # if file name is a simple file name (no path) then assume it's in the
   # same directory as the config file.
@@ -64,7 +65,7 @@ sub resolve_config_file {
       if $config_file;
   }
 
-  die "Config file '$file_key' not found or is not readable:\n", Dump($config)
+  LOGDIE "Config file '$file_key' not found or is not readable:\n", Dump($config)
     if !-f -r $file_path;
 
   return $file_path;

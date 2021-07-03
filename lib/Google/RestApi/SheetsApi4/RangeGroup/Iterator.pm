@@ -29,7 +29,7 @@ sub iterate {
   } $self->range_group()->ranges();
   my $range_group = $self->spreadsheet()->range_group(@ranges);
 
-  $self->{current} += $self->{by};
+  $self->{current} += $self->{by} if $range_group;
 
   return $range_group;
 }

@@ -8,7 +8,7 @@ use Hash::Merge;
 use List::MoreUtils qw(first_index);
 use Storable qw(dclone);
 
-sub submit_requests { die "Pure virtual function 'submit_requests' must be overridden"; }
+sub submit_requests { LOGDIE "Pure virtual function 'submit_requests' must be overridden"; }
 
 sub batch_requests {
   my $self = shift;
@@ -86,7 +86,7 @@ sub _can_merge {
   return 1;
 }
 
-sub requests_response {
+sub requests_response_from_api {
   my $self = shift;
 
   # we didn't ask for any requests, nothing more to do.

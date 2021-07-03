@@ -8,7 +8,7 @@ use Scalar::Util qw(looks_like_number);
 use aliased "Google::RestApi::SheetsApi4::Range";
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet";
 
-sub range { die "Pure virtual function 'range' must be overridden"; }
+sub range { LOGDIE "Pure virtual function 'range' must be overridden"; }
 
 sub left { shift->horizontal_alignment('LEFT'); }
 sub center { shift->horizontal_alignment('CENTER'); }
@@ -215,7 +215,7 @@ sub borders {
   # if these borders are to be part of repeatCell request, redirect
   # the borders to it.
   if ($self->{bd_repeat_cell}) {
-    die "Cannot use vertical|horizontal|inner when bd_repeat_cell is turned on"
+    LOGDIE "Cannot use vertical|horizontal|inner when bd_repeat_cell is turned on"
       if $p->{border} =~ /^(vertical|horizontal|inner)$/;
     return $self->user_entered_format(
       {
@@ -433,7 +433,7 @@ sub named_d { shift->delete_named(); }
 sub delete_named {
   my $self = shift;
 
-  my $named = $self->named() or die "Not a named range";
+  my $named = $self->named() or LOGDIE "Not a named range";
   $self->batch_requests(
     deleteNamedRange => {
       namedRangeId => $named->{namedRangeId},

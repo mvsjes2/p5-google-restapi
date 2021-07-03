@@ -40,7 +40,7 @@ sub headers {
 sub access_token {
   my $self = shift;
   $self->{access_token} = $self->{auth}->get_token()
-    or die "Service Account Auth failed";
+    or LOGDIE "Service Account Auth failed";
   return $self->{access_token};
 }
 

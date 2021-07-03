@@ -7,7 +7,7 @@ use Google::RestApi::Setup;
 use aliased "Google::RestApi::SheetsApi4::Request";
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet";
 
-sub worksheet_id { die "Pure virtual function 'worksheet_id' must be overridden"; }
+sub worksheet_id { LOGDIE "Pure virtual function 'worksheet_id' must be overridden"; }
 
 sub ws_rename { shift->update_worksheet_properties(properties => { title => shift }); }
 sub ws_index { shift->update_worksheet_properties(properties => { index => shift }); }

@@ -141,9 +141,9 @@ sub userinfo {
   my $token = $self->access_token();
   my $url = URI->new($self->{userinfo_url});
   my $res = $token->get($url);
-  $res->is_success or die 'userinfo request failed: ' . $res->as_string;
+  $res->is_success or LOGDIE 'userinfo request failed: ' . $res->as_string;
   my %res_params = $self->oauth2_webserver()->params_from_response($res)
-    or die 'params_from_response for userinfo response failed';
+    or LOGDIE 'params_from_response for userinfo response failed';
   return \%res_params;
 }
 

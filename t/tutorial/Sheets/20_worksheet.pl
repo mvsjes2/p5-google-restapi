@@ -9,13 +9,13 @@ use lib "$FindBin::RealBin/../../lib";
 use lib "$FindBin::RealBin/../../../lib";
 
 use YAML::Any qw(Dump);
-use Utils qw(init_logger message start end end_go show_api);
+use Utils qw(:all);
 
 init_logger();
 
 my $name = "Sheet1";
-my $spreadsheet_name = $Utils::spreadsheet_name;
-my $sheets = Utils::sheets_api(post_process => \&show_api);
+my $spreadsheet_name = spreadsheet_name();
+my $sheets = sheets_api(post_process => \&show_api);
 
 start("Now we will open the spreadsheet and worksheet.");
 my $ss = $sheets->open_spreadsheet(name => $spreadsheet_name);
@@ -35,7 +35,7 @@ my $col = $ws0->range_col(1);
 my $row = $ws0->range_row(1);
 $col->thaw();
 $row->thaw();
-$ss->submit_requests(requests => [$all, $col, $row]);
+$ss->submit_requests(ranges => [$all, $col, $row]);
 end("'Payroll' spreadsheet should now be blank.");
 
 # load up some sample data without any batch processing.

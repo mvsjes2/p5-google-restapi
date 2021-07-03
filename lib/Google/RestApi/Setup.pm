@@ -16,7 +16,7 @@ ToolSet->export(
   'autodie'                =>  [],
   'Log::Log4perl'          => ':easy',
   'Type::Params'           => 'compile compile_named multisig',
-  'Types::Standard'        => 'Defined Value Bool Str StrMatch Int ArrayRef HashRef CodeRef HasMethods slurpy Any Maybe',
+  'Types::Standard'        => 'Undef Defined Value Bool Str StrMatch Int ArrayRef HashRef CodeRef HasMethods slurpy Any Maybe',
   'YAML::Any'              => 'Dump',
   'Google::RestApi::Utils' => 'named_extra config_file resolve_config_file strip bool dim dims dims_all cl_black cl_white',
 );

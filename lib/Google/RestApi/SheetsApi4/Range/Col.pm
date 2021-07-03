@@ -14,35 +14,35 @@ sub new { shift->SUPER::new(@_, dim => 'col'); }
 sub range {
   my $self = shift;
   return $self->{normalized_range} if $self->{normalized_range};
+
   $self->{range} = { col => $self->{range} } if !ref($self->{range});
   my $range = $self->SUPER::range(@_);
   my $colA1 = Range->ColA1;
-  die "Unable to translate '$range' into a worksheet column"
+  LOGDIE "Unable to translate '$range' into a worksheet column"
     if !$self->is_named() && $range !~ qr/$colA1/;
   return $range;
 }
 
 sub values {
   my $self = shift;
-  my $p = _update_values(@_);
+  state $check = compile_named(
+    values => ArrayRef[Str], { optional => 1 },
+    _extra_ => slurpy Any,
+  );
+  my $p = named_extra($check->(@_));
+  $p->{values} = [ $p->{values} ] if defined $p->{values};
   my $values = $self->SUPER::values(%$p);
-  return $values->[0];
+  return defined $values ? $values->[0] : undef;
 }
 
 sub batch_values {
   my $self = shift;
-  my $p = _update_values(@_);
-  return $self->SUPER::batch_values(%$p);
-}
-
-sub _update_values {
   state $check = compile_named(
-    values  => ArrayRef[Str], { optional => 1 },
-    _extra_ => slurpy Any,
+    values => ArrayRef[Str], { optional => 1 },
   );
-  my $p = named_extra($check->(@_));
-  $p->{values} = [$p->{values}] if defined $p->{values};
-  return $p;
+  my $p = $check->(@_);
+  $p->{values} = [ $p->{values} ] if $p->{values};
+  return $self->SUPER::batch_values(%$p);
 }
 
 sub cell {

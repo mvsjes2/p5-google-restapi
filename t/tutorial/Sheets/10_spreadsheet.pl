@@ -10,12 +10,12 @@ use FindBin;
 use lib "$FindBin::RealBin/../../lib";
 use lib "$FindBin::RealBin/../../../lib";
 
-use Utils qw(init_logger message start end end_go show_api);
+use Utils qw(:all);
 
 init_logger($DEBUG);
 
-my $name = $Utils::spreadsheet_name;
-my $sheets = Utils::sheets_api();
+my $name = spreadsheet_name();
+my $sheets = sheets_api();
 # clean up any failed previous runs.
 $sheets->delete_all_spreadsheets($name);
 $sheets->rest_api()->post_process(\&show_api);

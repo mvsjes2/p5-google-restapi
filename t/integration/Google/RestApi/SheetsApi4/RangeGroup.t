@@ -7,10 +7,12 @@ use warnings;
 use Test::Most tests => 6;
 use YAML::Any qw(Dump);
 
-use Utils;
-Utils::init_logger();
+use aliased "Google::RestApi::SheetsApi4::RangeGroup";
 
-my $spreadsheet = Utils::spreadsheet();
+use Utils qw(:all);
+init_logger();
+
+my $spreadsheet = spreadsheet();
 my $worksheet = $spreadsheet->open_worksheet(id => 0);
 
 my @values_in = (
@@ -29,11 +31,11 @@ my $row = $worksheet->range_row(2);
 my $cell = $worksheet->range_cell([2,2]);
 my $range_group = $spreadsheet->range_group($col, $row, $cell);
 
-lives_ok sub { $range_group->batch_values(values => \@values_in), }, "Setting up mixed batch values should live";
-lives_ok sub { $range_group->submit_values(); }, "Submitting mixed values should live";
-lives_ok sub { $range_group->refresh_values(); }, "Refresh values on range group should live";
+isa_ok $range_group->batch_values(values => \@values_in), RangeGroup, "Setting up mixed batch values";
+is_array $range_group->submit_values(), "Submitting mixed values";
+isa_ok $range_group->refresh_values(), RangeGroup, "Refresh values on range group";
 is_deeply $range_group->values(), \@values_out, "Range group values should be correct";
-lives_ok sub { $range_group->clear(); }, "Range group should clear successfully";
+is_hash $range_group->clear(), "Range group clear";
 is_deeply $range_group->values(), [undef, undef, undef], "Range group values after clear should be empty";
 
-Utils::delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets());

@@ -6,7 +6,7 @@ use Google::RestApi::Setup;
 
 use parent "Google::RestApi::SheetsApi4::Request";
 
-sub spreadsheet_id { die "Pure virtual function 'spreadsheet_id' must be overridden"; }
+sub spreadsheet_id { LOGDIE "Pure virtual function 'spreadsheet_id' must be overridden"; }
 
 sub delete_protected_range {
   my $self = shift;

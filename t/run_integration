@@ -1,1 +1,1 @@
-prove -Ilib -I../lib -r --reverse integration
+prove -Ilib -I../lib -r integration "$@"

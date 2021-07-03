@@ -171,7 +171,7 @@ sub auth {
     # turn OAuth2Client into Google::RestApi::Auth::OAuth2Client etc.
     my $class = __PACKAGE__ . "::Auth::" . delete $self->{auth}->{class};
     eval "require $class";
-    die "Unable to require '$class': $@" if $@;
+    LOGDIE "Unable to require '$class': $@" if $@;
     $self->{auth}->{parent_config_file} = $self->{config_file}
       if $self->{config_file};
     $self->{auth} = $class->new(%{ $self->{auth} });
