@@ -4,15 +4,15 @@ use strict;
 use warnings;
 
 use YAML::Any qw(Dump);
-use Test::Most tests => 16;
+use Test::Most tests => 15;
 
 use aliased "Google::RestApi::SheetsApi4";
 
-use Utils;
-Utils::init_logger();
+use Utils qw(:all);
+init_logger();
 
-my $name = $Utils::spreadsheet_name;
-my $sheets = Utils::sheets_api();
+my $name = spreadsheet_name();
+my $sheets = sheets_api();
 my $spreadsheet = $sheets->create_spreadsheet(title => $name);
 
 my ($id, $uri);
@@ -48,15 +48,14 @@ $spreadsheet->{uri} = $uri;
 like $spreadsheet->spreadsheet_name(), qr/^$name$/, "Should find spreadsheet name when ID is missing";
 
 my $properties;
-lives_ok sub { $properties = $spreadsheet->properties('title') }, "Retreiving properties should live";
+is_hash $properties = $spreadsheet->properties('title'), "Retreiving properties";
 is $properties->{title}, $name, "Title property should be the correct name";
 
 my $worksheets;
-lives_ok sub { $worksheets = $spreadsheet->worksheet_properties('title') }, "Retreiving worksheets should live";
-is ref($worksheets), 'ARRAY', "Retreiving worksheets should be an array";
-is ref($worksheets->[0]), 'HASH', "First worksheet should be a hash";
+is_array $worksheets = $spreadsheet->worksheet_properties('title'), "Retreiving worksheets";
+is_hash $worksheets->[0], "First worksheet";
 is $worksheets->[0]->{title}, 'Sheet1', "First worksheet title should be 'Sheet1'";
 
-lives_ok sub { $spreadsheet->delete_spreadsheet(); }, "Deleting spreadsheet should succeed";
+is $spreadsheet->delete_spreadsheet(), 1, "Deleting spreadsheet should return 1";
 
 $sheets->delete_all_spreadsheets($name);

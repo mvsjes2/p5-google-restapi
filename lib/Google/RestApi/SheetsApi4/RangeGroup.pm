@@ -37,18 +37,15 @@ sub push_ranges {
 sub clear {
   my $self = shift;
 
+  $_->clear_cached_values() foreach $self->ranges();
+
   my @ranges = map { $_->range(); } $self->ranges();
   my %p = (
     content => { ranges => \@ranges },
     uri     => "/values:batchClear",
     method  => "post",
   );
-  my $response = $self->api(%p);
-
-  # private range routine called here!
-  $_->_clear_values() foreach $self->ranges();
-
-  return $response;
+  return $self->api(%p);
 }
 
 sub values {
@@ -96,7 +93,7 @@ sub _batch_get {
 
   my $value_ranges = $response->{valueRanges};
   # private range routine called here!
-  $ranges->[$_]->_value_range(%{ $value_ranges->[$_] })
+  $ranges->[$_]->_cache_range_values(%{ $value_ranges->[$_] })
     foreach (0..$#$ranges);
 
   return;
@@ -113,7 +110,7 @@ sub batch_values {
   my $values = $p->{values};
   if (defined $values) {
     my @ranges = $self->ranges();
-    die "Too many values provided for range group" if scalar @$values > scalar @ranges;
+    LOGDIE "Too many values provided for range group" if scalar @$values > scalar @ranges;
     $ranges[$_]->batch_values(values => $values->[$_]) foreach (0..$#$values);
     return $self;
   }
@@ -125,19 +122,20 @@ sub batch_values {
   return \@batch_values;
 }
 
-sub submit_values {
-  my $self = shift;
-  return $self->spreadsheet()->submit_values(@_, values => [ $self ]);
-}
-
-sub values_response {
+sub values_response_from_api {
   my $self = shift;
   state $check = compile(ArrayRef);
   my ($updates) = $check->(@_);
   my @updates = map {
-    $_->has_values() ? ($_->values_response($updates)) : ();
+    $_->has_values() ? ($_->values_response_from_api($updates)) : ();
   } $self->ranges();
   return \@updates;
+}
+
+sub submit_values {
+  my $self = shift;
+  $self->spreadsheet()->submit_values(ranges => [ $self ], @_);
+  return $self->values();
 }
 
 sub batch_requests {
@@ -150,16 +148,16 @@ sub batch_requests {
 
 sub submit_requests {
   my $self = shift;
-  $self->spreadsheet()->submit_requests(requests => [ $self ], @_);
-  return $self;
+  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
+#  return $self;
 }
 
-sub requests_response {
+sub requests_response_from_api {
   my $self = shift;
   state $check = compile(ArrayRef);
   my ($requests) = $check->(@_);
   my @requests = map {
-    $_->requests_response($requests);
+    $_->requests_response_from_api($requests);
   } $self->ranges();
   return \@requests;
 }

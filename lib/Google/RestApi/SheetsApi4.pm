@@ -51,7 +51,7 @@ sub create_spreadsheet {
     _extra_ => slurpy Any,
   );
   my $p = named_extra($check->(@_));
-  $p->{title} || $p->{name} or die "Either 'title' or 'name' should be supplied";
+  $p->{title} || $p->{name} or LOGDIE "Either 'title' or 'name' should be supplied";
   $p->{title} ||= $p->{name};
   delete $p->{name};
 
@@ -62,7 +62,7 @@ sub create_spreadsheet {
     },
   );
   for (qw(spreadsheetId spreadsheetUrl properties)) {
-    $result->{$_} or die "No '$_' returned from creating spreadsheet";
+    $result->{$_} or LOGDIE "No '$_' returned from creating spreadsheet";
   }
 
   return $self->open_spreadsheet(
@@ -101,7 +101,7 @@ sub delete_all_spreadsheets {
   my @spreadsheets = grep { $_->{name} eq $name; } @{ $spreadsheets->{files} };
   DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
   $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
-  return;
+  return scalar @spreadsheets;
 }
 
 sub spreadsheets {
@@ -341,7 +341,8 @@ Deletes a spreadsheet from Google Drive.
 =item delete_all_spreadsheets(spreadsheet_name<string>);
 
 Deletes all spreadsheets with the given name from Google Drive. Note that
-Google Sheets allows more than one spreadsheet to have the same name.
+Google Sheets allows more than one spreadsheet to have the same name. Returns
+the number of spreadsheets deleted.
 
  spreadsheet_name: The name of the spreadsheets you want to delete.
 
