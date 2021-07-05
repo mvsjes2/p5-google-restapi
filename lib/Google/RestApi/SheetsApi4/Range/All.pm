@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Range::All;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 use Google::RestApi::Setup;
 use parent 'Google::RestApi::SheetsApi4::Range';
