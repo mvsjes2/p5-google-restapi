@@ -249,7 +249,7 @@ endpoint on behalf of the underlying API classes (Sheets and Drive).
    specified between API calls to avoid threshhold errors from Google.
 
 You can specify any of the arguments in the optional YAML config file.
-Any passed in arguments will override what is in the config file.
+Any passed-in arguments will override what is in the config file.
 
 The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::*
 classes, or, for convenience sake, you can specify a hash of the required

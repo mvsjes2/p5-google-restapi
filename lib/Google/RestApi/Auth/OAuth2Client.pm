@@ -185,8 +185,8 @@ and creates the 'Authorization' header for use in Furl or LWP::UserAgent.
 
 This was copied from Net::Google::DataAPI::Auth::OAuth2 and modified
 to fit this framework. The other framework was dated and produced
-constant warnings to upgrade to Moo. I removed Moose since I didn't
-use Moose anywhere else in this framework.
+constant warnings to upgrade from Moose to Moo. I removed Moose since I
+didn't use Moose anywhere else in this framework.
 
 =head1 ATTRIBUTES
 
