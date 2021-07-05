@@ -1,6 +1,6 @@
 # NAME
 
-Google::RestApi - API to Google Sheets API V4.
+Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 
 # SYNOPSIS
 
