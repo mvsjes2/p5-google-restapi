@@ -22,6 +22,9 @@ mechanisms, added support for Google Service Accounts
 as a mechanism. Cleaned up request range class and added
 more formatting options. Minor bug fixes.
 
+0.5 General code cleanup, documentaion improvements,
+test imnprovements. No new features.
+
 INSTALLATION
 
 To install this module type the following:
