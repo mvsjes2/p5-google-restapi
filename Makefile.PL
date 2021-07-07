@@ -23,6 +23,7 @@ WriteMakefile(
 	'JSON'                            => 0,
 	'List::MoreUtils'                 => 0,
 	'List::Util'                      => 0,
+        'Log::Log4perl'                   => 0,
 	'Net::OAuth2::Client'             => 0,
 	'Net::OAuth2::Profile::WebServer' => 0,
 	'Scalar::Util'                    => 0,
