@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Range::Iterator;
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 use Google::RestApi::Setup;
 
