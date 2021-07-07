@@ -1,4 +1,4 @@
-Google-RestApi version 0.5
+Google-RestApi version 0.6
 ==========================
 
 This a collection of modules that is used for interfacing with
@@ -25,6 +25,8 @@ more formatting options. Minor bug fixes.
 0.5 General code cleanup, documentaion improvements,
 test imnprovements. No new features.
 
+0.6 Fix dist problems.
+
 INSTALLATION
 
 To install this module type the following:
@@ -48,6 +50,7 @@ This module requires these other modules and libraries:
   Furl 
   Hash::Merge 
   JSON 
+  Log::Log4perl
   List::MoreUtils
   List::Util
   Net::OAuth2::Client 
