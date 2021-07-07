@@ -6,5 +6,5 @@
 * git push
 * make
 * make test
-* make install
+* make dist
 * cpan-upload Google-RestApi-${new_version}.tar.gz
