@@ -3,6 +3,8 @@ package Google::RestApi::Setup;
 use strict;
 use warnings;
 
+our $VERSION = '0.6';
+
 use base 'ToolSet';
 
 ToolSet->use_pragma( 'strict' );

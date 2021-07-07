@@ -3,9 +3,9 @@ package Google::RestApi::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
-use 5.010_000;
+use feature 'state';
 
 use autodie;
 use File::Basename;
