@@ -30,5 +30,5 @@ Revision history for Perl extension Google::RestApi.
 0.6 Wed Jul 7 2021
         - Fix dist problems
 
-0.6.1 Thu Jul 8 2021
+0.7 Thu Jul 8 2021
         - Add ToolSet dependency
