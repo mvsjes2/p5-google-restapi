@@ -1,33 +1,6 @@
-Google-RestApi version 0.6.1
-============================
+Google-RestApi
 
-This a collection of modules that is used for interfacing with
-Google's various APIs. Currenly only paritial Drive support is
-included, and more comprehensive support for Google Sheets.
-Other APIs may be added in future (pull requests welcome).
-
-VERSION
-0.1 Initial version, beta status, partial support for Drive
-and more comprehensive support for Sheets. New versions will
-continue to build out these two APIs to be more complete.
-
-0.2 Breaking change to OAuth2 login procedure. Minor updates
-to POD, debug messages, comments etc.
-
-0.3 Added an attrs cache, removed testing dependency for
-Spreadsheets::Perl, fixed and added more tests.
-
-0.4 Breaking change to allow for multiple authorization
-mechanisms, added support for Google Service Accounts
-as a mechanism. Cleaned up request range class and added
-more formatting options. Minor bug fixes.
-
-0.5 General code cleanup, documentaion improvements,
-test imnprovements. No new features.
-
-0.6 Fix dist problems.
-
-0.6.1 Add ToolSet dependency
+See Changelog for versions details.
 
 INSTALLATION
 
@@ -43,29 +16,30 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
   aliased
-  autodie 
+  autodie
   autovivification
   constant
   Cache::Memory::Simple
   Carp
   Exporter
-  Furl 
-  Hash::Merge 
-  JSON 
+  Furl
+  Hash::Merge
+  JSON
   Log::Log4perl
   List::MoreUtils
   List::Util
-  Net::OAuth2::Client 
-  Net::OAuth2::Profile::WebServer 
+  Net::OAuth2::Client
+  Net::OAuth2::Profile::WebServer
   Scalar::Util
   Storable
-  Sub::Retry 
-  Tie::Hash 
+  Sub::Retry
+  Tie::Hash
   Time::Out
+  ToolSet
   Type::Params
   Types::Standard
-  URI 
-  URI::QueryParam 
+  URI
+  URI::QueryParam
   WWW::Google::Cloud::Auth::ServiceAccount
   YAML::Any
   Test::Class::Load
