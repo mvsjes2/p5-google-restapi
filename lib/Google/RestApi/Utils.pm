@@ -3,7 +3,7 @@ package Google::RestApi::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.6';
+our $VERSION = '0.6.1';
 
 use feature 'state';
 
