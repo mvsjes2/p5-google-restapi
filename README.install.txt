@@ -1,5 +1,5 @@
-Google-RestApi version 0.6
-==========================
+Google-RestApi version 0.6.1
+============================
 
 This a collection of modules that is used for interfacing with
 Google's various APIs. Currenly only paritial Drive support is
@@ -26,6 +26,8 @@ more formatting options. Minor bug fixes.
 test imnprovements. No new features.
 
 0.6 Fix dist problems.
+
+0.6.1 Add ToolSet dependency
 
 INSTALLATION
 
