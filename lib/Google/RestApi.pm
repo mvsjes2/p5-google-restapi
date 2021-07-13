@@ -4,10 +4,12 @@ our $VERSION = '0.7';
 
 use Google::RestApi::Setup;
 
+use File::Basename;
 use Furl;
 use JSON;
+use Module::Load qw(load);
 use Scalar::Util qw(blessed);
-use Sub::Retry;
+use Retry::Backoff 'retry';
 use Storable qw(dclone);
 use Time::Out qw(timeout);
 use URI;
@@ -16,15 +18,17 @@ use URI::QueryParam;
 sub new {
   my $class = shift;
 
-  my $self = config_file(@_);
+  my $self = merge_config_file(@_);
   state $check = compile_named(
-    config_file  => Str, { optional => 1 },
-    auth         => 1,
+    config_file  => ReadableFile, { optional => 1 },
+    auth         => HashRef | Object,
     post_process => CodeRef, { optional => 1 },
-    throttle     => Int->where('$_ > -1'), { default => 0 },
+    throttle     => PositiveOrZeroInt, { default => 0 },
     timeout      => Int, { default => 120 },
   );
   $self = $check->(%$self);
+
+  $self->{ua} = Furl->new(timeout => $self->{timeout});
 
   return bless $self, $class;
 }
@@ -33,146 +37,119 @@ sub api {
   my $self = shift;
 
   state $check = compile_named(
-    uri     => Str,
+    uri     => StrMatch[qr(^https://)],
     method  => StrMatch[qr/^(get|head|put|patch|post|delete)$/i], { default => 'get' },
     headers => ArrayRef[Str], { default => [] },
-    params  => HashRef, { default => {} },
-    content => 1, { optional => 1 },
+    params  => HashRef[Str|ArrayRef[Str]], { default => {} },
+    content => 0,
   );
-  my $p = $check->(@_);
+  my $request = $check->(@_);
 
-  $self->_stat( $p->{method}, 'total' );
-  $p->{method} = uc($p->{method});
+  $self->{transaction} = {};
+
+  $self->_stat( $request->{method}, 'total' );
+  $request->{method} = uc($request->{method});
 
   my ($package, $line, $i) = ('', '', 0);
   do {
     ($package, undef, $line) = caller(++$i);
   } while($package && $package =~ m|Google::RestApi|);
-  $p->{caller} = {
+  $request->{caller} = {
     package => $package,
     line    => $line,
   };
-  DEBUG("Rest API request:\n", Dump($p));
+  DEBUG("Rest API request:\n", Dump($request));
 
-  my $uri = $p->{uri};
-  my $content = $p->{content};
+  my $base_uri = $request->{uri};
+  my $content = $request->{content};
 
   my @headers;
   push(@headers, 'Content-Type' => 'application/json') if $content;
-  push(@headers, @{ $p->{headers} });
+  push(@headers, @{ $request->{headers} });
   push(@headers, @{ $self->auth()->headers() });
 
   # some (outdated) auth mechanisms may allow auth info in the params.
-  my %params = (%{ $p->{params} }, %{ $self->auth()->params() });
-  $uri = URI->new($uri);
+  my %params = (%{ $request->{params} }, %{ $self->auth()->params() });
+  my $uri = URI->new($base_uri);
   $uri->query_form_hash(\%params);
-  DEBUG("Rest API URI: $p->{method} ", $uri->as_string());
+  $request->{uri_string} = $uri->as_string();
+  DEBUG("Rest API URI: $request->{method}: $request->{uri_string}");
+
   my $req = HTTP::Request->new(
-    $p->{method}, $uri->as_string(), \@headers,
+    $request->{method}, $request->{uri_string}, \@headers,
     $content ? encode_json($content) : (),
   );
 
-  my $api_response = $self->_api($req);
-  if (!$api_response) {
+  my ($response, $tries, $last_error) = $self->_api($req);
+  $self->{transaction} = {
+    request  => $request,
+    tries    => $tries,
+    ($response ? (response => $response) : ()),
+    ($last_error ? (error => $last_error) : ())
+  };
+
+  if (!$response || !$response->is_success()) {
     $self->_stat('error');
-    LOGDIE("Rest API failure: Nothing returned from request:\n", Dump({called => $p}));
-  }
-  if (!$api_response->is_success()) {
-    $self->_stat('error');
-    my $error = {
-      code    => $api_response->code(),
-      message => $api_response->message(),
-      status  => $api_response->status_line(),
-      called  => $p,
-    };
-    $error->{response} = eval { decode_json($api_response->decoded_content()); };
-    LOGDIE("Rest API failure:\n", Dump($error));
+    LOGDIE("Rest API failure: Nothing returned from request:\n", Dump( $self->transaction() ));
   }
 
-  my $api_content = $api_response->decoded_content();
-  $api_content = $api_content ? decode_json($api_content) : 1;
+  my $decoded_content = $response->decoded_content();
+  $decoded_content = $decoded_content ? decode_json($decoded_content) : 1;
+  $self->{transaction}->{decoded_content} = $decoded_content;
+  DEBUG("Rest API response:\n", Dump($decoded_content));
 
-  $self->{post_process}->(
-    content  => $api_content,
-    response => $api_response,
-    called   => $p,
-  ) if $self->{post_process};
-  DEBUG("Rest API response:\n", Dump($api_content));
+  $self->{post_process}->( $self->transaction() ) if $self->{post_process};
 
-  # used for integration tests to avoid google 403's and 429's.
+  # used for to avoid google 403's and 429's as with integration tests.
   sleep($self->{throttle}) if $self->{throttle};
 
-  return wantarray ? ($api_content, $api_response, $p) : $api_content;
-}
-
-sub post_process {
-  my $self = shift;
-  state $check = compile(CodeRef, { optional => 1 });
-  my ($process) = $check->(@_);
-  if (!$process) {
-    delete $self->{post_process};
-    return;
-  }
-  $self->{post_process} = $process;
-  return;
-}
-
-sub _stat {
-  my $self = shift;
-  my @stats = @_;
-  $_ = lc for @stats;
-  foreach (@stats) {
-    $self->{stats}->{$_} //= 0;
-    $self->{stats}->{$_}++;
-  }
-  return;
+  return $decoded_content;
 }
 
 sub _api {
   my ($self, $req) = @_;
 
-  my $res = retry 3, 1.0,
+  # default is exponential backoff, initial delay 1.
+  my $tries = 0;
+  my $last_error;
+  my $response = retry
     sub {
       # timeout is in the ua too, but i've seen requests to spreadsheets
       # completely hang if the request isn't constructed correctly.
-      timeout $self->{timeout} => sub {
-        return $self->ua()->request($req);
-      };
+      timeout $self->{timeout} => sub { $self->{ua}->request($req); };
     },
-    sub {
-      my $r = shift;
+    retry_if => sub {
+      my $h = shift;
+      my $r = $h->{attempt_result};   # Furl::Response
       if (!$r) {
-        WARN("Not an HTTP::Response: $@");
-        return 1;      # 1 = do retry
-      } elsif ($r->status_line() =~ /^500\s+Internal Response/i or $r->code =~ /^50[234]$/) {
-        WARN('Retrying: %s', $r->status_line());
+        $last_error = $@ || "Unknown error";
+        WARN("API call error: $last_error");
         return 1;
       }
-      return;
-    };
-
-  return $res;
+      $last_error = $r->status_line() if !$r->is_success();
+      if ($r->code() == 429 || $r->code() =~ /^50[0234]$/) {
+        WARN("Retrying: $last_error");
+        return 1;
+      }
+      return; # we're accepting the response.
+    },
+    on_success   => sub { $tries++; },
+    on_failure   => sub { $tries++; },
+    max_attempts => 4;   # override default max_attempts 10.
+  return ($response, $tries, $last_error);
 }
 
-sub ua {
-  my $self = shift;
-  if (!$self->{ua}) {
-    $self->{ua} = Furl->new(
-      timeout => $self->{timeout},
-    );
-  }
-  return $self->{ua};
-}
-
+# convert a plain hash auth to an object if a hash was passed.
 sub auth {
   my $self = shift;
 
   if (!blessed($self->{auth})) {
     # turn OAuth2Client into Google::RestApi::Auth::OAuth2Client etc.
     my $class = __PACKAGE__ . "::Auth::" . delete $self->{auth}->{class};
-    eval "require $class";
-    LOGDIE "Unable to require '$class': $@" if $@;
-    $self->{auth}->{parent_config_file} = $self->{config_file}
+    load $class;
+    # add the path to the base config file so auth hash doesn't have
+    # to store the full path name for things like token_file etc.
+    $self->{auth}->{config_dir} = dirname($self->{config_file})
       if $self->{config_file};
     $self->{auth} = $class->new(%{ $self->{auth} });
   }
@@ -180,10 +157,31 @@ sub auth {
   return $self->{auth};
 }
 
+sub post_process {
+  my $self = shift;
+  state $check = compile(CodeRef, { optional => 1 });
+  my ($post_process) = $check->(@_);
+  my $prev_post_process = delete $self->{post_process};
+  $self->{post_process} = $post_process if $post_process;
+  return $prev_post_process;
+}
+
+sub transaction { shift->{transaction} || {}; }
+
+sub _stat {
+  my $self = shift;
+  my @stats = @_;
+  foreach (@stats) {
+    $_ = lc;
+    $self->{stats}->{$_} //= 0;
+    $self->{stats}->{$_}++;
+  }
+  return;
+}
+
 sub stats {
   my $self = shift;
-  my $stats = $self->{stats} || {};
-  $stats = dclone($stats);
+  my $stats = dclone($self->{stats} || {});
   return $stats;
 }
 

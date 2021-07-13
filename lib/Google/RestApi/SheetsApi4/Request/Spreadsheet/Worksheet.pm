@@ -33,7 +33,7 @@ sub _freeze {
   my $self = shift;
 
   my $dim = shift;
-  state $check = compile(Int->where('$_ > -1'), { default => 0 });
+  state $check = compile(PositiveOrZeroInt, { default => 0 });
   my ($count) = $check->(@_);
 
   # "frozenColumnCount" or "frozenRowCount".

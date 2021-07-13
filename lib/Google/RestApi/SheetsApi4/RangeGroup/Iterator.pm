@@ -10,9 +10,9 @@ sub new {
   my $class = shift;
   state $check = compile_named(
     range_group => HasMethods[qw(ranges)],
-    by          => Int->where('$_ > 0'), { default => 1 },
-    from        => Int->where('$_ > -1'), { optional => 1 },
-    to          => Int->where('$_ > -1'), { optional => 1 },
+    by          => PositiveInt, { default => 1 },
+    from        => PositiveOrZeroInt, { optional => 1 },
+    to          => PositiveOrZeroInt, { optional => 1 },
   );
   my $self = $check->(@_);
   $self->{current} = delete $self->{from} || 0;

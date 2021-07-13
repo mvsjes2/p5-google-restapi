@@ -15,7 +15,7 @@ sub class { 'Google::RestApi::SheetsApi4::Worksheet' }
 
 # sub constructor : Tests(4) { shift->SUPER::constructor(@_); }
 
-sub tie : Tests(1) {
+sub tie : Tests(startup => 1) {
   my $self = shift;
 
   my $worksheet = $self->worksheet();

@@ -1,9 +1,9 @@
 package Test::Google::RestApi::SheetsApi4;
 
 use Test::Most;
-use parent 'Test::Class';
+use Utils qw(:all);
 
-use Test::Mock::RestApi;
+use parent 'Test::Class';
 
 sub class { 'Google::RestApi::SheetsApi4' }
 
@@ -17,7 +17,7 @@ sub constructor : Tests(3) {
   my $class = $self->class();
   can_ok $class, 'new';
   ok my $spreadsheets = $class->new(
-    api => new Test::Mock::RestApi(),
+    api => fake_rest_api(),
   ), '... and the constructor should succeed';
   isa_ok $spreadsheets, $class, '... and the object it returns';
 }

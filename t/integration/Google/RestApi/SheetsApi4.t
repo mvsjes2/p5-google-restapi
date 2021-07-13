@@ -12,10 +12,8 @@ use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
 use Utils qw(:all);
 init_logger();
 
-my $api = rest_api();
-
 my ($sheets, $spreadsheet, $spreadsheets);
-isa_ok $sheets = SheetsApi4->new(api => $api), SheetsApi4, "New sheets API object";
+isa_ok $sheets = SheetsApi4->new(api => real_rest_api()), SheetsApi4, "New sheets API object";
 isa_ok $spreadsheet = $sheets->create_spreadsheet(title => spreadsheet_name()), Spreadsheet, "New spreadsheet object";
 is_hash $spreadsheets = $sheets->spreadsheets(), "Listing spreadsheets";
 is_array $spreadsheets->{files}, "Listing spreadsheet files should return an array";
