@@ -10,3 +10,4 @@
 * make dist
 * cpan-upload Google-RestApi-${new_version}.tar.gz --user $user
 * make clean
+* rm Google-RestApi-${new_version}.tar.gz

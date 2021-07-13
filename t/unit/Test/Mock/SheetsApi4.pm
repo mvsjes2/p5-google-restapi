@@ -13,8 +13,9 @@ use URI::QueryParam;
 use YAML::Any qw(Dump LoadFile);
 use Test::MockObject::Extends;
 
+use Utils qw(:all);
+
 use Test::Mock::Drive;
-use Test::Mock::RestApi;
 use Test::Mock::Spreadsheet;
 
 use aliased 'Google::RestApi::SheetsApi4';
@@ -22,9 +23,9 @@ use aliased 'Google::RestApi::SheetsApi4';
 sub new {
   # TODO: need a way to load this from the parent script.
   my $config = LoadFile("$FindBin::RealBin/etc/config.yaml");
-
+  
   my $self = SheetsApi4->new(
-    api    => Test::Mock::RestApi->new(),
+    api    => fake_rest_api(),
     config => $config,
   );
 

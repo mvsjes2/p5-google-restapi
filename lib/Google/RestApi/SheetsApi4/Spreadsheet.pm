@@ -26,7 +26,7 @@ sub new {
     title     => Str, { optional => 1 },
     uri       => StrMatch[qr|$qr_uri/$qr_id/|], { optional => 1 },
     config_id => Str, { optional => 1 },
-    cache     => Int->where('$_ > -1'), { default => 5 },
+    cache     => PositiveOrZeroInt, { default => 5 },
   );
   my $self = $check->(@_);
 
@@ -150,7 +150,7 @@ sub _cache {
 
 sub cache {
   my $self = shift;
-  state $check = compile(Int->where('$_ > -1'));
+  state $check = compile(PositiveOrZeroInt);
   my ($cache) = $check->(@_);
   $self->{_cache}->delete_all() if $self->{_cache};
   delete $self->{_cache} if !$cache;

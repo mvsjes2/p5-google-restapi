@@ -29,8 +29,8 @@ use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range"
 use constant {
   Range     => Defined,
   Col       => Value,
-  Row       => Int->where('$_ > 0'),
-  Index     => Int->where('$_ > -1'),
+  Row       => PositiveInt,
+  Index     => PositiveOrZeroInt,
   Dim       => StrMatch[qr/^(col|row)/i],
   Dims      => StrMatch[qr/^(col|row)/i],
   DimsAll   => StrMatch[qr/^(col|row|all)/i],

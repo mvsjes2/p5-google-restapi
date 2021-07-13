@@ -20,18 +20,17 @@ use aliased "Google::RestApi::SheetsApi4";
 use Exporter qw(import);
 
 our @EXPORT_OK = qw(
+  Dump LoadFile
   init_logger
   $OFF $FATAL $WARN $ERROR $INFO $DEBUG $TRACE
   debug_on debug_off
   is_array is_hash
-  rest_api
-  rest_api_config
-  sheets_api
-  spreadsheet
-  spreadsheet_name
-  delete_all_spreadsheets
+  real_rest_api real_config_file
+  fake_rest_api fake_config_file
+  fake_token_file
+  sheets_api show_api
+  spreadsheet spreadsheet_name delete_all_spreadsheets
   message start end end_go
-  show_api
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
@@ -78,21 +77,24 @@ sub spreadsheet_name { 'google_restapi_sheets_testing'; }
 sub spreadsheet { sheets_api()->create_spreadsheet(title => spreadsheet_name()); }
 
 sub sheets_api {
-  my $api = rest_api(@_);
+  my $api = real_rest_api(@_);
   return SheetsApi4->new(api => $api);
 }
 
 # point GOOGLE_RESTAPI_CONFIG to a file that contains the OAuth2 access config
 # for integration and tutorials to run. unit tests are mocked so is not needed
 # for them.
-sub rest_api_config {
+sub real_config_file {
   my $config_file = $ENV{GOOGLE_RESTAPI_CONFIG}
     or die "No testing config file found: set env var GOOGLE_RESTAPI_CONFIG first";
   return $config_file;
 }
+sub fake_config_file { "$FindBin::RealBin/etc/rest_config.yaml"; }
+sub fake_token_file { "$FindBin::RealBin/etc/rest_config.token"; }
 
 # set throttle to 1 if you start getting 403's or 429's back from google.
-sub rest_api { RestApi->new(@_, config_file => rest_api_config(), throttle => 1); }
+sub real_rest_api { RestApi->new(@_, config_file => real_config_file(), throttle => 1); }
+sub fake_rest_api { RestApi->new(@_, config_file => fake_config_file()); }
 
 # used by tutorial to interact with the user as each step in the tutorial is performed.
 sub message { print color(shift), @_, color('reset'), "\n"; }
@@ -101,13 +103,12 @@ sub end { message('green', @_, " Press enter to continue.\n"); <>; }
 sub end_go { message('green', @_, "\n"); }
 
 sub show_api {
-  my %p = @_;
+  my $trans = shift;
   my %dump = (
-    called           => $p{called},
-    response_content => $p{content},
+    request => $trans->{request},
+    response => $trans->{decoded_content},
   );
   warn color('magenta'), "Sent request to api:\n", color('reset'), Dump(\%dump);
-
   return;
 }
 

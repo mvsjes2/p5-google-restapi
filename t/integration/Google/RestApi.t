@@ -11,10 +11,8 @@ use aliased "Google::RestApi";
 use Utils qw(:all);
 init_logger();
 
-my $config_file = rest_api_config();
-
 my $api;
-$api = RestApi->new(config_file => $config_file);
+$api = RestApi->new(config_file => real_config_file());
 isa_ok $api, "Google::RestApi", "New api";
 
 my $about;
