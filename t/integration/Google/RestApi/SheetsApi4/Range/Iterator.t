@@ -1,15 +1,11 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
+use Test::Integration::Setup;
 
 use Test::Most tests => 28;
 
 use aliased "Google::RestApi::SheetsApi4::Range::Cell";
 use aliased "Google::RestApi::SheetsApi4::Range::Iterator";
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $spreadsheet = spreadsheet();
 my $worksheet = $spreadsheet->open_worksheet(id => 0);

@@ -1,15 +1,10 @@
-#!/usr/bin/perl
+use Test::Integration::Setup;
 
-use strict;
-use warnings;
-
-use YAML::Any qw(Dump);
 use Test::Most tests => 8;
 
 use aliased "Google::RestApi::SheetsApi4::RangeGroup::Tie";
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $text1 = "This is text for A1";
 my $text2 = "This is text for A2";

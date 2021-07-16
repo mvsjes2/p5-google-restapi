@@ -1,18 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
-
-use Log::Log4perl qw(:easy);
-use YAML::Any qw(Dump);
-
 use FindBin;
 use lib "$FindBin::RealBin/../../lib";
 use lib "$FindBin::RealBin/../../../lib";
 
-use Utils qw(:all);
+use Test::Tutorial::Setup;
 
-init_logger($DEBUG);
+# init_logger($DEBUG);
 
 my $name = spreadsheet_name();
 my $sheets = sheets_api();

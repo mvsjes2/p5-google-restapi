@@ -7,26 +7,32 @@ use Google::RestApi::Setup;
 use File::Basename;
 use Furl;
 use JSON;
+use Log::Log4perl qw(get_logger);
 use Module::Load qw(load);
 use Scalar::Util qw(blessed);
 use Retry::Backoff 'retry';
 use Storable qw(dclone);
 use Time::Out qw(timeout);
+use Try::Tiny;
 use URI;
 use URI::QueryParam;
 
 sub new {
   my $class = shift;
 
-  my $self = merge_config_file(@_);
+  # can't merge coderefs with hash::merge, so remove it first.
+  my %p = @_;
+  my $post_process = delete $p{post_process};  # it's optional.
+  my $self = merge_config_file(%p);
+
   state $check = compile_named(
     config_file  => ReadableFile, { optional => 1 },
     auth         => HashRef | Object,
-    post_process => CodeRef, { optional => 1 },
     throttle     => PositiveOrZeroInt, { default => 0 },
     timeout      => Int, { default => 120 },
   );
   $self = $check->(%$self);
+  $self->{post_process} = $post_process if $post_process;
 
   $self->{ua} = Furl->new(timeout => $self->{timeout});
 
@@ -39,8 +45,8 @@ sub api {
   state $check = compile_named(
     uri     => StrMatch[qr(^https://)],
     method  => StrMatch[qr/^(get|head|put|patch|post|delete)$/i], { default => 'get' },
-    headers => ArrayRef[Str], { default => [] },
     params  => HashRef[Str|ArrayRef[Str]], { default => {} },
+    headers => ArrayRef[Str], { default => [] },
     content => 0,
   );
   my $request = $check->(@_);
@@ -90,15 +96,19 @@ sub api {
 
   if (!$response || !$response->is_success()) {
     $self->_stat('error');
+    $self->_post_process();
     LOGDIE("Rest API failure: Nothing returned from request:\n", Dump( $self->transaction() ));
   }
+
+  my $logger = get_logger('dump_response_content');
+  $logger->info("$request->{uri_string}:\n" . $response->content() . "\n\n") if $logger;
 
   my $decoded_content = $response->decoded_content();
   $decoded_content = $decoded_content ? decode_json($decoded_content) : 1;
   $self->{transaction}->{decoded_content} = $decoded_content;
   DEBUG("Rest API response:\n", Dump($decoded_content));
 
-  $self->{post_process}->( $self->transaction() ) if $self->{post_process};
+  $self->_post_process();
 
   # used for to avoid google 403's and 429's as with integration tests.
   sleep($self->{throttle}) if $self->{throttle};
@@ -157,6 +167,18 @@ sub auth {
   return $self->{auth};
 }
 
+sub _post_process {
+  my $self = shift;
+  return if !$self->{post_process};
+  try {
+    $self->{post_process}->( $self->transaction() );
+  } catch {
+    my $err = $_;
+    FATAL("Post process died: $err");
+  };
+  return;
+}
+
 sub post_process {
   my $self = shift;
   state $check = compile(CodeRef, { optional => 1 });
@@ -165,8 +187,6 @@ sub post_process {
   $self->{post_process} = $post_process if $post_process;
   return $prev_post_process;
 }
-
-sub transaction { shift->{transaction} || {}; }
 
 sub _stat {
   my $self = shift;
@@ -184,6 +204,8 @@ sub stats {
   my $stats = dclone($self->{stats} || {});
   return $stats;
 }
+
+sub transaction { shift->{transaction} || {}; }
 
 1;
 
@@ -294,8 +316,8 @@ Useful for performance tuning during development.
 
 For specific use of this class, see:
 
- Google::RestApi::SheetsApi4
  Google::RestApi::DriveApi3
+ Google::RestApi::SheetsApi4
 
 =head1 AUTHORS
 

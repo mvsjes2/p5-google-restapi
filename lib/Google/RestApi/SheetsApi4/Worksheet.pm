@@ -281,8 +281,7 @@ sub tie {
 
 sub submit_requests {
   my $self = shift;
-  my @api = $self->spreadsheet()->submit_requests(requests => [ $self ], @_);
-  return wantarray ? @api : $api[0];
+  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
 }
 
 sub config {
@@ -303,6 +302,7 @@ sub sheets { shift->spreadsheet()->sheets(@_); }
 sub spreadsheet { shift->{spreadsheet}; }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(); }
 sub spreadsheet_config { shift->spreadsheet()->config(shift); }
+sub transaction { shift->spreadsheet()->transaction(); }
 
 1;
 

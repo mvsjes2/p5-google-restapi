@@ -136,6 +136,7 @@ sub STORE {
 sub refresh_values { shift->range_group()->refresh_values(@_); }
 sub submit_values { shift->range_group()->submit_values(@_); }
 sub submit_requests { shift->range_group()->submit_requests(@_); }
+sub transaction { shift->range_group()->transaction(); }
 sub ranges { shift->{ranges}; }
 sub worksheet { shift->{worksheet}; }
 sub spreadsheet { shift->{spreadsheet}; }

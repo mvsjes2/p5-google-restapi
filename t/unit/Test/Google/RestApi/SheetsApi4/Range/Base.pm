@@ -1,5 +1,7 @@
 package Test::Google::RestApi::SheetsApi4::Range::Base;
 
+use Test::Unit::Setup;
+
 use Scalar::Util qw(looks_like_number);
 
 use parent 'Test::Google::RestApi::SheetsApi4::Base';

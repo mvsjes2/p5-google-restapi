@@ -16,7 +16,7 @@ ToolSet->no_pragma( 'autovivification' );
 ToolSet->export(
   'autodie'                =>  [],
   'Log::Log4perl'          => ':easy',
-  'Type::Params'           => 'compile compile_named multisig',
+  'Type::Params'           => 'compile compile_named multisig validate',
   'Types::Standard'        => 'Undef Defined Value Bool Str StrMatch Int ArrayRef HashRef Dict CodeRef Object HasMethods slurpy Any Maybe',
   'Types::Common::Numeric' => 'PositiveInt PositiveOrZeroInt',
   'YAML::Any'              => 'Dump',

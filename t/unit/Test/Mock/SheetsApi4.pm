@@ -13,7 +13,7 @@ use URI::QueryParam;
 use YAML::Any qw(Dump LoadFile);
 use Test::MockObject::Extends;
 
-use Utils qw(:all);
+use Test::Unit::Setup;
 
 use Test::Mock::Drive;
 use Test::Mock::Spreadsheet;

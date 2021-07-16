@@ -1,16 +1,10 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
-
+use Test::Integration::Setup;
 
 use Test::Most tests => 6;
-use YAML::Any qw(Dump);
 
 use aliased "Google::RestApi::SheetsApi4::RangeGroup";
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $spreadsheet = spreadsheet();
 my $worksheet = $spreadsheet->open_worksheet(id => 0);

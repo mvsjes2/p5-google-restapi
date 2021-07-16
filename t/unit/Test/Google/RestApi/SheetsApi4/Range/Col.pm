@@ -1,6 +1,6 @@
 package Test::Google::RestApi::SheetsApi4::Range::Col;
 
-use Test::Most;
+use Test::Unit::Setup;
 
 use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Range::Base);
 

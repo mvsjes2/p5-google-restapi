@@ -273,8 +273,7 @@ sub submit_values {
 
 sub submit_requests {
   my $self = shift;
-  my @api = $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
-  return wantarray ? @api : $api[0];
+  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
 }
 
 sub append {
@@ -799,6 +798,7 @@ sub worksheet_id { shift->worksheet()->worksheet_id(@_); }
 sub spreadsheet { shift->worksheet()->spreadsheet(@_); }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(@_); }
 sub config { shift->worksheet()->config(@_); }
+sub transaction { shift->spreadsheet()->transaction(); }
 
 1;
 
@@ -812,7 +812,7 @@ Google::RestApi::SheetsApi4::Range - Represents a range in a Worksheet.
 
 A Range object that represents a range in a remote spreadsheet. These are
 normally short-lived objects used to set up and execute a remote action.
-Keep in mind that the remote spreadsheet can be potentially updated by
+Keep in mind that the remote spreadsheet can be concurrently updated by
 many people, so a compromise must always be reached between holding a copy
 of the local cell values and the number of network calls to the Google
 API to keep the values current.

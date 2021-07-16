@@ -187,6 +187,7 @@ sub AUTOLOAD {
 
 sub ranges { @{ shift->{ranges} }; }
 sub api { shift->spreadsheet()->api(@_); }
+sub transaction { shift->spreadsheet()->transaction(); }
 sub spreadsheet { shift->{spreadsheet}; }
 
 1;

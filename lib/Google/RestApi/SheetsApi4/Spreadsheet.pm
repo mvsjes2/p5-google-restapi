@@ -70,10 +70,7 @@ sub spreadsheet_id {
       LOGDIE "Unable to extract a sheet id from uri" if !$self->{id};
       DEBUG("Got sheet ID '$self->{id}' via URI '$self->{uri}'.");
     } else {
-      my $spreadsheets = $self->sheets()->spreadsheets();
-      my ($spreadsheet) = grep {
-        $_->{name} eq $self->{name};
-      } @{ $spreadsheets->{files} };
+      my ($spreadsheet) = grep { $_->{name} eq $self->{name}; } $self->sheets()->spreadsheets();
       LOGDIE "Sheet '$self->{name}' not found on google drive" if !$spreadsheet;
       $self->{id} = $spreadsheet->{id};
       DEBUG("Got sheet id '$self->{id}' via spreadsheet list.");
