@@ -1,13 +1,8 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
+use Test::Integration::Setup;
 
 use Test::Most tests => 34;
-use YAML::Any qw(Dump);
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Col';

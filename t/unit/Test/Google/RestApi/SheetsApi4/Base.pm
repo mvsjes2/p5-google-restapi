@@ -1,7 +1,7 @@
 package Test::Google::RestApi::SheetsApi4::Base;
 
-use YAML::Any qw(Dump);
-use Test::Most;
+use Test::Unit::Setup;
+
 use Test::Mock::Worksheet;
 
 use parent 'Test::Class';

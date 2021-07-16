@@ -1,7 +1,6 @@
 package Test::Google::RestApi::SheetsApi4::RangeGroup;
 
-use YAML::Any qw(Dump);
-use Test::Most;
+use Test::Unit::Setup;
 
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
 

@@ -2,11 +2,11 @@ package Test::Google::RestApi::Utils;
 
 # Utils is not a class, but it's the only module that's not a class module, so use the same
 # Test::Class pattern that the rest of the tests use so we don't have to do something
-# different for this one module.
+# different for this one module. prefix each test with 'test_' so it doesn't get mixed up
+# with the sub names in the Utils module we're testing. for the other modules that use actual
+# classes, there is no sub name clash since we're using class instances to call the subs.
 
-use Test::Most;
-
-use Utils qw(:all);
+use Test::Unit::Setup;
 
 use parent 'Test::Class';
 
@@ -15,13 +15,13 @@ sub class { 'Google::RestApi::Utils' }
 sub startup : Tests(startup => 1) {
   my $self = shift;
   use_ok $self->class(), ':all';
+  return;
 }
 
 sub test_named_extra : Tests(2) {
   my %args;
   throws_ok sub { named_extra(%args); }, qr/Missing required/i, "named_extra: No _extra_ key throws";
   %args = ( _extra_ => { joe => 'fred' } );
-
   is_deeply named_extra(%args), $args{_extra_}, "named_extra: Returns the _extra_ hash";
   return;
 }

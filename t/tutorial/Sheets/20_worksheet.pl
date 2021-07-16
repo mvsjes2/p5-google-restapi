@@ -1,17 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
-
-# use Carp::Always;
 use FindBin;
 use lib "$FindBin::RealBin/../../lib";
 use lib "$FindBin::RealBin/../../../lib";
 
-use YAML::Any qw(Dump);
-use Utils qw(:all);
+use Test::Tutorial::Setup;
 
-init_logger();
+# init_logger($DEBUG);
 
 my $name = "Sheet1";
 my $spreadsheet_name = spreadsheet_name();

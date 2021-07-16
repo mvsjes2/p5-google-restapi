@@ -19,6 +19,7 @@ WriteMakefile(
       'Cache::Memory::Simple'           => 0,
       'Carp'                            => 0,
       'Exporter'                        => 0,
+      'File::Slurp'                     => 0,
       'Furl'                            => 0,
       'Hash::Merge'                     => 0,
       'JSON'                            => 0,
@@ -34,6 +35,7 @@ WriteMakefile(
       'Storable'                        => 0,
       'Tie::Hash'                       => 0,
       'Time::Out'                       => 0,
+      'Try::Tiny'                       => 0,
       'ToolSet'                         => 0,
       'Type::Params'                    => 1.004004, # minimum version, not sure why
       'Types::Standard'                 => 0,
@@ -43,6 +45,7 @@ WriteMakefile(
       'YAML::Any'                       => 0,
     },
     TEST_REQUIRES     => {
+      'Capture::Tiny'             => 0,
       'Test::Class::Load'         => 0,
       'Test::MockObject::Extra'   => 0,
       'Test::MockObject::Extends' => 0,

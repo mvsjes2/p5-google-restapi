@@ -54,6 +54,7 @@ sub merge_config_file {
   LOGDIE "Unable to load config file '$config_file': $@" if $@;
 
   # left_precedence, the passed config wins over anything in the file.
+  # can't merge coderefs, error comes from Storable buried deep in hash::merge.
   my $merged_config = Hash::Merge::merge($passed_config, $config_from_file);
   TRACE("Config used:\n". Dump($merged_config));
 

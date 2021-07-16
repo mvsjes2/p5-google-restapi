@@ -97,8 +97,7 @@ sub delete_all_spreadsheets {
   my $self = shift;
   state $check = compile(Str);
   my ($name) = $check->(@_);
-  my $spreadsheets = $self->spreadsheets();
-  my @spreadsheets = grep { $_->{name} eq $name; } @{ $spreadsheets->{files} };
+  my @spreadsheets = grep { $_->{name} eq $name; } $self->spreadsheets();
   DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
   $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
   return scalar @spreadsheets;
@@ -107,7 +106,9 @@ sub delete_all_spreadsheets {
 sub spreadsheets {
   my $self = shift;
   my $drive = $self->drive();
-  return $drive->filter_files(Spreadsheet_Filter);
+  my $spreadsheets = $drive->filter_files(Spreadsheet_Filter);
+  my @spreadsheets = map { { id => $_->{id}, name => $_->{name} }; } @{ $spreadsheets->{files} };
+  return @spreadsheets;
 }
 
 sub drive {
@@ -127,6 +128,7 @@ sub config {
 }
 
 sub open_spreadsheet { Spreadsheet->new(sheets => shift, @_); }
+sub transaction { shift->rest_api()->transaction(); }
 sub stats { shift->rest_api()->stats(); }
 sub rest_api { shift->{api}; }
 

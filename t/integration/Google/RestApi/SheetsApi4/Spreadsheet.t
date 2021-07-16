@@ -1,15 +1,10 @@
-#!/usr/bin/perl
+use Test::Integration::Setup;
 
-use strict;
-use warnings;
-
-use YAML::Any qw(Dump);
 use Test::Most tests => 15;
 
 use aliased "Google::RestApi::SheetsApi4";
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $name = spreadsheet_name();
 my $sheets = sheets_api();
