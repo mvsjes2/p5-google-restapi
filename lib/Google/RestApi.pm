@@ -39,6 +39,7 @@ sub new {
   return bless $self, $class;
 }
 
+# TODO: this is a very long routine.
 sub api {
   my $self = shift;
 
@@ -51,6 +52,7 @@ sub api {
   );
   my $request = $check->(@_);
 
+  # reset our transaction for this new one.
   $self->{transaction} = {};
 
   $self->_stat( $request->{method}, 'total' );
@@ -67,10 +69,11 @@ sub api {
   DEBUG("Rest API request:\n", Dump($request));
 
   my $base_uri = $request->{uri};
-  my $content = $request->{content};
+  my $request_content = $request->{content};
+  my $request_json = defined $request_content ? encode_json($request_content) : (),
 
   my @headers;
-  push(@headers, 'Content-Type' => 'application/json') if $content;
+  push(@headers, 'Content-Type' => 'application/json') if $request_json;
   push(@headers, @{ $request->{headers} });
   push(@headers, @{ $self->auth()->headers() });
 
@@ -79,41 +82,44 @@ sub api {
   my $uri = URI->new($base_uri);
   $uri->query_form_hash(\%params);
   $request->{uri_string} = $uri->as_string();
-  DEBUG("Rest API URI: $request->{method}: $request->{uri_string}");
+  DEBUG("Rest API URI: $request->{method} => $request->{uri_string}");
 
   my $req = HTTP::Request->new(
-    $request->{method}, $request->{uri_string}, \@headers,
-    $content ? encode_json($content) : (),
+    $request->{method}, $request->{uri_string}, \@headers, $request_json
   );
-
   my ($response, $tries, $last_error) = $self->_api($req);
   $self->{transaction} = {
-    request  => $request,
-    tries    => $tries,
-    ($response ? (response => $response) : ()),
-    ($last_error ? (error => $last_error) : ())
+    request => $request,
+    tries   => $tries,
+    ($response   ? (response => $response)   : ()),
+    ($last_error ? (error    => $last_error) : ()),
   };
+
+  if ($response) {
+    my $decoded_content = $response->decoded_content();
+    my $decoded_response = $decoded_content ? decode_json($decoded_content) : 1;
+    $self->{transaction}->{decoded_response} = $decoded_response;
+    DEBUG("Rest API response:\n", Dump( $decoded_response ));
+  }
+
+  $self->_post_process();
 
   if (!$response || !$response->is_success()) {
     $self->_stat('error');
-    $self->_post_process();
-    LOGDIE("Rest API failure: Nothing returned from request:\n", Dump( $self->transaction() ));
+    LOGDIE("Rest API failure:\n", Dump( $self->transaction() ));
   }
 
-  my $logger = get_logger('dump_response_content');
-  $logger->info("$request->{uri_string}:\n" . $response->content() . "\n\n") if $logger;
-
-  my $decoded_content = $response->decoded_content();
-  $decoded_content = $decoded_content ? decode_json($decoded_content) : 1;
-  $self->{transaction}->{decoded_content} = $decoded_content;
-  DEBUG("Rest API response:\n", Dump($decoded_content));
-
-  $self->_post_process();
+  my $logger = get_logger('response.content');
+  if ($logger) {
+    $logger->info("Rest API URI: $request->{method} => $request->{uri_string}\n");
+    $logger->info("Request JSON:\n$request_json\n") if $request_json;
+    $logger->info("Response JSON:\n" . ($response->content() ? $response->content() : "''") . "\n\n");
+  }
 
   # used for to avoid google 403's and 429's as with integration tests.
   sleep($self->{throttle}) if $self->{throttle};
 
-  return $decoded_content;
+  return $self->{transaction}->{decoded_response};
 }
 
 sub _api {
@@ -137,7 +143,7 @@ sub _api {
         return 1;
       }
       $last_error = $r->status_line() if !$r->is_success();
-      if ($r->code() == 429 || $r->code() =~ /^50[0234]$/) {
+      if ($r->code() =~ /^(403|429|50[0234])$/) {
         WARN("Retrying: $last_error");
         return 1;
       }

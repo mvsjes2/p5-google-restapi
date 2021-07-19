@@ -27,11 +27,11 @@ sub api : Tests(13) {
   my $self = shift;
   
   my %valid_trans = (
-    tries           => Int->where('$_ == 1'),
-    request         => HashRef,
-    response        => InstanceOf['Furl::Response'],
-    decoded_content => HashRef,
-    error           => undef,
+    tries            => Int->where('$_ == 1'),
+    request          => HashRef,
+    response         => InstanceOf['Furl::Response'],
+    decoded_response => HashRef,
+    error            => undef,
   );
   
   my $class = $self->class();
@@ -41,7 +41,7 @@ sub api : Tests(13) {
   throws_ok sub { $api->api(uri => 'x'); }, qr/did not pass type constraint/i, 'Bad uri should throw';
 
   # this should return '{}' from fake_http_response
-  $self->_fake_http_response(200);
+  $self->_fake_http_response();
   is_valid $api->api(uri => 'https://x'), HashRef->where('scalar keys %$_ == 0'), 'Get 200';
   is_valid_n $api->transaction(), %valid_trans, 'Transaction 200';
   
@@ -53,24 +53,24 @@ sub api : Tests(13) {
   }, qr/did not pass type constraint/i, 'Bad params should throw';
 
   # error messages are filled in corresponding to the codes in the _fake_http_response subroutine.
-  $self->_fake_http_response(400);
+  $self->_fake_http_response(code => 400);
   throws_ok sub { $api->api(uri => 'https://x') }, qr/Bad request/i, 'Get 400 should throw';
-  $valid_trans{decoded_content} = undef;
+  $valid_trans{decoded_response} = undef;
   $valid_trans{error} = StrMatch[qr/400 Bad request/i];
   is_valid_n $api->transaction(), %valid_trans, 'Transaction 400';
 
-  $self->_fake_http_response(429);
+  $self->_fake_http_response(code => 429);
   throws_ok sub { $api->api(uri => 'https://x') }, qr/Too many requests/i, 'Get 429 should throw';
   $valid_trans{error} = StrMatch[qr/429 Too many requests/i];
   $valid_trans{tries} = Int->where('$_ == 4');
   is_valid_n $api->transaction(), %valid_trans, 'Transaction 429';
 
-  $self->_fake_http_response(500);
+  $self->_fake_http_response(code => 500);
   throws_ok sub { $api->api(uri => 'https://x') }, qr/Server error/i, 'Get 500 should throw';
   $valid_trans{error} = StrMatch[qr/500 Server error/i];
   is_valid_n $api->transaction(), %valid_trans, 'Transaction 500';
 
-  $self->_fake_http_response("die");
+  $self->_fake_http_response(code => "die");
   throws_ok sub { $api->api(uri => 'https://x') }, qr/Furl died/i, 'Request that dies should throw';
   $valid_trans{response} = undef;
   $valid_trans{error} = StrMatch[qr/Furl died/i];
@@ -128,23 +128,23 @@ sub post_process : Tests(8) {
   my $trans = 0;
   my $api = $class->new(config_file => fake_config_file(), post_process => sub { ++$trans; });
 
-  $self->_fake_http_response(200);
+  $self->_fake_http_response();
   $api->api(uri => 'https://x');
   is $trans, 1, "Post process 200 called";
   
-  $self->_fake_http_response(429);
+  $self->_fake_http_response(code => 429);
   eval { $api->api(uri => 'https://x') };
   is $trans, 2, "Post process 429 called";
 
-  $self->_fake_http_response(500);
+  $self->_fake_http_response(code => 500);
   eval { $api->api(uri => 'https://x') };
   is $trans, 3, "Post process 500 called";
 
-  $self->_fake_http_response("die");
+  $self->_fake_http_response(code => "die");
   eval { $api->api(uri => 'https://x'); }; # will throw, don't care.
   is $trans, 4, "Post process die called";
 
-  $self->_fake_http_response(200);
+  $self->_fake_http_response();
   $api->post_process(sub { die 'x'; });
   lives_ok sub { $api->api(uri => 'https://x'); }, "Post process that dies should allow api to live";
   
