@@ -39,7 +39,13 @@ sub   _fake_http_auth {
 sub _unfake_http_response { shift->_unfake('http_response'); }
 sub   _fake_http_response {
   my $self = shift;
-  my ($code, $json_response) = @_;
+  my $p = validate_named(\@_,
+    code     => Int|StrMatch[qr/^die$/], { default => 200 },
+    response => Str|ReadableFile, { default => '{}' },
+  );
+
+  my $code = $p->{code};
+  my $response = $p->{response};
 
   my %messages = (
     200 => 'Success',
@@ -50,17 +56,31 @@ sub   _fake_http_response {
   );
   my $message = $messages{$code} or die "Message missing for code $code";
   
-  $json_response //= '{}';
-  $json_response = read_file($json_response) if -f $json_response;
+  $response = read_file($response) if -f $response;
   
   my $sub = looks_like_number($code) ?
-    sub { Furl::Response->new(1, $code, $message, [], $json_response); }
+    sub { Furl::Response->new(1, $code, $message, [], $response); }
     :
     sub { die $message; };
   $self->_fake('http_response', 'Furl', 'request', $sub);
   # this allows the tests to check on rest failures without having to wait for retries.
   # sets the right part of retry::backoff to only wait for .1 seconds between retries.
   $self->_fake('http_response', 'Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
+
+  return;
+}
+
+sub _fake_http_responses {
+  my $self = shift;
+  my ($api, $responses) = @_;
+
+  my $response = shift @$responses;
+  if ($response) {
+    $self->_fake_http_response(%$response);
+    $api->post_process( sub { $self->_fake_http_responses($api, $responses); } );
+  } else {
+    $api->post_process();
+  }
 
   return;
 }

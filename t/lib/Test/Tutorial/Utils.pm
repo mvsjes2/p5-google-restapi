@@ -54,7 +54,7 @@ sub show_api {
   my $trans = shift;
   my %dump = (
     request  => $trans->{request},
-    response => $trans->{decoded_content},
+    response => $trans->{decoded_response},
   );
   warn color('magenta'), "Sent request to api:\n", color('reset'), Dump(\%dump);
   return;

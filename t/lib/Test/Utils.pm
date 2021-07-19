@@ -6,7 +6,8 @@ use strict;
 use warnings;
 
 use FindBin;
-use File::Temp qw(tempdir);
+use File::Path qw(make_path);
+use File::Spec;
 use Log::Log4perl qw(:easy);
 use Test::More;
 use Try::Tiny;
@@ -35,8 +36,20 @@ sub init_logger {
   return;
 }
 
-# this is for log4perl.conf to call back to get the log file name.
-sub log_file_name { tempdir() . "/google_restapi.log"; }
+# this is for etc/log4perl.conf to call back to get the log file name.
+sub log_file_name {
+  my $logfile = shift or die "No log file passed";
+  $logfile .= ".log";
+
+  my $username = ($ENV{LOGNAME} || $ENV{USER} || getpwuid($<)) or die "No user name found";
+  my $tmpdir = File::Spec->tmpdir();
+  my $logdir = File::Spec->catfile($tmpdir, $username);
+  make_path($logdir);
+
+  my $logpath = File::Spec->catfile($logdir, $logfile);
+  # warn "File logging will be sent to $logpath\n";
+  return $logpath;
+}
 
 # call these to temporarily toggle debug-level logger messages around particular tests so you
 # can see internally what's going on within the framework.
