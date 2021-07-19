@@ -26,11 +26,7 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
 sub rest_api { RestApi->new(@_, config_file => config_file()); }
-
-sub sheets_api {
-  my $api = rest_api(@_);
-  return SheetsApi4->new(api => $api);
-}
+sub sheets_api { SheetsApi4->new(@_, api => rest_api()); }
 
 # point GOOGLE_RESTAPI_CONFIG to a file that contains the OAuth2 access config
 # for integration and tutorials to run. unit tests are mocked so is not needed

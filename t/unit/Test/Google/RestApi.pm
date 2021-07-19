@@ -126,7 +126,8 @@ sub post_process : Tests(8) {
   $self->_fake_http_auth();
 
   my $trans = 0;
-  my $api = $class->new(config_file => fake_config_file(), post_process => sub { ++$trans; });
+  my $api = $class->new(config_file => fake_config_file());
+  $api->post_process( sub { ++$trans; } );
 
   $self->_fake_http_response();
   $api->api(uri => 'https://x');

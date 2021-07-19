@@ -20,11 +20,7 @@ use URI::QueryParam;
 sub new {
   my $class = shift;
 
-  # can't merge coderefs with hash::merge, so remove it first.
-  my %p = @_;
-  my $post_process = delete $p{post_process};  # it's optional.
-  my $self = merge_config_file(%p);
-
+  my $self = merge_config_file(@_);
   state $check = compile_named(
     config_file  => ReadableFile, { optional => 1 },
     auth         => HashRef | Object,
@@ -32,7 +28,6 @@ sub new {
     timeout      => Int, { default => 120 },
   );
   $self = $check->(%$self);
-  $self->{post_process} = $post_process if $post_process;
 
   $self->{ua} = Furl->new(timeout => $self->{timeout});
 
