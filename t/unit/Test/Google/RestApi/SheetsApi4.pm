@@ -1,4 +1,4 @@
-package Test::Google::RestApi::SheetsApi4;
+ package Test::Google::RestApi::SheetsApi4;
 
 use Test::Unit::Setup;
 
@@ -17,12 +17,31 @@ sub startup : Tests(startup => 3) {
   return;
 }
 
-sub api : Tests() {
+sub api : Tests(3) {
   my $self = shift;
 
   my $class = $self->class();
   $self->_fake_http_auth();
+
   my $sheets = $class->new(api => fake_rest_api());
+  $sheets->rest_api()->post_process(sub { $self->_api(shift); });
+
+  $self->_fake_http_response();
+  $sheets->api(
+    params  => { joe => 'fred' },
+    headers => [ qw(joe fred) ],
+    content => { joe => 'fred' },
+  );
+  return;  
+}
+
+sub _api {
+  my $self = shift;
+  my $transaction = shift;
+  is $transaction->{request}->{uri_string}, 'https://sheets.googleapis.com/v4/spreadsheets?joe=fred', "Request uri string is valid";
+  is "@{ $transaction->{request}->{headers} }", 'joe fred', "Request headers are valid";
+  is $transaction->{request}->{content}->{joe}, 'fred', "Request content is valid";
+  return;
 }
 
 sub spreadsheets : Tests(1) {
@@ -65,7 +84,7 @@ sub delete_spreadsheet : Tests() {
   my $sheets = $class->new(api => fake_rest_api());
 }
 
-sub delete_all_spreadsheets : Tests(3) {
+sub delete_all_spreadsheets : Tests(4) {
   my $self = shift;
 
   my $class = $self->class();
@@ -75,13 +94,16 @@ sub delete_all_spreadsheets : Tests(3) {
   my $sheets = $class->new(api => $api);
 
   $self->_fake_delete_all($api);
-  is $sheets->delete_all_spreadsheets("fake_spreadsheet1"), 1, 'Delete existing should return 1';
+  is $sheets->delete_all_spreadsheets("so_such_spreadsheet"), 0, 'Delete non-existant should return 0';
 
   $self->_fake_delete_all($api);
   is $sheets->delete_all_spreadsheets("fake_spreadsheet"), 0, 'Delete common prefix should return 0';
   
   $self->_fake_delete_all($api);
-  is $sheets->delete_all_spreadsheets("so_such_spreadsheet"), 0, 'Delete non-existant should return 0';
+  is $sheets->delete_all_spreadsheets("fake_spreadsheet1"), 1, 'Delete existing should return 1';
+
+  $self->_fake_delete_all($api);
+  is $sheets->delete_all_spreadsheets("fake_spreadsheet2"), 2, 'Delete existing duplicate name should return 2';
 
   return;
 }
@@ -91,7 +113,8 @@ sub _fake_delete_all {
   my ($api) = @_;
   $self->_fake_http_responses($api, [
     { response => fake_json_response('spreadsheets') },
-    { response => '' },
+    # delete just returns 200, no content.
+    { response => '' },  # this will stay in effect and keep replying until replaced.
   ]);
   return;
 }

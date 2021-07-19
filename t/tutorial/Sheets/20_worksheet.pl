@@ -10,7 +10,8 @@ use Test::Tutorial::Setup;
 
 my $name = "Sheet1";
 my $spreadsheet_name = spreadsheet_name();
-my $sheets = sheets_api(post_process => \&show_api);
+my $sheets = sheets_api();
+$sheets->rest_api()->post_process(\&show_api);
 
 start("Now we will open the spreadsheet and worksheet.");
 my $ss = $sheets->open_spreadsheet(name => $spreadsheet_name);
