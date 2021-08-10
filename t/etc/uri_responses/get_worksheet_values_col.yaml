@@ -1,0 +1,9 @@
+GET:
+  "^\Qhttps://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values/'\E(Sheet\d)\'\!([A-Z]+\:[A-Z]+)\Q?majorDimension=COLUMNS\E":
+    response: |
+      {
+        "range": "$1!$2",
+        "majorDimension": "COLUMNS"
+      }
+    tweaks:
+    - get_values

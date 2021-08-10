@@ -48,17 +48,29 @@ sub add_tied {
   my $self = shift;
   state $check = compile(HashRef);
   my ($tied) = $check->(@_);
+
+  my $fetch_range = tied(%$tied)->fetch_range();
   tied(%$tied)->fetch_range(1);
-  return $self->add_ranges(%$tied);
+  $self->add_ranges(%$tied);
+  tied(%$tied)->fetch_range($fetch_range);
+
+  return $tied;
 }
 
+# fetch_range(1) turns it on, fetch_range(0) turns it off, fetch_range()
+# fetch_range() returns current setting. return $self so it can be
+# chained with requests.
 sub fetch_range {
   my $self = shift;
-  if (shift) {
+  my $fetch_range = shift;
+  return $self->{fetch_range} if !defined $fetch_range;
+
+  if ($fetch_range) {
     $self->{fetch_range} = 1;
   } else {
     delete $self->{fetch_range};
   }
+
   return $self;
 }
 
@@ -133,6 +145,7 @@ sub STORE {
   return;
 }
 
+sub clear_cached_values { shift->range_group()->refresh_values(@_); }
 sub refresh_values { shift->range_group()->refresh_values(@_); }
 sub submit_values { shift->range_group()->submit_values(@_); }
 sub submit_requests { shift->range_group()->submit_requests(@_); }

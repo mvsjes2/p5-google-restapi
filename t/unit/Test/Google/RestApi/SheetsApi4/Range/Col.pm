@@ -2,9 +2,11 @@ package Test::Google::RestApi::SheetsApi4::Range::Col;
 
 use Test::Unit::Setup;
 
-use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Range::Base);
+use parent qw(Test::Google::RestApi::SheetsApi4::Range::Base);
 
 sub class { 'Google::RestApi::SheetsApi4::Range::Col' }
+
+# init_logger($TRACE);
 
 sub range : Tests(12) {
   my $self = shift;

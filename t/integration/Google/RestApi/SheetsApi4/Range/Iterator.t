@@ -68,7 +68,7 @@ sub iterate_by_2 {
   is $cell = $i->next(), undef, "Last by 2 iteration should be undef";
 }
 
-delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets_api());
 
 # use YAML::Any qw(Dump);
 # warn Dump($spreadsheet->stats());

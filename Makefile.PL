@@ -22,7 +22,7 @@ WriteMakefile(
       'File::Slurp'                     => 0,
       'Furl'                            => 0,
       'Hash::Merge'                     => 0,
-      'JSON'                            => 0,
+      'JSON::MaybeXS'                   => 0,
       'List::MoreUtils'                 => 0,
       'List::Util'                      => 0,
       'LWP::Protocol::https'            => 0,
@@ -46,8 +46,8 @@ WriteMakefile(
     },
     TEST_REQUIRES     => {
       'Capture::Tiny'             => 0,
+      'Mock::MonkeyPatch'         => 0,
       'Test::Class::Load'         => 0,
-      'Test::MockObject::Extra'   => 0,
       'Test::MockObject::Extends' => 0,
       'Test::Most'                => 0,
     },

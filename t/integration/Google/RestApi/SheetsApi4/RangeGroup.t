@@ -32,4 +32,4 @@ is_deeply $range_group->values(), \@values_out, "Range group values should be co
 is_hash $range_group->clear(), "Range group clear";
 is_deeply $range_group->values(), [undef, undef, undef], "Range group values after clear should be empty";
 
-delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets_api());

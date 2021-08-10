@@ -16,7 +16,7 @@ use Scalar::Util qw(blessed looks_like_number);
 
 use aliased 'Google::RestApi::SheetsApi4::Range::Iterator';
 
-use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range";
+use parent 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range';
 
 # should be SCALAR|ARRAYREF|HASHREF but types::standard doesn't currently support AnyOf.
 # TODO: Keep an eye on https://rt.cpan.org/Public/Bug/Display.html?id=121841 and alter
@@ -410,6 +410,9 @@ sub range {
 
   return $self->{normalized_range} if $self->{normalized_range};
 
+  TRACE("Range external caller: " . $self->_caller_external()); 
+  TRACE("Range internal caller: " . $self->_caller_internal()); 
+
   $self->normalize_named();
 
   my $range = $self->{range};
@@ -450,6 +453,26 @@ sub range {
   $self->{normalized_range} = $range;
 
   return $range;
+}
+
+sub _caller_internal {
+  my ($package, $subroutine, $line, $i) = ('', '', 0);
+  do {
+    ($package, undef, $line, $subroutine) = caller(++$i);
+  } while($subroutine =~ m|range$|);
+  # not usually going to happen, but during testing we call
+  # range directly, so have to backtrack.
+  ($package, undef, $line, $subroutine) = caller(--$i)
+    if !$package;
+  return "$package:$line => $subroutine";
+}
+
+sub _caller_external {
+  my ($package, $subroutine, $line, $i) = ('', '', 0);
+  do {
+    ($package, undef, $line, $subroutine) = caller(++$i);
+  } while($package && $package =~ m[^(Google::RestApi)]);
+  return "$package:$line => $subroutine";
 }
 
 # these are just used for debug message just above

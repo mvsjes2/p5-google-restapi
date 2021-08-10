@@ -20,7 +20,7 @@ sub new {
 
   my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
   state $check = compile_named(
-    spreadsheet => HasMethods[qw(api config sheets worksheet_properties)],  # if it's got these basics, it must be a duck.
+    spreadsheet => HasMethods[qw(api sheets_api config worksheet_properties)],  # if it's got these basics, it must be a duck.
     id          => Str, { optional => 1 },
     name        => Str, { optional => 1 },
     uri         => StrMatch[qr|$qr_worksheet_uri|], { optional => 1 },
@@ -298,7 +298,8 @@ sub range_row { Row->new(worksheet => shift, range => shift); }
 sub range_cell { Cell->new(worksheet => shift, range => shift); }
 sub range_all { All->new(worksheet => shift); }
 sub api { shift->spreadsheet()->api(@_); }
-sub sheets { shift->spreadsheet()->sheets(@_); }
+sub sheets_api { shift->spreadsheet()->sheets_api(@_); }
+sub rest_api { shift->spreadsheet()->rest_api(@_); }
 sub spreadsheet { shift->{spreadsheet}; }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(); }
 sub spreadsheet_config { shift->spreadsheet()->config(shift); }
@@ -522,7 +523,7 @@ Returns a Range::All object that represents the whole worksheet.
 
 A passthrough to the parent Spreadsheet object's 'api' routine.
 
-=item sheets();
+=item sheets_api();
 
 Returns the SheetsApi4 object.
 

@@ -1,19 +1,12 @@
 package Test::Mock::SheetsApi4;
 
-use strict;
-use warnings;
-
-use feature 'state';
+use Test::Unit::Setup;
 
 use FindBin;
-use Type::Params qw(compile_named);
-use Types::Standard qw(Str StrMatch ArrayRef HashRef);
 use URI;
 use URI::QueryParam;
 use YAML::Any qw(Dump LoadFile);
 use Test::MockObject::Extends;
-
-use Test::Unit::Setup;
 
 use Test::Mock::Drive;
 use Test::Mock::Spreadsheet;

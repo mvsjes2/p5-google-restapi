@@ -2,16 +2,16 @@ package Test::Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
 
 use Test::Unit::Setup;
 
-use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
+use parent 'Test::Unit::TestBase';
 
-use parent 'Test::Google::RestApi::SheetsApi4::Base';
+use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
 
 sub class { 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator' }
 
 sub tie_range : Tests(14) {
   my $self = shift;
 
-  my $worksheet = $self->worksheet();
+  my $worksheet = fake_worksheet();
   my ($row, $iterator);
   my $cols = $worksheet->tie_cols();
   isa_ok $iterator = tied(%$cols)->iterator(from => 1), Iterator, "Tie iterator creation";

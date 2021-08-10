@@ -5,10 +5,10 @@ use warnings;
 
 use base 'ToolSet';
 
-ToolSet->use_pragma( 'strict' );
-ToolSet->use_pragma( 'warnings' );
+ToolSet->use_pragma('strict');
+ToolSet->use_pragma('warnings');
 
-ToolSet->no_pragma( 'autovivification' );
+ToolSet->no_pragma('autovivification');
 
 ToolSet->export(
   'autodie'                =>  [],

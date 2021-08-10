@@ -19,7 +19,14 @@ use YAML::Any qw(Dump LoadFile);
 no autovivification;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(named_extra merge_config_file resolve_config_file_path strip bool dim dims dims_all cl_black cl_white);
+our @EXPORT_OK = qw(
+  named_extra
+  merge_config_file resolve_config_file_path
+  bool
+  dim dims dims_all
+  cl_black cl_white
+  strip
+);
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
 # used by validation with type::params.
