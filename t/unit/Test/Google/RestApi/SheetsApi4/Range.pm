@@ -13,7 +13,7 @@ my $sheet = 'Customer Addresses';
 sub constructor : Tests(4) {
   my $self = shift;
   $self->SUPER::constructor(
-    worksheet => $self->worksheet(),
+    worksheet => fake_worksheet(),
     range     => "A1",
   );
   can_ok $self, 'range';

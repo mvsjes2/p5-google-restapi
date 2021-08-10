@@ -37,7 +37,7 @@ sub push_ranges {
 sub clear {
   my $self = shift;
 
-  $_->clear_cached_values() foreach $self->ranges();
+  $self->clear_cached_values();
 
   my @ranges = map { $_->range(); } $self->ranges();
   my %p = (
@@ -46,6 +46,18 @@ sub clear {
     method  => "post",
   );
   return $self->api(%p);
+}
+
+sub clear_cached_values {
+  my $self = shift;
+  $_->clear_cached_values() foreach $self->ranges();
+  return;
+}
+
+sub refresh_values {
+  my $self = shift;
+  $self->clear_cached_values();
+  return $self->values();
 }
 
 sub values {

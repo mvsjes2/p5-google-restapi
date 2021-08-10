@@ -2,16 +2,16 @@ package Test::Google::RestApi;
 
 use Test::Unit::Setup;
 
+use parent 'Test::Unit::TestBase';
+
 use aliased 'Google::RestApi';
 use aliased 'Google::RestApi::Auth::OAuth2Client';
-
-use parent 'Test::Unit::TestBase';
 
 # init_logger($DEBUG);
 
 sub class { 'Google::RestApi' }
 
-sub startup : Tests(startup => 4) {
+sub _constructor : Tests(4) {
   my $self = shift;
 
   my $class = $self->class();
@@ -23,7 +23,7 @@ sub startup : Tests(startup => 4) {
   return;
 }
 
-sub api : Tests(13) {
+sub api : Tests(16) {
   my $self = shift;
   
   my %valid_trans = (
@@ -34,19 +34,22 @@ sub api : Tests(13) {
     error            => undef,
   );
   
-  my $class = $self->class();
   $self->_fake_http_auth();
 
-  my $api = $class->new(config_file => fake_config_file());
+  my $api = fake_rest_api();
   throws_ok sub { $api->api(uri => 'x'); }, qr/did not pass type constraint/i, 'Bad uri should throw';
 
   # this should return '{}' from fake_http_response
   $self->_fake_http_response();
-  is_valid $api->api(uri => 'https://x'), HashRef->where('scalar keys %$_ == 0'), 'Get 200';
+  is_valid $api->api(uri => 'https://x'), EmptyHashRef, 'Get 200';
   is_valid_n $api->transaction(), %valid_trans, 'Transaction 200';
   
+  is_valid $api->api(uri => 'https://x', headers => [qw(joe fred)]), EmptyHashRef, 'Get 200 headers';
+  is_valid_n $api->transaction(), %valid_trans, 'Transaction headers 200';
+  is join(' ', @{ $api->transaction()->{request}->{headers} }), 'joe fred', "Headers are valid"; 
+
   $api->api(uri => 'https://x', params => { fred => 'joe' });
-  is $api->transaction()->{request}->{uri_string}, 'https://x?fred=joe', 'Build uri using params';
+  is $api->transaction()->{request}->{uri}, 'https://x?fred=joe', 'Build uri using params';
   
   throws_ok sub {
     $api->api(uri => 'https://x', params => { fred => { joe => 'pete' } });
@@ -119,40 +122,51 @@ sub auth : Tests(4) {
   return;
 }
 
-sub post_process : Tests(8) {
+sub api_callback : Tests(8) {
   my $self = shift;
 
-  my $class = $self->class();
   $self->_fake_http_auth();
-
+  my $api = fake_rest_api();
   my $trans = 0;
-  my $api = $class->new(config_file => fake_config_file());
-  $api->post_process( sub { ++$trans; } );
+
+  $api->api_callback( sub { ++$trans; } );
 
   $self->_fake_http_response();
   $api->api(uri => 'https://x');
-  is $trans, 1, "Post process 200 called";
+  is $trans, 1, "Api callback 200 called";
   
   $self->_fake_http_response(code => 429);
   eval { $api->api(uri => 'https://x') };
-  is $trans, 2, "Post process 429 called";
+  is $trans, 2, "Api callback 429 called";
 
   $self->_fake_http_response(code => 500);
   eval { $api->api(uri => 'https://x') };
-  is $trans, 3, "Post process 500 called";
+  is $trans, 3, "Api callback 500 called";
 
   $self->_fake_http_response(code => "die");
   eval { $api->api(uri => 'https://x'); }; # will throw, don't care.
-  is $trans, 4, "Post process die called";
+  is $trans, 4, "Api callback die called";
 
   $self->_fake_http_response();
-  $api->post_process(sub { die 'x'; });
-  lives_ok sub { $api->api(uri => 'https://x'); }, "Post process that dies should allow api to live";
+  $api->api_callback(sub { die 'x'; });
+  lives_ok sub { $api->api(uri => 'https://x'); }, "Api callback that dies should allow api to live";
   
-  is ref($api->post_process(sub {})), 'CODE', "returns previous coderef";
-  is ref($api->post_process()), 'CODE', "returns second previous coderef";
-  is $api->post_process(), undef, "returns undef";
+  is ref($api->api_callback(sub {})), 'CODE', "New sub returns previous coderef";
+  is ref($api->api_callback()), 'CODE', "Empty sub returns second previous coderef";
+  is $api->api_callback(), undef, "Second empty sub returns undef";
 
+  return;
+}
+
+sub max_attempts : Tests(4) {
+  my $self = shift;
+
+  my $api = fake_rest_api();
+  is $api->max_attempts(), 4, "Max attempts default is 4";
+  is $api->max_attempts(1), 1, "Setting max attempts to 1 is 1";
+  is $api->max_attempts(), 1, "Querying max attempts default is still 1";
+  is $api->max_attempts(0), 4, "Setting max attempts default is 4";
+  
   return;
 }
 

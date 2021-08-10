@@ -11,6 +11,7 @@ use Scalar::Util qw(blessed);
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Worksheet';
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
+use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie';
 
 use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet";
 
@@ -20,13 +21,14 @@ sub new {
   my $qr_id = SheetsApi4->Spreadsheet_Id;
   my $qr_uri = SheetsApi4->Spreadsheet_Uri;
   state $check = compile_named(
-    sheets    => HasMethods[qw(api config spreadsheets)],
-    id        => StrMatch[qr/$qr_id/], { optional => 1 },  # https://developers.google.com/sheets/api/guides/concepts
-    name      => Str, { optional => 1 },
-    title     => Str, { optional => 1 },
-    uri       => StrMatch[qr|$qr_uri/$qr_id/|], { optional => 1 },
-    config_id => Str, { optional => 1 },
-    cache     => PositiveOrZeroInt, { default => 5 },
+    sheets_api => HasMethods[qw(api config spreadsheets)],
+    # https://developers.google.com/sheets/api/guides/concepts
+    id         => StrMatch[qr/^$qr_id$/], { optional => 1 },
+    name       => Str, { optional => 1 },
+    title      => Str, { optional => 1 },
+    uri        => StrMatch[qr|^$qr_uri/$qr_id/?|], { optional => 1 },
+    config_id  => Str, { optional => 1 },
+    cache_seconds => PositiveOrZeroNum, { default => 5 },
   );
   my $self = $check->(@_);
 
@@ -56,7 +58,7 @@ sub api {
   );
   my $p = named_extra($check->(@_));
   $p->{uri} = $self->spreadsheet_id() . $p->{uri};
-  return $self->sheets()->api(%$p);
+  return $self->sheets_api()->api(%$p);
 }
 
 sub spreadsheet_id {
@@ -66,13 +68,15 @@ sub spreadsheet_id {
     if ($self->{uri}) {
       my $qr_id = SheetsApi4->Spreadsheet_Id;
       my $qr_uri = SheetsApi4->Spreadsheet_Uri;
-      ($self->{id}) = $self->{uri} =~ m|$qr_uri/($qr_id)|;
+      ($self->{id}) = $self->{uri} =~ m|^$qr_uri/($qr_id)|;   # can end with '/edit'
       LOGDIE "Unable to extract a sheet id from uri" if !$self->{id};
       DEBUG("Got sheet ID '$self->{id}' via URI '$self->{uri}'.");
     } else {
-      my ($spreadsheet) = grep { $_->{name} eq $self->{name}; } $self->sheets()->spreadsheets();
-      LOGDIE "Sheet '$self->{name}' not found on google drive" if !$spreadsheet;
-      $self->{id} = $spreadsheet->{id};
+      my @spreadsheets = grep { $_->{name} eq $self->{name}; } $self->sheets_api()->spreadsheets();
+      LOGDIE "Sheet '$self->{name}' not found on Google Drive" if !@spreadsheets;
+      LOGDIE "More than one spreadsheet found with name '$self->{name}'. Specify 'id' or 'uri' instead."
+        if scalar @spreadsheets > 1;
+      $self->{id} = $spreadsheets[0]->{id};
       DEBUG("Got sheet id '$self->{id}' via spreadsheet list.");
     }
   }
@@ -80,13 +84,7 @@ sub spreadsheet_id {
   return $self->{id};
 }
 
-sub spreadsheet_uri {
-  my $self = shift;
-  $self->{uri} ||= $self->attrs('spreadsheetUrl')->{spreadsheetUrl}
-    or LOGDIE "No spreadsheet URI found from get results";
-  return $self->{uri};
-}
-
+# when 'api' is eventually called, id will be worked out if we don't already have it.
 sub spreadsheet_name {
   my $self = shift;
   $self->{name} ||= $self->properties('title')->{title}
@@ -94,6 +92,15 @@ sub spreadsheet_name {
   return $self->{name};
 }
 sub spreadsheet_title { spreadsheet_name(@_); }
+
+# when 'api' is eventually called, id will be worked out if we don't already have it.
+sub spreadsheet_uri {
+  my $self = shift;
+  $self->{uri} ||= $self->attrs('spreadsheetUrl')->{spreadsheetUrl}
+    or LOGDIE "No spreadsheet URI found from get results";
+  $self->{uri} =~ s[/(edit|copy)$][]; # this isn't necessary but keeps things cleaner.
+  return $self->{uri};
+}
 
 sub attrs {
   my $self = shift;
@@ -112,6 +119,7 @@ sub properties {
 }
 
 # GET https://sheets.googleapis.com/v4/spreadsheets/spreadsheetId?&fields=sheets.properties
+# returns properties for each worksheet in the spreadsheet.
 sub worksheet_properties {
   my $self = shift;
   state $check = compile(Str);
@@ -137,67 +145,36 @@ sub _cache {
 
   state $check = compile(Str, CodeRef);
   my ($key, $code) = $check->(@_);
-  return $code->() if !$self->{cache};
+  return $code->() if !$self->{cache_seconds};
 
   $self->{_cache} ||= Cache::Memory::Simple->new();
+  # will run the code and store the result for x seconds.
   return $self->{_cache}->get_or_set(
-    $key, $code, $self->{cache}  # cache for x seconds
+    $key, $code, $self->{cache_seconds}
   );
 }
 
-sub cache {
+# sets the number of seconds that things will be cached.
+sub cache_seconds {
   my $self = shift;
-  state $check = compile(PositiveOrZeroInt);
-  my ($cache) = $check->(@_);
+  state $check = compile(PositiveOrZeroNum);
+  my ($cache_seconds) = $check->(@_);
   $self->{_cache}->delete_all() if $self->{_cache};
-  delete $self->{_cache} if !$cache;
-  $self->{cache} = $cache;
+  delete $self->{_cache} if !$cache_seconds;
+  $self->{cache_seconds} = $cache_seconds;
   return;
-}
-
-# each worksheet has an entry:
-# ---
-# - protectedRanges:
-#   - editors:
-#       users:
-#       - xxx@gmail.com
-#       - yyy@gmail.com
-#     protectedRangeId: 1161285259
-#     range: {}
-#     requestingUserCanEdit: !!perl/scalar:JSON::PP::Boolean 1
-#     warningOnly: !!perl/scalar:JSON::PP::Boolean 1
-# - {}
-# - {}
-# submit_requests needs to be called by the caller after this.
-sub delete_all_protected_ranges {
-  my $self = shift;
-  foreach my $worksheet (@{ $self->protected_ranges() }) {
-    my $ranges = $worksheet->{protectedRanges} or next;
-    $self->delete_protected_range($_->{protectedRangeId}) foreach (@$ranges);
-  }
-  return $self;
-}
-
-sub named_ranges {
-  my $self = shift;
-  state $check = compile(Str, { optional => 1 });
-  my ($range) = $check->(@_);
-  my $named_ranges = $self->attrs('namedRanges')->{namedRanges};
-  return $named_ranges if !$range;
-  ($range) = grep { $_->{name} eq $range; } @$named_ranges;
-  return $range;
 }
 
 sub copy_spreadsheet {
   my $self = shift;
-  return $self->sheets()->copy_spreadsheet(
+  return $self->sheets_api()->copy_spreadsheet(
     spreadsheet_id => $self->spreadsheet_id(), @_,
   );
 }
 
 sub delete_spreadsheet {
   my $self = shift;
-  return $self->sheets()->delete_spreadsheet($self->spreadsheet_id());
+  return $self->sheets_api()->delete_spreadsheet($self->spreadsheet_id());
 }
 
 sub range_group {
@@ -213,18 +190,15 @@ sub range_group {
 sub tie {
   my $self = shift;
   my %ranges = @_;
-  tie my %tie,
-    'Google::RestApi::SheetsApi4::RangeGroup::Tie', $self;
+  tie my %tie, Tie, $self;
   tied(%tie)->add_ranges(%ranges);
   return \%tie;
 }
 
-# this is done simply to allow open_worksheet to return the
-# same worksheet instance each time it's called for the
-# same remote worksheet. this is to avoid working on multiple
-# local copies of the same remote worksheet.
-# TODO: if worksheet is renamed, registration should be
-# updated too.
+# this is done simply to allow open_worksheet to return the same worksheet instance
+# each time it's called for the same remote worksheet. this is to avoid working on
+# multiple local copies of the same remote worksheet.
+# TODO: if worksheet is renamed, registration should be updated too.
 sub _register_worksheet {
   my $self = shift;
   state $check = compile(HasMethods['worksheet_name']);
@@ -233,13 +207,6 @@ sub _register_worksheet {
   return $self->{registered_worksheet}->{$name} if $self->{registered_worksheet}->{$name};
   $self->{registered_worksheet}->{$name} = $worksheet;
   return $worksheet;
-}
-
-sub config {
-  my $self = shift;
-  my $config = $self->{config} or return;
-  my $key = shift;
-  return defined $key ? $config->{$key} : $config;
 }
 
 sub submit_values {
@@ -315,11 +282,53 @@ sub submit_requests {
   return $api;
 }
 
+sub named_ranges {
+  my $self = shift;
+  state $check = compile(Str, { optional => 1 });
+  my ($named_range) = $check->(@_);
+  my $named_ranges = $self->attrs('namedRanges')->{namedRanges};
+  return $named_ranges if !$named_range;
+  ($named_range) = grep { $_->{name} eq $named_range; } @$named_ranges;
+  return $named_range;
+}
+
 sub protected_ranges { shift->attrs('sheets.protectedRanges')->{sheets}; }
+
+# each worksheet has an entry:
+# ---
+# - protectedRanges:
+#   - editors:
+#       users:
+#       - xxx@gmail.com
+#       - yyy@gmail.com
+#     protectedRangeId: 1161285259
+#     range: {}
+#     requestingUserCanEdit: !!perl/scalar:JSON::PP::Boolean 1
+#     warningOnly: !!perl/scalar:JSON::PP::Boolean 1
+# - {}
+# - {}
+# submit_requests needs to be called by the caller after this.
+sub delete_all_protected_ranges {
+  my $self = shift;
+  foreach my $worksheet (@{ $self->protected_ranges() }) {
+    my $ranges = $worksheet->{protectedRanges} or next;
+    $self->delete_protected_range($_->{protectedRangeId}) foreach (@$ranges);
+  }
+  return $self;
+}
+
+sub config {
+  my $self = shift;
+  my $config = $self->{config} or return;
+  my $key = shift;
+  return defined $key ? $config->{$key} : $config;
+}
+
 sub open_worksheet { Worksheet->new(spreadsheet => shift, @_); }
-sub sheets_config { shift->sheets()->config(shift); }
-sub sheets { shift->{sheets}; }
-sub stats { shift->sheets()->stats(); }
+sub sheets_config { shift->sheets_api()->config(shift); }
+sub sheets_api { shift->{sheets_api}; }
+sub rest_api { shift->sheets_api()->rest_api(); }
+sub stats { shift->sheets_api()->stats(); }
 
 1;
 
@@ -337,7 +346,7 @@ See the description and synopsis at Google::RestApi::SheetsApi4.
 
 =over
 
-=item new(sheets => <SheetsApi4>, (id => <string> | name => <string> | title => <string> | uri => <string>), config_id => <string>, cache => <int>);
+=item new(sheets => <SheetsApi4>, (id => <string> | name => <string> | title => <string> | uri => <string>), config_id => <string>, cache_seconds => <int>);
 
 Creates a new instance of a Spreadsheet object. You would not normally
 call this directly, you would obtain it from the
@@ -349,14 +358,14 @@ Sheets::open_spreadsheet routine.
  title: An alias for name.
  uri: The spreadsheet ID extracted from the overall URI.
  config_id: The custom config for this worksheet.
- cache: Cache information for this many seconds (default to 5, 0 disables).
+ cache_seconds: Cache information for this many seconds (default to 5, 0 disables).
 
 Only one of id/name/title/uri should be specified and this API will derive the others
 as necessary.
 
 The cache exists so that repeated calls for the same attributes
 or worksheet properties doesn't keep hammering the Google API
-over and over. The default is 5 seconds. See 'cache' below.
+over and over. The default is 5 seconds. See 'cache_seconds' below.
 
 =item api(%args);
 
@@ -397,7 +406,7 @@ Returns the spreadsheet property attributes of the specified fields.
 Returns an array ref of the properties of the worksheets
 owned by this spreadsheet.
 
-=item cache(<int>)
+=item cache_seconds(<int>)
 
 Sets the caching time in seconds. Calling will always
 delete the existing cache. 0 also disables the cache.
@@ -477,7 +486,7 @@ Creates a new Worksheet object, passing the args to that object's
 
 Returns the parent SheetsApi4 config.
 
-=item sheets();
+=item sheets_api();
 
 Returns the SheetsApi4 object.
 

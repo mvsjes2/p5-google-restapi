@@ -2,14 +2,14 @@ package Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet;
 
 use Test::Unit::Setup;
 
-use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Base);
+use parent 'Test::Unit::TestBase';
 
 sub class { 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet' }
 
 sub ws_format : Tests() {
   my $self = shift;
 
-  my $ws0 = $self->worksheet();
+  my $ws0 = fake_worksheet();
   my $ws = {
     updateSheetProperties => {
       properties => {

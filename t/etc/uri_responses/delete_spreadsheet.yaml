@@ -1,0 +1,3 @@
+DELETE:
+  "^\Qhttps://www.googleapis.com/drive/v3/files/\E":
+    response: ''

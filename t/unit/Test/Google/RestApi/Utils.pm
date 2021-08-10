@@ -8,11 +8,11 @@ package Test::Google::RestApi::Utils;
 
 use Test::Unit::Setup;
 
-use parent 'Test::Class';
+use parent 'Test::Unit::TestBase';
 
 sub class { 'Google::RestApi::Utils' }
 
-sub startup : Tests(startup => 1) {
+sub _constructor : Tests(1) {
   my $self = shift;
   use_ok $self->class(), ':all';
   return;

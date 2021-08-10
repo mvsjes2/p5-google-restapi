@@ -11,7 +11,7 @@ Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 >       auth          => <object|hashref>,
 >       timeout       => <int>,
 >       throttle      => <int>,
->       post_process  => <coderef>,
+>       api_callback  => <coderef>,
 >     );
 >
 >     # you can call the raw api directly, but usually Drive and Sheets will take care of forming the correct API calls for you.

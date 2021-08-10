@@ -6,7 +6,7 @@ use Google::RestApi::Setup;
 
 use File::Basename;
 use Furl;
-use JSON;
+use JSON::MaybeXS;
 use Log::Log4perl qw(get_logger);
 use Module::Load qw(load);
 use Scalar::Util qw(blessed);
@@ -26,6 +26,7 @@ sub new {
     auth         => HashRef | Object,
     throttle     => PositiveOrZeroInt, { default => 0 },
     timeout      => Int, { default => 120 },
+    max_attempts => PositiveInt->where('$_ < 10'), { default => 4 },
   );
   $self = $check->(%$self);
 
@@ -34,7 +35,6 @@ sub new {
   return bless $self, $class;
 }
 
-# TODO: this is a very long routine.
 sub api {
   my $self = shift;
 
@@ -52,16 +52,8 @@ sub api {
 
   $self->_stat( $request->{method}, 'total' );
   $request->{method} = uc($request->{method});
-
-  my ($package, $line, $i) = ('', '', 0);
-  do {
-    ($package, undef, $line) = caller(++$i);
-  } while($package && $package =~ m|Google::RestApi|);
-  $request->{caller} = {
-    package => $package,
-    line    => $line,
-  };
-  DEBUG("Rest API request:\n", Dump($request));
+  $request->{caller_internal} = _caller_internal();
+  $request->{caller_external} = _caller_external();
 
   my $base_uri = $request->{uri};
   my $request_content = $request->{content};
@@ -76,11 +68,11 @@ sub api {
   my %params = (%{ $request->{params} }, %{ $self->auth()->params() });
   my $uri = URI->new($base_uri);
   $uri->query_form_hash(\%params);
-  $request->{uri_string} = $uri->as_string();
-  DEBUG("Rest API URI: $request->{method} => $request->{uri_string}");
+  $request->{uri} = $uri->as_string();
+  DEBUG("Rest API request:\n", Dump($request));
 
   my $req = HTTP::Request->new(
-    $request->{method}, $request->{uri_string}, \@headers, $request_json
+    $request->{method}, $request->{uri}, \@headers, $request_json
   );
   my ($response, $tries, $last_error) = $self->_api($req);
   $self->{transaction} = {
@@ -91,24 +83,37 @@ sub api {
   };
 
   if ($response) {
-    my $decoded_content = $response->decoded_content();
-    my $decoded_response = $decoded_content ? decode_json($decoded_content) : 1;
+    my $decoded_response = $response->decoded_content();
+    $decoded_response = $decoded_response ? decode_json($decoded_response) : 1;
     $self->{transaction}->{decoded_response} = $decoded_response;
     DEBUG("Rest API response:\n", Dump( $decoded_response ));
   }
 
-  $self->_post_process();
+  $self->_api_callback();
+
+  # this is for capturing request/responses for unit tests. copy/paste the results
+  # into t/etc/uri_responses for unit testing.
+  my $logger = get_logger('unit.test.capture');
+  if ($logger && $response) {
+    my %request_response = ($request->{method} => {});
+    if ($request_json) {
+      $request_response{ $request->{method} } = {
+        $request->{uri} => {
+          content  => $request_json,
+          response => ($response->content() ? $response->content() : ''),
+        },
+      };
+    } else {
+      $request_response{ $request->{method} } = {
+        $request->{uri} => ($response->content() ? $response->content() : ''),
+      };
+    }
+    $logger->info(Dump(\%request_response) . "\n\n");
+  }
 
   if (!$response || !$response->is_success()) {
     $self->_stat('error');
     LOGDIE("Rest API failure:\n", Dump( $self->transaction() ));
-  }
-
-  my $logger = get_logger('response.content');
-  if ($logger) {
-    $logger->info("Rest API URI: $request->{method} => $request->{uri_string}\n");
-    $logger->info("Request JSON:\n$request_json\n") if $request_json;
-    $logger->info("Response JSON:\n" . ($response->content() ? $response->content() : "''") . "\n\n");
   }
 
   # used for to avoid google 403's and 429's as with integration tests.
@@ -146,7 +151,7 @@ sub _api {
     },
     on_success   => sub { $tries++; },
     on_failure   => sub { $tries++; },
-    max_attempts => 4;   # override default max_attempts 10.
+    max_attempts => $self->max_attempts();   # override default max_attempts 10.
   return ($response, $tries, $last_error);
 }
 
@@ -168,11 +173,11 @@ sub auth {
   return $self->{auth};
 }
 
-sub _post_process {
+sub _api_callback {
   my $self = shift;
-  return if !$self->{post_process};
+  return if !$self->{api_callback};
   try {
-    $self->{post_process}->( $self->transaction() );
+    $self->{api_callback}->( $self->transaction() );
   } catch {
     my $err = $_;
     FATAL("Post process died: $err");
@@ -180,13 +185,13 @@ sub _post_process {
   return;
 }
 
-sub post_process {
+sub api_callback {
   my $self = shift;
   state $check = compile(CodeRef, { optional => 1 });
-  my ($post_process) = $check->(@_);
-  my $prev_post_process = delete $self->{post_process};
-  $self->{post_process} = $post_process if $post_process;
-  return $prev_post_process;
+  my ($api_callback) = $check->(@_);
+  my $prev_api_callback = delete $self->{api_callback};
+  $self->{api_callback} = $api_callback if $api_callback;
+  return $prev_api_callback;
 }
 
 sub _stat {
@@ -208,6 +213,41 @@ sub stats {
 
 sub transaction { shift->{transaction} || {}; }
 
+sub _caller_internal {
+  my ($package, $subroutine, $line, $i) = ('', '', 0);
+  do {
+    ($package, undef, $line, $subroutine) = caller(++$i);
+  } while($package &&
+    ($package =~ m[^Cache::Memory] ||
+     $subroutine =~ m[api$] ||
+     $subroutine =~ m[^Cache|_cache])
+  );
+  # not usually going to happen, but during testing we call
+  # RestApi::api directly, so have to backtrack.
+  ($package, undef, $line, $subroutine) = caller(--$i)
+    if !$package;
+  return "$package:$line => $subroutine";
+}
+
+sub _caller_external {
+  my ($package, $subroutine, $line, $i) = ('', '', 0);
+  do {
+    ($package, undef, $line, $subroutine) = caller(++$i);
+  } while($package && $package =~ m[^(Google::RestApi|Cache)]);
+  return "$package:$line => $subroutine";
+}
+
+# undef returns current value. postitive int sets and returns new value.
+# 0 sets and returns default value.
+sub max_attempts {
+  my $self = shift;
+  state $check = compile(PositiveOrZeroInt->where('$_ < 10'), { optional => 1 });
+  my ($max_attempts) = $check->(@_);
+  $self->{max_attempts} = $max_attempts if $max_attempts;
+  $self->{max_attempts} = 4 if defined $max_attempts && $max_attempts == 0;
+  return $self->{max_attempts};
+}
+
 1;
 
 __END__
@@ -226,7 +266,7 @@ Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
     auth          => <object|hashref>,
     timeout       => <int>,
     throttle      => <int>,
-    post_process  => <coderef>,
+    api_callback  => <coderef>,
   );
 
   $response = $rest_api->api(
@@ -260,12 +300,12 @@ endpoint on behalf of the underlying API classes (Sheets and Drive).
 
 =over
 
-=item new(config_file => <path_to_config_file>, auth => <object|hash>, post_process => <coderef>, throttle => <int>);
+=item new(config_file => <path_to_config_file>, auth => <object|hash>, api_callback => <coderef>, throttle => <int>);
 
  config_file: Optional YAML configuration file that can specify any
    or all of the following args:
  auth: A hashref to create the specified auth class, or (outside the config file) an instance of the blessed class itself.
- post_process: A coderef to call after each API call.
+ api_callback: A coderef to call after each API call.
  throttle: Used in development to sleep the number of seconds
    specified between API calls to avoid threshhold errors from Google.
 

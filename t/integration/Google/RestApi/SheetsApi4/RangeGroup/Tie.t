@@ -24,4 +24,4 @@ is_array sub { tied(%$tied)->values(); }, "Fetching tied values";
 is $tied->{A1}, $text1, "Checking tied A1 text should succeed";
 is $tied->{A2}, $text2, "Checking tied A2 text should succeed";
 
-delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets_api());

@@ -2,9 +2,9 @@ package Test::Google::RestApi::SheetsApi4::RangeGroup;
 
 use Test::Unit::Setup;
 
-use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
+use parent 'Test::Unit::TestBase';
 
-use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Base);
+use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
 
 sub class { 'Google::RestApi::SheetsApi4::RangeGroup' }
 
@@ -23,7 +23,7 @@ sub spreadsheet { shift->worksheet()->spreadsheet(); }
 
 sub new_ranges {
   my $self = shift;
-  my @ranges = map { $self->worksheet()->range($_); } @_;
+  my @ranges = map { fake_worksheet()->range($_); } @_;
   return @ranges;
 }
 
