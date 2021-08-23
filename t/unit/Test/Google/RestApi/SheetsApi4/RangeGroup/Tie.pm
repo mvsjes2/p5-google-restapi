@@ -7,8 +7,9 @@ use parent 'Test::Unit::TestBase';
 use aliased 'Google::RestApi::SheetsApi4::Range::Col';
 use aliased 'Google::RestApi::SheetsApi4::Range::Row';
 use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
+use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie';
 
-sub class { 'Google::RestApi::SheetsApi4::RangeGroup::Tie' }
+sub class { Tie; }
 
 sub setup : Tests(setup) {
   my $self = shift;
@@ -18,7 +19,9 @@ sub setup : Tests(setup) {
     get_worksheet_properties_title_sheetid
     get_worksheet_values_cell
     get_worksheet_values_a1_b1_c1
-    post_worksheet_values_a1_b1_c1
+    get_worksheet_values_range
+    post_worksheet_values_x_y_z
+    put_worksheet_values_range
   ));
   $self->_fake_http_auth();
   $self->_fake_http_no_retries();
@@ -26,15 +29,69 @@ sub setup : Tests(setup) {
   return;
 }
 
-sub tie : Tests(10) {
+sub tie : Tests(16) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
   my $worksheet = fake_worksheet();
+  my $worksheet_name = fake_worksheet_name();
   $worksheet->rest_api()->max_attempts(1);
 
   my $tied;
-  is_hash $tied = $worksheet->tie_cells({id => 'A1'}, {name => 'B1'}, {address => 'C1'}), "Tie some cells";
+  is_hash $tied = $worksheet->tie_cells(qw(A1 B1 C1)), "Tie some cells";
+
+  tied(%$tied)->fetch_range(1);
+  for (qw(A1 B1 C1)) {
+    isa_ok $tied->{$_}, Cell, "Key '$_'";
+    is $tied->{$_}->range(), "'$worksheet_name'!$_", "Cell '$_' is range '$_'";
+  }
+  tied(%$tied)->fetch_range(0);
+
+  is_deeply tied(%$tied)->values(), [undef,undef,undef], "Tied cell values";
+
+  $tied->{A1} = 1000;
+  $tied->{B1} = "Joe Blogs";
+  $tied->{C1} = "123 Some Street";
+
+  is $worksheet->cell("A1"), undef, "Cell 'A1' is 'undef'";
+  is $worksheet->cell("B1"), undef, "Cell 'B1' is 'undef'";
+  is $worksheet->cell("C1"), undef, "Cell 'C1' is 'undef'";
+
+  is_array my $values = tied(%$tied)->submit_values(), "Updating cells";
+  is scalar @$values, 3, "Updated three values";
+
+  is $worksheet->cell("A1"), 1000, "Cell 'A1' is '1000'";
+  is $worksheet->cell("B1"), "Joe Blogs", "Cell 'B1' is 'Joe Blogs'";
+  is $worksheet->cell("C1"), "123 Some Street", "Cell 'C1' is '123 Some Street'";
+
+  return;
+}
+
+sub tie_named : Tests(16) {
+  my $self = shift;
+
+  $self->_fake_http_response_by_uri();
+  my $worksheet = fake_worksheet();
+  my $worksheet_name = fake_worksheet_name();
+  $worksheet->rest_api()->max_attempts(1);
+
+  my %ties = (
+    id      => 'A1',
+    name    => 'B1',
+    address => 'C1',
+  );
+  my @ties = map { { $_ => $ties{$_} }; } keys %ties;
+  
+  my $tied;
+  is_hash $tied = $worksheet->tie_cells(@ties), "Tie some cells";
+
+  tied(%$tied)->fetch_range(1);
+  while (my ($k, $v) = each %ties) {
+    isa_ok $tied->{$k}, Cell, "Key '$k'";
+    is $tied->{$k}->range(), "'$worksheet_name'!$v", "Cell '$k' is range '$v'";
+  }
+  tied(%$tied)->fetch_range(0);
+
   is_deeply tied(%$tied)->values(), [undef,undef,undef], "Tied cell values";
 
   $tied->{id} = 1000;
@@ -45,7 +102,7 @@ sub tie : Tests(10) {
   is $worksheet->cell("B1"), undef, "Cell 'B1' is 'undef'";
   is $worksheet->cell("C1"), undef, "Cell 'C1' is 'undef'";
 
-  is_array my $values = tied(%$tied)->submit_values(), "Updating a row";
+  is_array my $values = tied(%$tied)->submit_values(), "Updating cells";
   is scalar @$values, 3, "Updated three values";
 
   is $worksheet->cell("A1"), 1000, "Cell 'A1' is '1000'";
@@ -55,27 +112,37 @@ sub tie : Tests(10) {
   return;
 }
 
-sub tie_cols : Tests(11) {
+sub tie_cols : Tests(18) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
   my $worksheet = fake_worksheet();
+  my $worksheet_name = fake_worksheet_name();
   $worksheet->rest_api()->max_attempts(1);
 
-  my $cols;
-  is_hash $cols = $worksheet->tie_cols({id => 'B:B'}, {name => 'C:C'}, {address => 'D:D'}), "Tie cols";
+  my %ties = (
+    id      => 'B:B',
+    name    => 'C:C',
+    address => 'D:D',
+  );
+  my @ties = map { { $_ => $ties{$_} }; } keys %ties;
+  
+  my $tied;
+  is_hash $tied = $worksheet->tie_cols(@ties), "Tie cols";
 
-  tied(%$cols)->fetch_range(1);
-  isa_ok $cols->{1}, Col, "Key '1' should be a col";
-  is $cols->{1}->range(), "$self->{name}A:A", "Col '1' is range 'A:A'";
-  isa_ok $cols->{2}, Col, "Key '2' should be a col";
-  is $cols->{2}->range(), "$self->{name}B:B", "Col '2' is range 'B:B'";
+  tied(%$tied)->fetch_range(1);
+  while (my ($k, $v) = each %ties) {
+    isa_ok $tied->{$k}, Col, "Key '$k' should be a col";
+    is $tied->{$k}->range(), "'$worksheet_name'!$v", "Col '$k' is range '$v'";
+  }
+  tied(%$tied)->fetch_range(0);
 
-  $cols->{id} = [ 1000, 1001, 1002 ];
-  $cols->{name} = [ "Joe Blogs", "Freddie Mercury", "Iggy Pop" ];
-  $cols->{address} = [ "123 Some Street", "345 Some Other Street", "Another Universe" ];
+  $tied->{id} = [ 1000, 1001, 1002 ];
+  $tied->{name} = [ "Joe Blogs", "Freddie Mercury", "Iggy Pop" ];
+  $tied->{address} = [ "123 Some Street", "345 Some Other Street", "Another Universe" ];
 
-  is_array tied(%$cols)->submit_values(), "Updating a row";
+  is_array my $values = tied(%$tied)->submit_values(), "Updating columns";
+  is scalar @$values, 3, "Updated three values";
 
   is $worksheet->cell("B1"), 1000, "Cell 'B1' is '1000'";
   is $worksheet->cell("C1"), "Joe Blogs", "Cell 'C1' is 'Joe Blogs'";
@@ -92,72 +159,73 @@ sub tie_cols : Tests(11) {
   return;
 }
 
-sub tie_cols2 { # : Tests(10) {
+sub tie_rows : Tests(18) {
   my $self = shift;
 
+  $self->_fake_http_response_by_uri();
   my $worksheet = fake_worksheet();
+  my $worksheet_name = fake_worksheet_name();
+  $worksheet->rest_api()->max_attempts(1);
 
-  my $cols;
-  is_hash $cols = $worksheet->tie_cols(1, 2), "Tying cols '1' and '2'";
-  tied(%$cols)->fetch_range(1);
-  isa_ok $cols->{1}, Col, "Key '1' should be a col";
-  is $cols->{1}->range(), "$self->{name}A:A", "Col '1' is range 'A:A'";
-  isa_ok $cols->{2}, Col, "Key '2' should be a col";
-  is $cols->{2}->range(), "$self->{name}B:B", "Col '2' is range 'B:B'";
+  my %ties = (
+    id      => '2:2',
+    name    => '3:3',
+    address => '4:4',
+  );
+  my @ties = map { { $_ => $ties{$_} }; } keys %ties;
+  
+  my $tied;
+  is_hash $tied = $worksheet->tie_rows(@ties), "Tie rows";
 
-  is_hash $cols = $worksheet->tie_cols({ fred => '1' }), "Tying cols 'fred => 1'";
-  tied(%$cols)->fetch_range(1);
-  isa_ok $cols->{fred}, Col, "Key 'fred' should be a col";
-  is $cols->{fred}->range(), "$self->{name}A:A", "Col 'fred => 1' is range 'A:A'";
+  tied(%$tied)->fetch_range(1);
+  while (my ($k, $v) = each %ties) {
+    isa_ok $tied->{$k}, Row, "Key '$k' should be a row";
+    is $tied->{$k}->range(), "'$worksheet_name'!$v", "Row '$k' is range '$v'";
+  }
+  tied(%$tied)->fetch_range(0);
 
-  is_hash $cols = $worksheet->tie_cols({ fred => [[1,1], [2,2]] }), "Tying cols to a bad range";
-  tied(%$cols)->fetch_range(1);
-  throws_ok sub { $cols->{fred}->range(); }, qr/Unable to translate/, "Using a bad range should fail";
+  $tied->{id} = [ 1000, 1001, 1002 ];
+  $tied->{name} = [ "Joe Blogs", "Freddie Mercury", "Iggy Pop" ];
+  $tied->{address} = [ "123 Some Street", "345 Some Other Street", "Another Universe" ];
 
-  return;
-}
+  is_array my $values = tied(%$tied)->submit_values(), "Updating rows";
+  is scalar @$values, 3, "Updated three values";
 
-sub tie_rows { # : Tests(10) {
-  my $self = shift;
+  is $worksheet->cell("A2"), 1000, "Cell 'A2' is '1000'";
+  is $worksheet->cell("A3"), "Joe Blogs", "Cell 'C1' is 'Joe Blogs'";
+  is $worksheet->cell("A4"), "123 Some Street", "Cell 'D1' is '123 Some Street'";
 
-  my $worksheet = fake_worksheet();
+  is $worksheet->cell("B2"), 1001, "Cell 'B2' is '1001'";
+  is $worksheet->cell("B3"), "Freddie Mercury", "Cell 'C2' is 'Freddie Mercury'";
+  is $worksheet->cell("B4"), "345 Some Other Street", "Cell 'D2' is '345 Some Other Street'";
 
-  my $rows;
-  is_hash $rows = $worksheet->tie_rows(1, 2), "Tying rows '1' and '2'";
-  tied(%$rows)->fetch_range(1);
-  isa_ok $rows->{1}, Row, "Key '1' should be a row";
-  is $rows->{1}->range(), "$self->{name}1:1", "Key '1' should be range '1:1'";
-  isa_ok $rows->{2}, Row, "Key '2' should be a row";
-  is $rows->{2}->range(), "$self->{name}2:2", "Key '2' should be range '2:2'";
+  is $worksheet->cell("C2"), 1002, "Cell 'C2' is '1002'";
+  is $worksheet->cell("C3"), "Iggy Pop", "Cell 'C3' is 'Iggy Pop'";
+  is $worksheet->cell("C4"), "Another Universe", "Cell 'D3' is 'Another Universe'";
 
-  is_hash $rows = $worksheet->tie_rows({ fred => '1' }), "Tying rows 'fred => 1'";
-  tied(%$rows)->fetch_range(1);
-  isa_ok $rows->{fred}, Row, "Key 'fred' should be a row";
-  is $rows->{fred}->range(), "$self->{name}1:1", "Row 'fred => 1' is range '1:1'";
-
-  is_hash $rows = $worksheet->tie_rows({ fred => [[1,1], [2,2]] }), "Tying rows to a bad range";
-  tied(%$rows)->fetch_range(1);
-  throws_ok sub { $rows->{fred}->range(); }, qr/Unable to translate/, "Using a bad range should fail";
-
+  
+  
   return;
 }
 
 sub tie_cell { # : Tests(7) {
   my $self = shift;
 
+  $self->_fake_http_response_by_uri();
   my $worksheet = fake_worksheet();
+  $worksheet->rest_api()->max_attempts(1);
 
-  my $cells;
-  is_hash $cells = $worksheet->tie(), "Create blank tie";
+  my $tied;
+  is_hash $tied = $worksheet->tie(), "Create blank tie";
   my $ranges = $worksheet->tie_cells('A1', { fred => [2, 2] });
-  is_hash tied(%$cells)->add_tied($ranges), "Adding tied cells";
-  is_array tied(%$cells)->values(), "Tied cell batch values";
+  is_hash tied(%$tied)->add_tied($ranges), "Adding tied cells";
+  is_array tied(%$tied)->values(), "Tied cell batch values";
 
-  $cells->{A1} = 1000;
-  $cells->{fred} = "Joe Blogs";
-  $cells->{C3} = "123 Some Street";
+  $tied->{A1} = 1000;
+  $tied->{fred} = "Joe Blogs";
+  $tied->{C3} = "123 Some Street";
 
-  is_array tied(%$cells)->submit_values(), "Updating cells";
+  is_array tied(%$tied)->submit_values(), "Updating cells";
 
   is $worksheet->cell("A1"), 1000, "Cell 'A1' is '1000'";
   is $worksheet->cell("B2"), "Joe Blogs", "Cell 'B2' is 'Joe Blogs'";
@@ -166,66 +234,38 @@ sub tie_cell { # : Tests(7) {
   return;
 }
 
-sub tie_cells { # : Tests(16) {
+sub tie_slice : Tests(10) {
   my $self = shift;
 
+  $self->_fake_http_response_by_uri();
   my $worksheet = fake_worksheet();
+  $worksheet->rest_api()->max_attempts(1);
 
-  my $cells;
-  is_hash $cells = $worksheet->tie_cells('A1', 'B2'), "Tying cells 'A1' and 'B2'";
-  tied(%$cells)->fetch_range(1);
-  isa_ok $cells->{A1}, Cell, "Key 'A1' should be a cell";
-  is $cells->{A1}->range(), "$self->{name}A1", "Cell 'A1' is range 'A1'";
-  isa_ok $cells->{B2}, Cell, "Key 'B2' should be a cell";
-  is $cells->{B2}->range(), "$self->{name}B2", "Cell 'B2' is range 'B2'";
-
-  isa_ok $cells->{C3} = "Charlie", Cell, "Auto-creating cell 'C3'";
-  isa_ok $cells->{C3}, Cell, "Key 'C3' should be a cell";
-  is $cells->{C3}->range(), "$self->{name}C3", "Cell 'C3' is range 'C3'";
-
-  is_hash $cells = $worksheet->tie_cells({ fred => 'A1' }), "Tying cells 'fred => A1'";
-  tied(%$cells)->fetch_range(1);
-  isa_ok $cells->{fred}, Cell, "Key 'fred' should be a cell";
-  is $cells->{fred}->range(), "$self->{name}A1", "Cell 'fred => A1' is range 'A1'";
-
-  is_hash $cells = $worksheet->tie_cells({ fred => [1, 1] }), "Tying cells 'fred => [1, 1]'";
-  tied(%$cells)->fetch_range(1);
-  isa_ok $cells->{fred}, Cell, "Key 'fred' should be a cell";
-  is $cells->{fred}->range(), "$self->{name}A1", "Cell 'fred => [1, 1]' is 'A1'";
-
-  is_hash $cells = $worksheet->tie_cells({ fred => [[1,1], [2,2]] }), "Tying a cell to a bad range";
-  tied(%$cells)->fetch_range(1);
-  throws_ok sub { $cells->{fred}->range(); }, qr/Unable to translate/, "Using a bad range should fail";
-
-  return;
-}
-
-sub tie_slice { # : Tests(8) {
-  my $self = shift;
-
-  my $worksheet = fake_worksheet();
-
-  my $cells;
-  is_hash $cells = $worksheet->tie(), "Create blank tie";
-  @$cells{ 'A1', 'B2', 'C3', 'D4:E5' } = (1000, "Joe Blogs", "123 Some Street", [["Halifax"]]);
+  my $tied;
+  is_hash $tied = $worksheet->tie(), "Create blank tie";
+  @$tied{ 'A1', 'B2', 'C3', 'D4:E5' } = (1000, "Joe Blogs", "123 Some Street", [["Halifax"]]);
 
   is $worksheet->cell("A1"), undef, "Cell 'A1' is 'undef'";
   is $worksheet->cell("B2"), undef, "Cell 'B2' is 'undef'";
   is $worksheet->cell("C3"), undef, "Cell 'C3' is 'undef'";
+  is_deeply $worksheet->range("D4:E5")->values(), [], "Range 'D4:E5' is 'undef'";
 
-  is_array tied(%$cells)->submit_values(), "Updating cells";
+  is_array tied(%$tied)->submit_values(), "Updating cells";
 
   is $worksheet->cell("A1"), 1000, "Cell 'A1' is '1000'";
   is $worksheet->cell("B2"), "Joe Blogs", "Cell 'B2' is 'Joe Blogs'";
   is $worksheet->cell("C3"), "123 Some Street", "Cell 'C3' is '123 Some Street'";
+  is_deeply $worksheet->range("D4:E5")->values(), [["Halifax"]], "Range 'D4:E5' is 'Halifax'";
 
   return;
 }
 
-sub tie_return_objects { # : Tests(6) {
+sub tie_return_objects : Tests(6) {
   my $self = shift;
 
+  $self->_fake_http_response_by_uri();
   my $worksheet = fake_worksheet();
+  $worksheet->rest_api()->max_attempts(1);
 
   my $cols = $worksheet->tie_cols({id => 'B:B'}, {name => 'C:C'}, {address => 'D:D'});
   isa_ok tied(%$cols)->fetch_range(1), $self->class(), "Turning on cols return objects";

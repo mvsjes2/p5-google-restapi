@@ -1,6 +1,11 @@
 PUT:
-  "^\Qhttps://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values/'Sheet1'!1:1?valueInputOption=USER_ENTERED\E":
-    content: "{\"range\":\"'Sheet1'!1:1\",\"majorDimension\":\"ROWS\",\"values\":[[\"joe\"]]}"
+  "https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values/'Sheet1'!1:1?valueInputOption=USER_ENTERED":
+    content: |
+      {
+        "range": "'Sheet1'!1:1,
+        "majorDimension": "ROWS",
+        "values": [["joe"]]
+      }
     response: |
       {
         "spreadsheetId": "fake_spreadsheet_id1",

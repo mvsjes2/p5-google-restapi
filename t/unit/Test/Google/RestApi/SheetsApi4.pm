@@ -4,11 +4,12 @@ use Test::Unit::Setup;
 
 use parent 'Test::Unit::TestBase';
 
+use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
 
 # init_logger();
 
-sub class { 'Google::RestApi::SheetsApi4' }
+sub class { SheetsApi4; }
 
 sub setup : Tests(setup) {
   my $self = shift;

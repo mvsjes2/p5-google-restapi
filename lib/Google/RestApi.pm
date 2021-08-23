@@ -7,6 +7,7 @@ use Google::RestApi::Setup;
 use File::Basename;
 use Furl;
 use JSON::MaybeXS;
+use List::Util qw(pairs);
 use Log::Log4perl qw(get_logger);
 use Module::Load qw(load);
 use Scalar::Util qw(blessed);
@@ -55,7 +56,6 @@ sub api {
   $request->{caller_internal} = _caller_internal();
   $request->{caller_external} = _caller_external();
 
-  my $base_uri = $request->{uri};
   my $request_content = $request->{content};
   my $request_json = defined $request_content ? encode_json($request_content) : (),
 
@@ -66,8 +66,9 @@ sub api {
 
   # some (outdated) auth mechanisms may allow auth info in the params.
   my %params = (%{ $request->{params} }, %{ $self->auth()->params() });
-  my $uri = URI->new($base_uri);
+  my $uri = URI->new($request->{uri});
   $uri->query_form_hash(\%params);
+  $uri = $self->_normalize_uri($uri);
   $request->{uri} = $uri->as_string();
   DEBUG("Rest API request:\n", Dump($request));
 
@@ -92,22 +93,21 @@ sub api {
   $self->_api_callback();
 
   # this is for capturing request/responses for unit tests. copy/paste the results
-  # into t/etc/uri_responses for unit testing.
+  # in the log into t/etc/uri_responses for unit testing.
   my $logger = get_logger('unit.test.capture');
   if ($logger && $response) {
-    my %request_response = ($request->{method} => {});
-    if ($request_json) {
-      $request_response{ $request->{method} } = {
-        $request->{uri} => {
-          content  => $request_json,
-          response => ($response->content() ? $response->content() : ''),
-        },
-      };
-    } else {
-      $request_response{ $request->{method} } = {
-        $request->{uri} => ($response->content() ? $response->content() : ''),
-      };
-    }
+    my %request_response;
+    my $json = JSON->new->ascii->pretty->canonical;
+    my $pretty_request_json = $request_json ?
+      $json->encode(decode_json($request_json)) : '';
+    my $pretty_response_json = $response->content() ?
+      $json->encode(decode_json($response->content())) : '';
+    $request_response{ $request->{method} } = {
+      $request->{uri} => {
+        ($pretty_request_json) ? (content  => $pretty_request_json) : (),
+        response => $pretty_response_json,
+      },
+    };
     $logger->info(Dump(\%request_response) . "\n\n");
   }
 
@@ -153,6 +153,20 @@ sub _api {
     on_failure   => sub { $tries++; },
     max_attempts => $self->max_attempts();   # override default max_attempts 10.
   return ($response, $tries, $last_error);
+}
+
+# although this is a bit smelly, making the uri params sorted makes
+# possible much easier and more predictable unit testing. the responses
+# that contain arrays come out in predictable order.
+sub _normalize_uri {
+  my $self = shift;
+  my $uri = shift;
+  $uri->query_form([
+    map { $_->[0], $_->[1] }
+    sort { $a->[0] cmp $b->[0] || $a->[1] cmp $b->[1] }
+    pairs($uri->query_form())
+  ]);
+  return $uri;
 }
 
 # convert a plain hash auth to an object if a hash was passed.

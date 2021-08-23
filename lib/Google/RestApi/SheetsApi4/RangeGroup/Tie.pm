@@ -82,11 +82,11 @@ sub range_group {
 sub default_worksheet {
   my $self = shift;
   state $check = compile(
-    HasMethods[qw(tie_ranges tie_cells)],
+    HasMethods[qw(tie_ranges tie_cells)], { optional => 1 },
   );
   my ($worksheet) = $check->(@_);
-  $self->{worksheet} = $worksheet;
-  return;
+  $self->{worksheet} = $worksheet if $worksheet;
+  return $self->{worksheet};
 }
 
 sub TIEHASH  {

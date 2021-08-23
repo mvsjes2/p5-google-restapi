@@ -21,7 +21,7 @@ sub new {
   my $qr_id = SheetsApi4->Spreadsheet_Id;
   my $qr_uri = SheetsApi4->Spreadsheet_Uri;
   state $check = compile_named(
-    sheets_api => HasMethods[qw(api config spreadsheets)],
+    sheets_api => HasMethods[qw(api sheets_config spreadsheets)],
     # https://developers.google.com/sheets/api/guides/concepts
     id         => StrMatch[qr/^$qr_id$/], { optional => 1 },
     name       => Str, { optional => 1 },
@@ -36,13 +36,12 @@ sub new {
   $self->{name} ||= $self->{title};
   delete $self->{title};
 
-  if ($self->{config_id}) {
-    my $config = $self->sheets_config($self->{config_id})
-      or LOGDIE "Config '$self->{config_id}' is missing";
+  if ($self->config_id()) {
+    my $config = $self->spreadsheet_config()
+      or LOGDIE "Sheets config id '" . $self->config_id() . "' is missing";
     foreach (qw(id name uri)) {
       $self->{$_} = $config->{$_} if defined $config->{$_};
     }
-    $self->{config} = $config->{worksheets} if $config->{worksheets};
   }
 
   $self->{id} || $self->{name} || $self->{uri} or LOGDIE "At least one of id, name, or uri must be specified";
@@ -219,7 +218,7 @@ sub submit_values {
   my $p = $check->(@_);
 
   # find out which ranges have something to send.
-  my @ranges = grep { $_->has_values(); } @{ delete $p->{ranges} };
+  my @ranges = sort { $a->range() cmp $b->range(); } grep { $_->has_values(); } @{ delete $p->{ranges} };
   my @values = map { $_->batch_values(); } @ranges;
   return if !@values;
 
@@ -248,24 +247,23 @@ sub submit_requests {
   );
   my $p = $check->(@_);
 
+  # sort the ranges so they come out in a predictable order.
+  my @all_requests = ((sort { $a->range() cmp $b->range(); } @{ delete $p->{ranges} }), $self);   # add myself to the list.
+
   # for each object that has requests to submit, store them so that
   # they can process the responses that come back.
   my @ranges = map {
     $_->batch_requests() ? $_ : ();
-  } @{ $p->{ranges} }, $self;   # add myself to the list.
+  } @all_requests;
   return if !@ranges;
 
-  # pull out the requests hashes to be send to the rest api.
+  # pull out the requests hashes to be sent to the rest api.
   my @batch_requests = map {
     $_->batch_requests();
-  } @{ delete $p->{ranges} }, $self;
+  } @all_requests;
   return if !@batch_requests;
 
-  # call the batch requuest api. returns an array with:
-  #   $api_content (json decoded content)
-  #   $api_response (Furl::Response, also contains the string content)
-  #   $p (params of the original request)
-  # most users will only be interested in $api[0].
+  # call the batch requuest api.
   $p->{content}->{requests} = \@batch_requests;
   $p->{method} = 'post';
   $p->{uri} = ':batchUpdate';
@@ -317,15 +315,17 @@ sub delete_all_protected_ranges {
   return $self;
 }
 
-sub config {
+sub spreadsheet_config {
   my $self = shift;
-  my $config = $self->{config} or return;
   my $key = shift;
+  my $config = $self->sheets_config( $self->config_id() ) or return;
   return defined $key ? $config->{$key} : $config;
 }
 
+sub config_id { shift->{config_id}; }
+sub worksheets_config { shift->spreadsheet_config('worksheets'); }
 sub open_worksheet { Worksheet->new(spreadsheet => shift, @_); }
-sub sheets_config { shift->sheets_api()->config(shift); }
+sub sheets_config { shift->sheets_api()->sheets_config(shift); }
 sub sheets_api { shift->{sheets_api}; }
 sub rest_api { shift->sheets_api()->rest_api(); }
 sub stats { shift->sheets_api()->stats(); }

@@ -2,24 +2,39 @@ package Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Rang
 
 use Test::Unit::Setup;
 
-use Test::Mock::Worksheet;
-
 use parent 'Test::Unit::TestBase';
 
 use aliased 'Google::RestApi::SheetsApi4::Range';
-
-sub class { 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range' }
+use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range' => 'Worksheet::Range';
 
 my $index = {
-  sheetId          => 'mock_worksheet_id',
+  sheetId          => 'Sheet1',
   startColumnIndex => 0,
   startRowIndex    => 0,
   endColumnIndex   => 1,
   endRowIndex      => 1,
 };
 
+sub class { Worksheet::Range; }
+
+sub setup : Tests(setup) {
+  my $self = shift;
+  $self->SUPER::setup(@_);
+
+  $self->_fake_http_auth();
+  $self->_fake_http_no_retries();
+
+  $self->_uri_responses(qw(
+    get_worksheet_properties_title_sheetid
+  ));
+
+  return;
+}
+
 sub range_text_format : Tests(29) {
   my $self = shift;
+
+  $self->_fake_http_response_by_uri();
 
   my $cell = {
     repeatCell => {
@@ -111,6 +126,8 @@ sub _range_text_format_color {
 sub range_background_color : Tests(13) {
   my $self = shift;
 
+  $self->_fake_http_response_by_uri();
+
   my $cell = {
     repeatCell => {
       range => '',
@@ -161,6 +178,8 @@ sub _range_background_color {
 # functionality for each type of format option.
 sub range_misc : Tests(12) {
   my $self = shift;
+
+  $self->_fake_http_response_by_uri();
 
   my $cell = {
     repeatCell => {
@@ -224,6 +243,8 @@ sub range_misc : Tests(12) {
 sub range_borders : Tests(22) {
   my $self = shift;
 
+  $self->_fake_http_response_by_uri();
+
   my $cell = {
     updateBorders => {
       range => '',
@@ -280,6 +301,8 @@ sub _range_borders {
 sub range_border_style : Tests(14) {
   my $self = shift;
 
+  $self->_fake_http_response_by_uri();
+
   my $cell = {
     updateBorders => {
       range => '',
@@ -315,6 +338,8 @@ sub _range_border_style {
 
 sub range_border_colors : Tests(13) {
   my $self = shift;
+
+  $self->_fake_http_response_by_uri();
 
   my $cell = {
     updateBorders => {
@@ -362,6 +387,8 @@ sub _range_border_colors {
 sub range_border_cells : Tests(7) {
   my $self = shift;
 
+  $self->_fake_http_response_by_uri();
+
   my $cell = {
     repeatCell => {
       range => '',
@@ -397,6 +424,8 @@ sub range_border_cells : Tests(7) {
 
 sub range_merge : Tests(6) {
   my $self = shift;
+
+  $self->_fake_http_response_by_uri();
 
   my $cell = {
     mergeCells => {
