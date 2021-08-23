@@ -68,7 +68,6 @@ sub api {
   my %params = (%{ $request->{params} }, %{ $self->auth()->params() });
   my $uri = URI->new($request->{uri});
   $uri->query_form_hash(\%params);
-  $uri = $self->_normalize_uri($uri);
   $request->{uri} = $uri->as_string();
   DEBUG("Rest API request:\n", Dump($request));
 
@@ -153,20 +152,6 @@ sub _api {
     on_failure   => sub { $tries++; },
     max_attempts => $self->max_attempts();   # override default max_attempts 10.
   return ($response, $tries, $last_error);
-}
-
-# although this is a bit smelly, making the uri params sorted makes
-# possible much easier and more predictable unit testing. the responses
-# that contain arrays come out in predictable order.
-sub _normalize_uri {
-  my $self = shift;
-  my $uri = shift;
-  $uri->query_form([
-    map { $_->[0], $_->[1] }
-    sort { $a->[0] cmp $b->[0] || $a->[1] cmp $b->[1] }
-    pairs($uri->query_form())
-  ]);
-  return $uri;
 }
 
 # convert a plain hash auth to an object if a hash was passed.

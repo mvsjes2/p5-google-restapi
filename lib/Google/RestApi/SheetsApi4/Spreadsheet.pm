@@ -218,7 +218,7 @@ sub submit_values {
   my $p = $check->(@_);
 
   # find out which ranges have something to send.
-  my @ranges = sort { $a->range() cmp $b->range(); } grep { $_->has_values(); } @{ delete $p->{ranges} };
+  my @ranges = grep { $_->has_values(); } @{ delete $p->{ranges} };
   my @values = map { $_->batch_values(); } @ranges;
   return if !@values;
 
@@ -247,8 +247,7 @@ sub submit_requests {
   );
   my $p = $check->(@_);
 
-  # sort the ranges so they come out in a predictable order.
-  my @all_requests = ((sort { $a->range() cmp $b->range(); } @{ delete $p->{ranges} }), $self);   # add myself to the list.
+  my @all_requests = (@{ delete $p->{ranges} }, $self);   # add myself to the list.
 
   # for each object that has requests to submit, store them so that
   # they can process the responses that come back.

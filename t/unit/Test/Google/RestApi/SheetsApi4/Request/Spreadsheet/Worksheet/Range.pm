@@ -5,7 +5,7 @@ use Test::Unit::Setup;
 use parent 'Test::Unit::TestBase';
 
 use aliased 'Google::RestApi::SheetsApi4::Range';
-use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range' => 'Worksheet::Range';
+use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range' => 'Request::Range';
 
 my $index = {
   sheetId          => 'Sheet1',
@@ -15,7 +15,7 @@ my $index = {
   endRowIndex      => 1,
 };
 
-sub class { Worksheet::Range; }
+sub class { Request::Range; }
 
 sub setup : Tests(setup) {
   my $self = shift;
@@ -26,6 +26,7 @@ sub setup : Tests(setup) {
 
   $self->_uri_responses(qw(
     get_worksheet_properties_title_sheetid
+    post_worksheet_batch_request
   ));
 
   return;
@@ -48,7 +49,7 @@ sub range_text_format : Tests(29) {
     },
   };
 
-  my $range = $self->new_range("A1");
+  my $range = $self->_new_range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
 
   _range_text_format($cell, $range, 'bold');
@@ -140,7 +141,7 @@ sub range_background_color : Tests(13) {
     },
   };
 
-  my $range = $self->new_range("A1");
+  my $range = $self->_new_range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
  
   _range_background_color($cell, $range, 'red', 1);
@@ -195,7 +196,7 @@ sub range_misc : Tests(12) {
     },
   };
 
-  my $range = $self->new_range("A1");
+  my $range = $self->_new_range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
   my $user = $cell->{repeatCell}->{cell}->{userEnteredFormat};
 
@@ -251,7 +252,7 @@ sub range_borders : Tests(22) {
     },
   };
 
-  my $range = $self->new_range("A1");
+  my $range = $self->_new_range("A1");
   my $borders = $cell->{updateBorders};
   $borders->{range} = $range->range_to_index();
 
@@ -312,7 +313,7 @@ sub range_border_style : Tests(14) {
     },
   };
 
-  my $range = $self->new_range("A1");
+  my $range = $self->_new_range("A1");
   $cell->{updateBorders}->{range} = $range->range_to_index();
 
   _range_border_style($cell, $range, $_)
@@ -350,7 +351,7 @@ sub range_border_colors : Tests(13) {
     },
   };
 
-  my $range = $self->new_range("A1");
+  my $range = $self->_new_range("A1");
   $cell->{updateBorders}->{range} = $range->range_to_index();
 
   _range_border_colors($cell, $range, 'red', 1);
@@ -401,7 +402,7 @@ sub range_border_cells : Tests(7) {
     },
   };
 
-  my $range = $self->new_range("A1");
+  my $range = $self->_new_range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
   my $borders = $cell->{repeatCell}->{cell}->{userEnteredFormat}->{borders};
   my $fields = $cell->{repeatCell}->{fields};
@@ -434,7 +435,7 @@ sub range_merge : Tests(6) {
     },
   };
 
-  my $range = $self->new_range("A1:B2");
+  my $range = $self->_new_range("A1:B2");
   $cell->{mergeCells}->{range} = $range->range_to_index();
   my @requests;
 
@@ -459,7 +460,7 @@ sub range_merge : Tests(6) {
   return;
 }
 
-sub new_range {
+sub _new_range {
   my $self = shift;
   return Range->new(worksheet => fake_worksheet(), range => shift);
 }
