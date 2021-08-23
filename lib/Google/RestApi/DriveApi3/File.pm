@@ -33,9 +33,9 @@ sub copy {
     _extra_ => slurpy Any,
   );
   my $p = named_extra($check->(@_));
-  $p->{name} ||= $p->{title};
-  delete $p->{title};
-  $p->{content}->{name} = delete $p->{name};
+  $p->{name} //= $p->{title};
+  $p->{content}->{name} = $p->{name} if defined $p->{name};
+  delete @$p{qw(name title)};
 
   my $file_id = $self->file_id();
   $p->{uri} = "$file_id/copy";
