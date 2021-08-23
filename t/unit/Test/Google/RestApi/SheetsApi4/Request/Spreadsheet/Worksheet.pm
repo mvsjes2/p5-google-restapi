@@ -4,10 +4,28 @@ use Test::Unit::Setup;
 
 use parent 'Test::Unit::TestBase';
 
-sub class { 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet' }
+use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet';
+
+sub class { Worksheet; }
+
+sub setup : Tests(setup) {
+  my $self = shift;
+  $self->SUPER::setup(@_);
+
+  $self->_fake_http_auth();
+  $self->_fake_http_no_retries();
+
+  $self->_uri_responses(qw(
+    get_worksheet_properties_title_sheetid
+  ));
+
+  return;
+}
 
 sub ws_format : Tests() {
   my $self = shift;
+
+  $self->_fake_http_response_by_uri();
 
   my $ws0 = fake_worksheet();
   my $ws = {

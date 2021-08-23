@@ -9,7 +9,7 @@ use aliased 'Google::RestApi::Auth::OAuth2Client';
 
 # init_logger($DEBUG);
 
-sub class { 'Google::RestApi' }
+sub class { RestApi; }
 
 sub _constructor : Tests(4) {
   my $self = shift;

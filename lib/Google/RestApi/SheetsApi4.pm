@@ -5,6 +5,8 @@ our $VERSION = '0.7';
 use Google::RestApi::Setup;
 
 use Module::Load qw(load);
+use Try::Tiny;
+use YAML::Any qw(LoadFile);
 
 use aliased 'Google::RestApi::DriveApi3';
 use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
@@ -23,10 +25,10 @@ sub new {
   my $class = shift;
 
   state $check = compile_named(
-    api      => HasMethods[qw(api)],
-    drive    => HasMethods[qw(filter_files)], { optional => 1 },
-    endpoint => Str, { default => Sheets_Endpoint },
-    config   => HashRef, { optional => 1 },
+    api           => HasMethods[qw(api)],
+    drive         => HasMethods[qw(filter_files)], { optional => 1 },
+    endpoint      => Str, { default => Sheets_Endpoint },
+    sheets_config => ReadableFile|HashRef, { optional => 1 },
   );
   my $self = $check->(@_);
 
@@ -121,9 +123,20 @@ sub drive {
   return $self->{drive};
 }
 
-sub config {
+sub sheets_config {
   my $self = shift;
-  my $config = $self->{config} or return;
+  my $config = $self->{sheets_config} or return;
+
+  if (!ref($config)) {
+    try {
+      $config = LoadFile($config);
+    } catch {
+      my $err = $_;
+      LOGDIE("Unable to load sheets config file '$config': $err");
+    };
+    $self->{sheets_config} = $config;
+  }
+
   my $key = shift;
   return defined $key ? $config->{$key} : $config;
 }
@@ -187,7 +200,7 @@ Google::RestApi::SheetsApi4 - API to Google Sheets API V4.
  $row = $ws0->range_row("C1:1");
  $row = $ws0->range_row([<false>, 1]);
  $row = $ws0->range_row({row => 1});
- $row = $ws0->range_row([col => 3, row => 1 }, {row => 1}]);
+ $row = $ws0->range_row([{col => 3, row => 1 }, {row => 1}]);
 
  # add a header:
  $row = $ws0->range_row(1);

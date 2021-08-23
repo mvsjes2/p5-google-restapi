@@ -18,7 +18,7 @@ use parent 'Test::Class';
 sub setup : Tests(setup) {
   my $self = shift;
 
-  # temp storage to fake spreadsheet cells, set by post_* in etc/uri_responses.
+  # temp storage to fake spreadsheet cells, set by post_*, used by get_* in etc/uri_responses.
   $self->{cell_values} = {};
 
   # ensure that we don't send any network traffic to google during our unit tests.
@@ -30,15 +30,11 @@ sub setup : Tests(setup) {
   return;
 }
 
-sub teardown : Tests(teardown) {
-  my $self = shift;
-  $self->_unfake();
-  return;
-}
+sub teardown : Tests(teardown) { shift->_unfake(); return; }
 
 sub _uri_responses {
   my $self = shift;
-  $self->{responses_by_uri} //= {};
+  $self->{responses_by_uri} = {};
   foreach my $response_file (@_) {
     my $response_yaml;
     try {

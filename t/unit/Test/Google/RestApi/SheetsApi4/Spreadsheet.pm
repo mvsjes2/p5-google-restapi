@@ -7,10 +7,11 @@ use Time::HiRes qw(sleep);
 use parent 'Test::Unit::TestBase';
 
 use aliased 'Google::RestApi::SheetsApi4';
+use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
 
 # init_logger();
 
-sub class { 'Google::RestApi::SheetsApi4::Spreadsheet' }
+sub class { Spreadsheet; }
 
 sub setup : Tests(setup) {
   my $self = shift;

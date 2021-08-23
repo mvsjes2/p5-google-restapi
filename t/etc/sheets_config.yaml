@@ -3,18 +3,18 @@ customers:
   name: Customers Sheet
   worksheets:
     addresses:
-      name: Customer_Addresses
+      name: Customer Addresses
       cols:
-        id: Customer ID
+        id: Customer ID      # refer to column 'id' in the code, translates to the column with header 'Customer ID' in the worksheet
         name: Customer Name
         address: Address
       rows:
         sam: Sam Brady
         george: George Jones
     orders:
-      name: Customer_Orders
+      name: Customer Orders
       cols:
-        id: ID
+        id: Customer ID
         item: Item
     config:
       name: Config

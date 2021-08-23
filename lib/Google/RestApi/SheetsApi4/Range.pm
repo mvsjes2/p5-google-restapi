@@ -89,7 +89,7 @@ sub _send_values {
   my $self = shift;
 
   state $check = compile_named(
-    values  => ArrayRef, { optional => 1 }, # ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
+    values  => ArrayRef[ArrayRef[Str]], { optional => 1 }, # ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
     params  => HashRef, { default => {} },
     content => HashRef, { default => {} },
     _extra_ => slurpy Any,
@@ -551,12 +551,14 @@ sub _col_to_a1 {
   return $col if looks_like_number($col) && $col < 1;  # allow this to fail above.
   return $self->_col_i2a($col) if looks_like_number($col);
 
-  my $config = $self->config('cols');
+  my $config = $self->worksheet_config('cols');
   if ($config) {
     my $config_col = $config->{$col};
     return $self->_col_i2a($config_col)
       if $config_col && looks_like_number($config_col);
-    $col = $config_col if $config_col;
+    if ($config_col) {
+      $col = $config_col;
+    }
   }
 
   my $headers = $self->worksheet()->header_row();
@@ -578,7 +580,7 @@ sub _row_to_a1 {
 
   return $row if is_rowA1($row);
 
-  my $config = $self->config('rows');
+  my $config = $self->worksheet_config('rows');
   if ($config) {
     my $config_row = $config->{$row};
     return $config_row
@@ -820,7 +822,7 @@ sub worksheet_name { shift->worksheet()->worksheet_name(@_); }
 sub worksheet_id { shift->worksheet()->worksheet_id(@_); }
 sub spreadsheet { shift->worksheet()->spreadsheet(@_); }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(@_); }
-sub config { shift->worksheet()->config(@_); }
+sub worksheet_config { shift->worksheet()->worksheet_config(@_); }
 sub transaction { shift->spreadsheet()->transaction(); }
 
 1;
