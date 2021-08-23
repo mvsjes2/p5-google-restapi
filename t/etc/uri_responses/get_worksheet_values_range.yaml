@@ -6,5 +6,5 @@ GET:
          "range" : "Sheet1!D4:E5"
       }
     tweaks:
-    - dump_values
+    # - dump_values
     - get_value

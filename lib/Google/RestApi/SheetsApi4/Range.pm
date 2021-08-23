@@ -104,13 +104,13 @@ sub _send_values {
   # response will replace the cache again.
   $self->_cache_range_values(
     range          => $range,
-    majorDimension => $self->{dim},
+    majorDimension => $self->dimension(),
     values         => $p->{values},
   );
 
   $p->{content}->{range} = $range;
   $p->{content}->{values} = delete $p->{values};
-  $p->{content}->{majorDimension} = $self->{dim};
+  $p->{content}->{majorDimension} = $self->dimension();
   $p->{params}->{valueInputOption} //= 'USER_ENTERED';
   # $p->{params}->{includeValuesInResponse} = 1;
   $p->{uri} = "/values/$range";
@@ -130,7 +130,7 @@ sub _send_values {
 # updatedColumns: 3
 # updatedRange: Sheet1!B3:D4
 # updatedRows: 2
-# if invludeValuesInResponse was requested, the values are stashed
+# if includeValuesInResponse was requested, the values are stashed
 # from the updatedData response key.
 # spreadsheet object will call this on a batch update response.
 sub values_response_from_api {
@@ -187,10 +187,20 @@ sub _cache_range_values {
     );
     my $p = $check->(@_);
 
-    my ($worksheet_name) = $p->{range} =~ /(.+)!/;
-    $worksheet_name =~ s/'//g;
-    LOGDIE "Setting range data to worksheet name '$worksheet_name' that doesn't belong to this range: ", $self->worksheet_name()
+    # remove all quotes for comparison.
+    my $self_range = $self->range();
+    $self_range =~ s/'//g;
+    my $range = $p->{range};
+    $range =~ s/'//g;
+    my ($worksheet_name) = $range =~ /^(.+)!/;
+
+    LOGDIE "Setting range data to worksheet name '$worksheet_name' that doesn't belong to this range: " . $self->worksheet_name()
       if $worksheet_name ne $self->worksheet_name();
+    #LOGDIE "Setting range data to '$range' which is not this range: " . $self_range
+    #  if $range ne $self_range;
+    LOGDIE "Setting major dimention to '$p->{majorDimension}' that doesn't belong to this range: " . $self->dimention()
+      if $p->{majorDimension} ne $self->dimension();
+
     delete $p->{range};  # we only cache the values and dimensions.
     $self->{cache_range_values} = $p;
   }
@@ -226,7 +236,7 @@ sub _cache_range_values {
 
   # no values are found for this range, go get them from the api immediately.
   $p{uri} = sprintf("/values/%s", $self->range());
-  $p{params}->{majorDimension} = $self->{dim};
+  $p{params}->{majorDimension} = $self->dimension();
   $self->{cache_range_values} = $self->api(%p);
 
   $self->{cache_range_values}->{values} //= [];  # in case there's nothing set in the ss.
@@ -250,7 +260,7 @@ sub batch_values {
     # response will replace the cache again.
     $self->_cache_range_values(
         range          => $self->range(),
-        majorDimension => $self->{dim},
+        majorDimension => $self->dimension(),
         values         => $p->{values},
     );
   }
@@ -290,7 +300,7 @@ sub append {
   my $range = $self->range();
   $p->{content}->{range} = $range;
   $p->{content}->{values} = delete $p->{values};
-  $p->{content}->{majorDimension} = $self->{dim};
+  $p->{content}->{majorDimension} = $self->dimension();
   $p->{params}->{valueInputOption} //= 'USER_ENTERED';
   $p->{uri} = "/values/$range:append";
   $p->{method} = 'post';

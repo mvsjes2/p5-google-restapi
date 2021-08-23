@@ -57,7 +57,7 @@ sub add_tied {
   return $tied;
 }
 
-# fetch_range(1) turns it on, fetch_range(0) turns it off, fetch_range()
+# fetch_range(1) turns it on, fetch_range(0) turns it off.
 # fetch_range() returns current setting. return $self so it can be
 # chained with requests.
 sub fetch_range {
@@ -145,7 +145,7 @@ sub STORE {
   return;
 }
 
-sub clear_cached_values { shift->range_group()->refresh_values(@_); }
+sub clear_cached_values { shift->range_group()->clear_cached_values(@_); }
 sub refresh_values { shift->range_group()->refresh_values(@_); }
 sub submit_values { shift->range_group()->submit_values(@_); }
 sub submit_requests { shift->range_group()->submit_requests(@_); }

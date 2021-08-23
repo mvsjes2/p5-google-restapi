@@ -21,6 +21,7 @@ sub setup : Tests(setup) {
     get_worksheet_values_a1_b1_c1
     get_worksheet_values_range
     post_worksheet_values_x_y_z
+    post_worksheet_batch_request
     put_worksheet_values_range
   ));
   $self->_fake_http_auth();

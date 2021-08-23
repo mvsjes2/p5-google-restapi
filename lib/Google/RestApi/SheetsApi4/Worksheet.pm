@@ -103,7 +103,7 @@ sub cols {
 
   my @cols = map { $self->range_col($_); } @$cols;
   my $range_group = $self->spreadsheet()->range_group(@cols);
-  return $range_group->values(params => { majorDimension => 'COLUMNS' }) if !$values;
+  return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
   foreach my $i (0..$#ranges) {

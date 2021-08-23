@@ -14,8 +14,8 @@ my ($id, $uri);
 my $qr_id = SheetsApi4->Spreadsheet_Id;
 my $qr_uri = SheetsApi4->Spreadsheet_Uri;
 
-like $id = $spreadsheet->spreadsheet_id(), qr/$qr_id/, "Should find spreadsheet ID";
-like $uri = $spreadsheet->spreadsheet_uri(), qr/^$qr_uri$/, "Should find spreadsheet URI";
+like $id = $spreadsheet->spreadsheet_id(), qr/^$qr_id$/, "Should find spreadsheet ID";
+like $uri = $spreadsheet->spreadsheet_uri(), qr/^$qr_uri/, "Should find spreadsheet URI";
 like $name = $spreadsheet->spreadsheet_name(), qr/^$name$/, "Should find spreadsheet name";
 
 delete @$spreadsheet{qw(id uri)};
