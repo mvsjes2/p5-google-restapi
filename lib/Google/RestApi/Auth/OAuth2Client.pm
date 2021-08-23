@@ -6,6 +6,9 @@ use Google::RestApi::Setup;
 
 # this was taken from Net::Google::DataAPI::Auth::OAuth2 and had a moose-ectomy. this will
 # get rid of warnings about switching to Moo instead of Moose::Any.
+#
+# NOTE NOTE NOTE: to generate a config file and token file for use by this module, see:
+# bin/google_restapi_oauth_token_creator in this package.
 
 use Net::OAuth2::Client;
 use Net::OAuth2::Profile::WebServer;
@@ -174,11 +177,14 @@ Google::RestApi::Auth::OAuth2Client - OAuth2 support for Google Rest APIs
 
   # generate an access token from the code returned from Google:
   my $token = $oauth2->access_token($code);
-
+  
 =head1 DESCRIPTION
 
 Google::RestApi::Auth::OAuth2Client interacts with google OAuth 2.0 service
 and creates the 'Authorization' header for use in Furl or LWP::UserAgent.
+
+To generate a config file and token file for use by this moudle, see:
+bin/google_restapi_oauth_token_creator in this pacakage.
 
 This was copied from Net::Google::DataAPI::Auth::OAuth2 and modified
 to fit this framework. The other framework was dated and produced
@@ -228,7 +234,7 @@ See L<https://developers.google.com/accounts/docs/OAuth2> for details.
 
 This class depends on first creating an OAuth2 token session file
 that you point to via the 'token_file' config param passed via 'new'.
-See bin/google_restapi_session_creator and follow the instructions to
+See bin/google_restapi_oauth_token_creator and follow the instructions to
 save your token file.
 
 =head1 AUTHOR

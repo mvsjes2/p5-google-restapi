@@ -19,7 +19,7 @@ our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 sub delete_all_spreadsheets { shift->delete_all_spreadsheets(spreadsheet_name()); }
 
 # standard testing spreadsheet name.
-sub spreadsheet_name { 'google_restapi_sheets_testing'; }
+sub spreadsheet_name { 'google_restapi_sheets_integration_testing'; }
 
 # called to create a spreadsheet for use in tests.
 sub spreadsheet { sheets_api()->create_spreadsheet(title => spreadsheet_name()); }
