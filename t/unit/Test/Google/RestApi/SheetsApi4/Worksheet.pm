@@ -5,8 +5,6 @@ use Test::Unit::Setup;
 use parent 'Test::Unit::TestBase';
 
 use aliased 'Google::RestApi::SheetsApi4::Worksheet';
-use aliased 'Google::RestApi::SheetsApi4::Range::Col';
-use aliased 'Google::RestApi::SheetsApi4::Range::Row';
 
 # init_logger($TRACE);
 
@@ -112,7 +110,7 @@ sub row : Tests(3) {
   my $ws0 = $self->_fake_worksheet();
   is $ws0->row(1), undef, 'Row returns undef';
   is_deeply $ws0->row(1, [qw(joe)]), [qw(joe)], 'Row returns an array of values';
-  throws_ok sub { $ws0->row('A1:B2') }, qr/Must be a positive integer/i, 'Bad row throws';
+  throws_ok sub { $ws0->row('A1:B2') }, qr/Must be a spreadsheet range/i, 'Bad row throws';
   
   return;
 }

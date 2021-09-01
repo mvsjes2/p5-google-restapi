@@ -4,7 +4,7 @@ our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
-use Tie::Hash;
+use Tie::Hash ();
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
 use parent -norequire, 'Tie::StdHash';
 
@@ -38,7 +38,7 @@ sub batch_values {
 sub add_ranges {
   my $self = shift;
   my %ranges = @_;
-  state $check = compile(slurpy ArrayRef[HasMethods[qw(range)]]);
+  state $check = compile(slurpy ArrayRef[HasRange]);
   $check->(CORE::values %ranges);
   @{ $self->{ranges} }{ keys %ranges } = CORE::values %ranges;
   return \%ranges;

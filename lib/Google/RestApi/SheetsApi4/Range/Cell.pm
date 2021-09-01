@@ -4,16 +4,24 @@ our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
-use parent 'Google::RestApi::SheetsApi4::Range';
+use Try::Tiny qw( try catch );
+
+use aliased 'Google::RestApi::SheetsApi4::Range';
+
+use parent Range;
 
 # make sure the translated range refers to a single cell (no ':').
-sub range {
-  my $self = shift;
-  return $self->{normalized_range} if $self->{normalized_range};
-  my $range = $self->SUPER::range(@_);
-  LOGDIE "Unable to translate '$range' into a worksheet cell"
-    if $range =~ /:/;
-  return $range;
+sub new {
+  my $self = shift->SUPER::new(@_);
+
+  state $check = compile(RangeCell);
+  try {
+    $check->($self->{range});  # not range() since we don't want the sheet name.
+  } catch {
+    LOGDIE "Unable to translate '$self->{range}' into a worksheet cell";
+  };
+
+  return $self;
 }
 
 sub values {
@@ -40,7 +48,14 @@ sub batch_values {
   return $self->SUPER::batch_values(%$p);
 }
 
-sub cell { shift; }
+# is this 0 or infinity? return self if offset is 0, undef otherwise.
+sub cell_at_offset {
+  my $self = shift;
+  state $check = compile(Int, DimAny);
+  my ($offset) = $check->(@_);   # we're a cell, no dim required.
+  return $self if !$offset;
+  return;
+}
 
 1;
 

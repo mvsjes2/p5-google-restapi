@@ -1,55 +1,187 @@
 package Google::RestApi::SheetsApi4::Range;
 
-# some private subroutines here are called by RangeGroup,
-# so think of RangeGroup as a friend of Range. the routines
-# RangeGroup calls are commented thusly:
+# some private subroutines here are called by RangeGroup, so think of RangeGroup as
+# a friend of Range. the routines RangeGroup calls are commented thusly:
 # "private range routine called here!"
+
+# there are different ways to specify ranges. this came
+# about by merging different ideas from different
+# spreadsheet implementations.
+
+# column:
+# A             ====> A:A
+# A:A           ====> A:A
+# [A]           ====> A:A
+# [[A]]         ====> A:A
+# [1]           ====> A:A
+# [[1]]         ====> A:A
+# {col => A}    ====> A:A
+# [{col => A}]  ====> A:A
+# {col => 1}    ====> A:A
+# [{col => 1}]  ====> A:A
+# a partial column is still considered a column
+# A5:A10        ====> A:A
+
+# row:
+# 1             ====> 1:1
+# 1:1           ====> 1:1
+# [undef, 1]    ====> 1:1
+# [[undef, 1]]  ====> 1:1
+# 0's are 'valid' in that they are ignored.
+# [0, 1]        ====> 1:1
+# [[0, 1]]      ====> 1:1
+# {row => 1}    ====> 1:1
+# [{row => 1}]  ====> 1:1
+# a partial row is still considered a row
+# D1:1          ====> A:A
+
+# partial rows/columns:
+# [[A, 5], [A]]                       ====> A5:A
+# [{col => A, row => 5}, {col => A}]  ====> A5:A
+# [[5, 1], [undef, 1]]                ====> E1:1
+# [[5, 1], [0, 1]]                    ====> E1:1
+# [{col => 5, row => 1}, {row => 1}]  ====> E1:1
+
+# single cell:
+# A1                      ====> A1
+# [A, 1]                  ====> A1
+# [[A, 1]]                ====> A1
+# [1, 1]                  ====> A1
+# [[1, 1]]                ====> A1
+# {col => A, row => 1}    ====> A1
+# [{col => A, row => 1}]  ====> A1
+# {col => 1, row => 1}    ====> A1
+# [{col => 1, row => 1}]  ====> A1
+
+# same cell twice gets reduced to single cell:
+# A1:A1                   ====> A1
+# these only get reduced using the factory method.
+# [[A, 1], [A, 1]]        ====> A1
+# [[1, 1], [1, 1]]        ====> A1
+# [{col => A, row => 1}, {col => A, row => 1}]  ====> A1
+# [{col => 1, row => 1}, {col => 1, row => 1}]  ====> A1
+
+# general ranges:
+# A1:B2                                         ====> A1:B2
+# [[1,1],[2,2]]                                 ====> A1:B2
+# [[A,1],[B,2]]                                 ====> A1:B2
+# [{col => 1, row => 1}, {col => 2, row => 2}]  ====> A1:B2
+# [{col => A, row => 1}, {col => B, row => 2}]  ====> A1:B2
+
+# mixing is usually ok:
+# [A1, [2, 2]]                    ====> A1:B2
+# [{col => 1, row => 1}, [2, 2]]  ====> A1:B2
+# [{col => 1. row => 1}, B2]      ====> A1:B2
+
+# bad ranges:
+# should be able to support this but makes range routine
+# too complex, and the simple workaround is to just A1:B2.
+# [A1, B2]
 
 our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
-use Carp qw(confess);
-use List::Util qw(max);
-use List::MoreUtils qw(first_index);
-use Scalar::Util qw(blessed looks_like_number);
+use Carp qw( confess );
+use List::Util qw( max );
+use List::MoreUtils qw( first_index );
+use Scalar::Util qw( looks_like_number );
+use Try::Tiny qw( try catch );
 
+use experimental qw( switch );
+
+use aliased 'Google::RestApi::SheetsApi4::Range::Col';
+use aliased 'Google::RestApi::SheetsApi4::Range::Row';
+use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 use aliased 'Google::RestApi::SheetsApi4::Range::Iterator';
 
 use parent 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range';
 
-# should be SCALAR|ARRAYREF|HASHREF but types::standard doesn't currently support AnyOf.
-# TODO: Keep an eye on https://rt.cpan.org/Public/Bug/Display.html?id=121841 and alter
-# this when anyof is supported. this is currently a pretty big hole, hopefully no one
-# will fall into it for a while.
-# need a feature of type::parms to do something like:
-#  Dim       => StrMatch[qr/^(COLUMN|ROW)$/]->plus_coercions(dim($_)) that would convert
-# 'col' to 'COLUMN'. need to explore this and then fix up the areas that use it.
-# TODO: switch to ReadOnly
-use constant {
-  Range     => Defined,
-  Col       => Value,
-  Row       => PositiveInt,
-  Index     => PositiveOrZeroInt,
-  Dim       => StrMatch[qr/^(col|row)/i],
-  Dims      => StrMatch[qr/^(col|row)/i],
-  DimsAll   => StrMatch[qr/^(col|row|all)/i],
-  RangeA1   => '^(?:.+!)*[A-Z]+\d+:[A-Z]+\d+$',
-  ColA1     => '^(?:.+!)*([A-Z]+)\d*(?::\1\d*)?$',
-  RowA1     => '^(?:.+!)*[A-Z]*(\d+)(?::[A-Z]*\1)?$',
-  CellA1    => '^(?:.+!)*[A-Z]+\d+$',
-};
+sub factory {
+  my %original_range_args = @_;
+  my $original_range = $original_range_args{range};
+
+  state $check = multisig(
+    compile_named(
+      worksheet => HasApi,
+      range     => RangeCol,
+      dim       => DimAny, { optional => 1 },  # is switched to 'col'.
+      name      => RangeNamed, { optional => 1 },
+    ),
+    compile_named(
+      worksheet => HasApi,
+      range     => RangeRow,
+      dim       => DimAny, { optional => 1 },  # is switched to 'row'
+      name      => RangeNamed, { optional => 1 },
+    ),
+    compile_named(
+      worksheet => HasApi,
+      range     => RangeCell,
+      dim       => DimAny, { optional => 1 },  # doesn't matter for cells.
+      name      => RangeNamed, { optional => 1 },
+    ),
+    compile_named(
+      worksheet => HasApi,
+      range     => RangeAny,
+      dim       => DimAny, { default => 'row' },
+      name      => RangeNamed, { optional => 1 },
+    ),
+    compile_named(
+      worksheet => HasApi,
+      range     => RangeNamed,
+      dim       => DimAny, { default => 'row' },
+    ),
+  );
+  my @range_args = $check->(@_);
+  my $range_args = $range_args[0];  # no idea why it returns an arrayref pointer to a hashref.
+  my $range = $range_args->{range};
+  
+  # be careful here, recursive.
+  given (${^TYPE_PARAMS_MULTISIG}) {
+    when (0) { return Col->new(%$range_args); }
+    when (1) { return Row->new(%$range_args); }
+    when (2) { return Cell->new(%$range_args); }
+    when (3) {
+      # convert the range to A1:A1 format and redrive the factory routine to see
+      # if it ends up being a col, row, or cell range.
+      if ($range ne $original_range) {
+        DEBUG(sprintf("Range '%s' converted to '$range'", _flatten_range($original_range)));
+        # resolve cells by collapsing A1:A1 to just A1. also A:A and 1:1 will be
+        # properly resolved to cols/rows.
+        my ($start, $end) = split(':', $range);
+        $range = $start if $end && $start eq $end;
+        return factory(%$range_args);
+      }
+      # we're already in A1:A1 format so just create a new range object.
+      return __PACKAGE__->new(%$range_args);
+    }
+    when (4) {
+      my $worksheet = $range_args->{worksheet};
+      my $range = $worksheet->normalize_named($range)
+        or LOGDIE("Unable to resolve named range '$range'");
+      # we've resolved the name to A1 format, so redrive factory routine to
+      # generate a range object with the resolved range.
+      $range_args->{name} = $range;
+      $range = $range;
+      return factory(%$range_args);
+    }
+  }
+
+  LOGDIE("Unable to resolve '$range_args->{range}' to a range object");
+}
 
 sub new {
   my $class = shift;
 
+  # TODO: sort start range and end range before storing.
+
   state $check = compile_named(
     worksheet => HasMethods[qw(api worksheet_name)],
-    range     => Range,
-    dim       => DimsAll, { default => 'row' },
+    range     => RangeAny,
+    dim       => DimAny, { default => 'row' },
   );
   my $self = $check->(@_);
-  $self->{dim} = dims($self->{dim});
+  $self->{dim} = dims_any($self->{dim});   # convert internally to COLUMN | ROW
 
   return bless $self, $class;
 }
@@ -181,7 +313,7 @@ sub _cache_range_values {
   # calculated value.
   if ($p{range}) {
     state $check = compile_named(
-      majorDimension => Dims,
+      majorDimension => DimAny,
       range          => StrMatch[qr/.+!/],
       values         => ArrayRef, { optional => 1 }  # will not exist if values aren't set in the ss.
     );
@@ -308,162 +440,15 @@ sub append {
   return $self->api(%$p);
 }
 
-sub normalize_named {
-  my $self = shift;
-  my $named = $self->named() or return;
-  my $range = $named->{range};
-  $self->{range} = [
-    [ $range->{startColumnIndex} + 1, $range->{startRowIndex} + 1 ],
-    [ $range->{endColumnIndex}, $range->{endRowIndex} ],
-  ];
-  return $self;
-}
-
-sub named {
-  my $self = shift;
-  return if !$self->is_named();
-  return $self->spreadsheet()->named_ranges($self->{range});
-}
-
-# https://support.google.com/docs/answer/63175?co=GENIE.Platform%3DDesktop&hl=en
-sub is_named {
-  my $self = shift;
-
-  my $range = $self->{range};
-
-  return if !$range;
-  return if ref($range);
-  return if length($range) > 250;
-
-  for (
-    qr/^\d/,
-    qr/^(true|false)/,
-    qr/^R\d+C\d+$/,
-    qr/^[A-Z]+\d+$/,
-    RangeA1, ColA1, RowA1, CellA1,
-  ) { return if $range =~ /$_/; }
-
-  return 1;
-}
-
-# there are different ways to specify ranges. this came
-# about by merging different ideas from different
-# spreadsheet implementations.
-
-# single cell:
-# A1                      ====> A1
-# [A, 1]                  ====> A1
-# [[A, 1]]                ====> A1
-# [1, 1]                  ====> A1
-# [[1, 1]]                ====> A1
-# {row => 1, col => A}    ====> A1
-# [{row => 1, col => A}]  ====> A1
-# {row => 1, col => 1}    ====> A1
-# [{row => 1, col => 1}]  ====> A1
-
-# same cell twice gets reduced to single cell:
-# [[A, 1], [A, 1]]        ====> A1
-# [[1, 1], [1, 1]]        ====> A1
-# [{row => 1, col => A}, {row => 1, col => A}]  ====> A1
-# [{row => 1, col => 1}, {row => 1, col => 1}]  ====> A1
-
-# column:
-# A:A           ====> A:A
-# [A]           ====> A:A
-# [[A]]         ====> A:A
-# [1]           ====> A:A
-# [[1]]         ====> A:A
-# {col => A}    ====> A:A
-# [{col => A}]  ====> A:A
-# {col => 1}    ====> A:A
-# [{col => 1}]  ====> A:A
-# a partial column is still considered a column
-# A5:A10        ====> A:A
-
-# row:
-# 1:1           ====> 1:1
-# [undef, 1]    ====> 1:1
-# [[undef, 1]]  ====> 1:1
-# 0's are 'valid' in that they are ignored.
-# [0, 1]        ====> 1:1
-# [[0, 1]]      ====> 1:1
-# {row => 1}    ====> 1:1
-# [{row => 1}]  ====> 1:1
-# a partial row is still considered a row
-# D1:1          ====> A:A
-
-# partial rows/columns:
-# [[A, 5], [A]]                       ====> A5:A
-# [{col => A, row => 5}, {col => A}]  ====> A5:A
-# [[5, 1], [undef, 1]]                ====> E1:1
-# [[5, 1], [0, 1]]                    ====> E1:1
-# [{row => 1, col => 5}, {row => 1}]  ====> E1:1
-
-# ranges:
-# A1:B2                                         ====> A1:B2
-# [[1,1],[2,2]]                                 ====> A1:B2
-# [[A,1],[B,2]]                                 ====> A1:B2
-# [{row => 1, col => 1}, {row => 2, col => 2}]  ====> A1:B2
-# [{row => 1, col => A}, {row => 2, col => B}]  ====> A1:B2
-
-# mixing is usually ok:
-# [A1, [2, 2]]                    ====> A1:B2
-# [{row => 1, col => 1}, [2, 2]]  ====> A1:B2
-# [{row => 1, col => 1}, B2]      ====> A1:B2
-
-# bad ranges:
-# should be able to support this but makes range routine
-# too complex, and the simple workaround is to just A1:B2.
-# [A1, B2]
 sub range {
   my $self = shift;
-
-  return $self->{normalized_range} if $self->{normalized_range};
-
   TRACE("Range external caller: " . $self->_caller_external()); 
   TRACE("Range internal caller: " . $self->_caller_internal()); 
-
-  $self->normalize_named();
-
-  my $range = $self->{range};
-  my ($start_cell, $end_cell);
-  if (ref($range) eq 'ARRAY') {
-    if (ref($range->[0]) || ref($range->[1])) {
-      ($start_cell, $end_cell) = @$range;
-    } else {
-      $start_cell = $range;
-    }
-  } elsif (ref($range) eq 'HASH') {
-    $start_cell = $range;
-  } else {
-    ($start_cell, $end_cell) = split(':', $range);
-  }
-  $start_cell = $self->_cell_to_a1($start_cell);
-  $end_cell = $self->_cell_to_a1($end_cell) if $end_cell;
-
-  $range = $start_cell;
-  $end_cell = $start_cell if $start_cell =~ /^\d+$/;
-  $end_cell = $start_cell if $start_cell =~ /^[A-Z]+$/;
-
-  $end_cell = undef if defined $end_cell &&
-    $start_cell eq $end_cell &&
-    $start_cell =~ 
-      /          # turn A1:A1 to A1
-      ^[A-Z]     # starts with a column
-      [A-Z\d]*   # has cap letters and digits in the middle bit
-      \d$        # ends with a digit
-      /x;
-
-  # TODO: sort start range and end range before storing.
   my $name = $self->worksheet_name();
-  $range .= ":$end_cell" if defined $end_cell;
-  $range = "'$name'!$range";
-
-  DEBUG(sprintf("Range '%s' converted to '$range'", $self->_flatten_range($self->{range})));
-  $self->{normalized_range} = $range;
-
-  return $range;
+  return "'$name'!$self->{range}";
 }
+
+# some staic calls...
 
 sub _caller_internal {
   my ($package, $subroutine, $line, $i) = ('', '', 0);
@@ -488,248 +473,37 @@ sub _caller_external {
 # these are just used for debug message just above
 # to display the original range in a pretty format.
 sub _flatten_range {
-  my $self = shift;
-
   my $range = shift;
-  return 'undef' if !$range;
+  return 'False' if !$range;
   return $range if !ref($range);
 
-  return _flatten_hash($range) if ref($range) eq 'HASH';
-  return _flatten_array($range)
-    if ref($range) eq 'ARRAY' && scalar @$range == 1;
+  return _flatten_range_hash($range) if ref($range) eq 'HASH';
+  return _flatten_range_array($range) if ref($range) eq 'ARRAY'
+    && scalar @$range == 2;
 
   # recursion... here be potential dragons.
   return sprintf('[ %s, %s ]',
-    $self->_flatten_range($range->[0]),
-    $self->_flatten_range($range->[1]),
+    _flatten_range($range->[0]),
+    _flatten_range($range->[1]),
   );
 }
 
-sub _flatten_hash {
-  my $hash = shift;
-  my $flat = '{ ';
-  $flat .= "$_ => " . ($hash->{$_} || 'undef') . ", "
-    foreach (keys %$hash);
-  $flat =~ s/, $/ \}/;
-  return $flat;
+sub _flatten_range_hash {
+  my $range = shift;
+  my @flat = map { "$_ => " . ($range->{$_} || 'False') } keys %$range;
+  my $flat = join(', ', @flat);
+  return "{ $flat }";
 }
 
-sub _flatten_array {
-  my $array = shift;
-  my $flat = '[ ';
-  $flat .= $_ || 'undef' . ", " foreach (@$array);
-  $flat =~ s/, $/ \]/;
-  return $flat;
-}
-
-sub is_colA1 {
-  my $col = shift;
-  return if !defined $col;
-  return if ref($col);
-  my $colA1 = ColA1;
-  my $cellA1 = CellA1;
-  return 1 if !is_cellA1($col) && $col =~ /$colA1/;
-  return;
-}
-
-sub is_rowA1 {
-  my $row = shift;
-  return if !defined $row;
-  return if ref($row);
-  my $rowA1 = RowA1;
-  my $cellA1 = CellA1;
-  return 1 if !is_cellA1($row) && $row =~ /$rowA1/;
-  return;
-}
-
-sub is_cellA1 {
-  my $cell = shift;
-  return if !defined $cell;
-  return if ref($cell);
-  my $cellA1 = CellA1;
-  return 1 if $cell =~ qr/$cellA1/;
-  return;
-}
-
-sub _col_to_a1 {
-  my $self = shift;
-
-  my $col = shift;
-  return '' if !$col;
-
-  return $col if is_colA1($col);
-  return $col if looks_like_number($col) && $col < 1;  # allow this to fail above.
-  return $self->_col_i2a($col) if looks_like_number($col);
-
-  my $config = $self->worksheet_config('cols');
-  if ($config) {
-    my $config_col = $config->{$col};
-    return $self->_col_i2a($config_col)
-      if $config_col && looks_like_number($config_col);
-    if ($config_col) {
-      $col = $config_col;
-    }
-  }
-
-  my $headers = $self->worksheet()->header_row();
-  my $i = first_index { $_ eq $col; } @$headers;
-  if ($i > -1) {
-    $i++;
-    $config->{$col} = $i if $config;
-    return $self->_col_i2a($i)
-  }
-
-  confess "Unable to translate column '$col' into a worksheet col";
-}
-
-sub _row_to_a1 {
-  my $self = shift;
-
-  my $row = shift;
-  return '' if !$row;
-
-  return $row if is_rowA1($row);
-
-  my $config = $self->worksheet_config('rows');
-  if ($config) {
-    my $config_row = $config->{$row};
-    return $config_row
-      if $config_row && looks_like_number($config_row);
-    $row = $config_row if $config_row;
-  }
-
-  my $headers = $self->worksheet()->header_col();
-  my $i = first_index { $_ eq $row; } @$headers;
-  if ($i > -1) {
-    $i++;
-    $config->{$row} = $i if $config;
-    return $i;
-  }
-
-  confess "Unable to translate row '$row' into a worksheet row";
-}
-
-sub _cell_to_a1 {
-  my $self = shift;
-
-  state $check = compile(Defined);
-  my ($cell) = $check->(@_);
-
-  return $cell if is_cellA1($cell);
-
-  my ($col, $row);
-  if (ref($cell) eq 'ARRAY') {
-    ($col, $row) = @$cell;
-    $col = $self->_col_to_a1($col);
-    $row = $self->_row_to_a1($row);
-  } elsif (ref($cell) eq 'HASH') {
-    $col = $self->_col_to_a1($cell->{col});
-    $row = $self->_row_to_a1($cell->{row});
-  }
-
-  confess sprintf("Unable to translate cell '%s' into a worksheet cell", $self->_flatten_range($cell))
-    if !$col && !$row;
-  confess "Unable to translate col '$col' into a worksheet col" if looks_like_number($col);
-  confess "Unable to translate row '$row' into a worksheet row" if looks_like_number($row) && $row < 1;
-
-  return "$col$row";
-}
-
-sub _col_i2a {
-  my $self = shift;
-
-  my $n = shift;
-
-  my $l = int($n / 27);
-  my $r = $n - $l * 26;
-
-  return $l > 0 ? (pack 'CC', $l+64, $r+64) : (pack 'C', $r+64);
-}
-
-sub range_to_hash {
-  my $self = shift;
-
-  my $range = $self->range_to_array();
-
-  return [ map { { col => $_->[0], row => $_->[1] } } @$range ]
-    if ref($range->[0]);
-
-  my %hash;
-  $hash{col} = $range->[0];
-  $hash{row} = $range->[1];
-
-  return \%hash;
-}
-
-sub range_to_array {
-  my $self = shift;
-
-  my $range = $self->range();
-  ($range) = $range =~ /!(.+)/;
-  $range or LOGDIE "Unable to convert range to array: ", $self->range();
-
-  my ($start_cell, $end_cell) = split(':', $range);
-  $end_cell = undef if defined $end_cell && $start_cell eq $end_cell;
-  $start_cell = $self->_cell_to_array($start_cell);
-  $end_cell = $self->_cell_to_array($end_cell) if $end_cell;
-
-  return $end_cell ? [$start_cell, $end_cell] : $start_cell;
-}
-
-sub range_to_index {
-  my $self = shift;
-
-  my $array = $self->range_to_array();
-  $array = [$array, $array] if !ref($array->[0]);
-
-  my %range;
-  $range{sheetId} = $self->worksheet()->worksheet_id();
-  $range{startColumnIndex} = max($array->[0]->[0] - 1, 0);
-  $range{startRowIndex} = max($array->[0]->[1] - 1, 0);
-  $range{endColumnIndex} = $array->[1]->[0];
-  $range{endRowIndex} = $array->[1]->[1];
-
-  return \%range;
-}
-
-sub range_to_dimension {
-  my $self = shift;
-
-  state $check = compile(Dim);
-  my ($dims) = $check->(@_);
-  $dims = dims($dims);
-
-  my $array = $self->range_to_array();
-  $array = [$array, $array] if !ref($array->[0]);
-  my $start = $dims =~ /^col/i ? $array->[0]->[0] : $array->[0]->[1];
-  my $end = $dims =~ /^col/i ? $array->[1]->[0] : $array->[1]->[1];
-
-  my %range;
-  $range{sheetId} = $self->worksheet()->worksheet_id();
-  $range{startIndex} = max($start - 1, 0);
-  $range{endIndex} = $end;
-  $range{dimension} = $dims;
-
-  return \%range;
-}
-
-sub _cell_to_array {
-  my $self = shift;
-
-  my $cell = shift;
-  my ($col, $row) = $cell =~ /^([A-Z]*)(\d*)$/;
-  $col = $self->_col_a2i($col) if $col;
-
-  $col ||= 0;
-  $row ||= 0;
-
-  return [$col, $row];
+sub _flatten_range_array {
+  my $range = shift;
+  my @flat = map { $_ || 'False' } @$range;
+  my $flat = join(', ', @flat);
+  return "[ $flat ]";
 }
 
 # taken from https://metacpan.org/source/DOUGW/Spreadsheet-ParseExcel-0.65/lib/Spreadsheet/ParseExcel/Utility.pm
 sub _col_a2i {
-  my $self = shift;
-
   state $check = compile(StrMatch[qr/^[A-Z]+$/]);
   my ($a) = $check->(@_);
 
@@ -744,6 +518,117 @@ sub _col_a2i {
   }
 
   return $result;
+}
+
+sub _cell_to_array {
+  my $cell = shift;
+
+  my ($col, $row) = $cell =~ /^([A-Z]*)(\d*)$/;
+  $col = _col_a2i($col) if $col;
+
+  $col ||= 0;
+  $row ||= 0;
+
+  return [$col, $row];
+}
+
+# back to object calls...
+
+# returns [[col, row], [col, row]] for a full range.
+# returns [col, row] for a cell.
+sub range_to_array {
+  my $self = shift;
+
+  my $range = $self->range();
+  ($range) = $range =~ /!(.+)/;
+  $range or LOGDIE "Unable to convert range to array: ", $self->range();
+
+  my ($start_cell, $end_cell) = split(':', $range);
+  $end_cell = undef if defined $end_cell && $start_cell eq $end_cell;
+  $start_cell = _cell_to_array($start_cell);
+  $end_cell = _cell_to_array($end_cell) if $end_cell;
+
+  return $end_cell ? [$start_cell, $end_cell] : $start_cell;
+}
+
+# returns [{col =>, row =>}, {col =>, row => }] for a full range.
+# returns {col =>, row =>} for a cell.
+sub range_to_hash {
+  my $self = shift;
+
+  my $range = $self->range_to_array();
+  my @ranges = [ map { { col => $_->[0], row => $_->[1] } } @$range ];
+
+  return $ranges[1] ? \@ranges : $ranges[0];
+}
+
+sub range_to_index {
+  my $self = shift;
+
+  my $array = $self->range_to_array();
+  $array = [$array, $array] if !ref($array->[0]);
+
+  my %range = (
+    sheetId          => $self->worksheet()->worksheet_id(),
+    startColumnIndex => max($array->[0]->[0] - 1, 0),
+    startRowIndex    => max($array->[0]->[1] - 1, 0),
+    endColumnIndex   => $array->[1]->[0],
+    endRowIndex      => $array->[1]->[1],
+  );
+  
+  return \%range;
+}
+
+sub range_to_dimension {
+  my $self = shift;
+
+  state $check = compile(DimAny);
+  my ($dims) = $check->(@_);
+  $dims = dims_any($dims);
+
+  my $array = $self->range_to_array();
+  $array = [$array, $array] if !ref($array->[0]);
+  my $start = $dims =~ /^col/i ? $array->[0]->[0] : $array->[0]->[1];
+  my $end = $dims =~ /^col/i ? $array->[1]->[0] : $array->[1]->[1];
+
+  my %range = (
+    sheetId    => $self->worksheet()->worksheet_id(),
+    startIndex => max($start - 1, 0),
+    endIndex   => $end,
+    dimension  => $dims,
+  );
+
+  return \%range;
+}
+
+sub cell_at_offset {
+  my $self = shift;
+
+  state $check = compile(Int, DimAny);
+  my ($offset, $dim) = $check->(@_);
+
+  my $range = $self->range()->range_to_hash();
+  $range = [$range, $range] if ref($range) eq 'HASH';  # is just a cell.
+
+  my $cell_range = $self->range()->range_to_hash();
+  $cell_range = $cell_range->[0] if ref($cell_range) eq 'ARRAY';
+
+  my $other_dim = $dim eq 'col' ? 'row' : 'col';
+  my $new_dim = $cell_range->{$dim} + $offset;
+  # if going in a box, reset the col/row to 0 and start again.
+  while ($new_dim > $range->[1]->{$dim}) {
+    $cell_range->{$other_dim}++;
+    $cell_range->{$dim} = $range->[0]->{$dim};
+    return if $cell_range->{$other_dim} > $range->[1]->{$other_dim};
+  }
+  $cell_range->{$dim} = $new_dim;
+
+  # if parent range is a col or row, col or row will be 0 and we won't be
+  # able to calculate a cell address from it.
+  $cell_range->{$_} ||= 1 for (qw(col row));
+  my $new_cell = $self->worksheet()->range_cell($cell_range);
+  $new_cell->share_values($self);
+  return $new_cell;
 }
 
 sub offset {
@@ -781,7 +666,7 @@ sub offset {
 
 sub offsets {
   my $self = shift;
-  state $check = compile(HasMethods['range']);
+  state $check = compile(HasRange);
   my ($other) = $check->(@_);
   my $range = $self->range_to_hash();
   $range = [ $range, $range ] if ref($range) eq 'HASH';
@@ -794,14 +679,9 @@ sub offsets {
   return ( $top, $left, $bottom, $right );
 }
 
-sub iterator {
-  my $self = shift;
-  return Iterator->new(@_, range => $self);
-}
-
 sub is_inside {
   my $self = shift;
-  state $check = compile(HasMethods['range']);
+  state $check = compile(HasRange);
   my ($other) = $check->(@_);
   my $range = $self->range_to_hash();
   $range = [ $range, $range ] if ref($range) eq 'HASH';
@@ -832,8 +712,8 @@ sub worksheet_name { shift->worksheet()->worksheet_name(@_); }
 sub worksheet_id { shift->worksheet()->worksheet_id(@_); }
 sub spreadsheet { shift->worksheet()->spreadsheet(@_); }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(@_); }
-sub worksheet_config { shift->worksheet()->worksheet_config(@_); }
 sub transaction { shift->spreadsheet()->transaction(); }
+sub iterator { Iterator->new(@_, range => shift); }
 
 1;
 
@@ -1054,10 +934,6 @@ Returns the parent Spreadsheet object.
 =item spreadsheet_id();
 
 Returns the parent Spreadsheet ID.
-
-=item config();
-
-Returns the parent Worksheet config hash.
 
 =back
 

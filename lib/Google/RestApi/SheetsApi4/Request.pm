@@ -4,9 +4,9 @@ our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
-use Hash::Merge;
-use List::MoreUtils qw(first_index);
-use Storable qw(dclone);
+use Hash::Merge ();
+use List::MoreUtils qw( first_index );
+use Storable ();
 
 sub submit_requests { LOGDIE "Pure virtual function 'submit_requests' must be overridden"; }
 

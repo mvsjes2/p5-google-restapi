@@ -34,16 +34,16 @@ sub named {
   throws_ok sub { $range->add_named(name => "xxx")->submit_requests(); },
     qr/a named range with that name already exists/, "Creating same named range should fail";
 
-  isa_ok $range = $worksheet->range("xxx"), Range, "Adding named range";
+  isa_ok $range = $worksheet->range("xxx"), Range, "Loading named range";
   is_deeply $range->values(values => \@values), \@values, "Setting named range values should return same values";
 
-  isa_ok $range = $worksheet->range_col("xxx"), Col, "Adding named range as a col";
+  isa_ok $range = $worksheet->range_col("xxx"), Col, "Loading named range as a col";
   throws_ok sub { $range->range(); }, qr/Unable to translate/, "Using a non-col named range should die";
 
-  isa_ok $range = $worksheet->range_row("xxx"), Row, "Adding named range as a row";
+  isa_ok $range = $worksheet->range_row("xxx"), Row, "Loading named range as a row";
   throws_ok sub { $range->range(); }, qr/Unable to translate/, "Using a non-row named range should die";
 
-  isa_ok $range = $worksheet->range_cell("xxx"), Cell, "Adding named range as a cell";
+  isa_ok $range = $worksheet->range_cell("xxx"), Cell, "Loading named range as a cell";
   throws_ok sub { $range->range(); }, qr/Unable to translate/, "Using a non-cell named range should die";
 
   my $col = "A1:A10";

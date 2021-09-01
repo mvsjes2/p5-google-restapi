@@ -10,7 +10,7 @@ sub new {
   my $class = shift;
   my $qr_id = DriveApi3->Drive_File_Id;
   state $check = compile_named(
-    drive => HasMethods['api'],
+    drive => HasApi,
     id    => StrMatch[qr/$qr_id/],
   );
   return bless $check->(@_), $class;

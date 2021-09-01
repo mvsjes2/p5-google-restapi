@@ -4,21 +4,24 @@ our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
+use Try::Tiny qw( try catch );
+
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 
-use parent 'Google::RestApi::SheetsApi4::Range';
+use parent Range;
 
-sub range {
-  my $self = shift;
-  return $self->{normalized_range} if $self->{normalized_range};
+sub new {
+  my $self = shift->SUPER::new(@_, dim => 'row');
 
-  $self->{range} = { row => $self->{range} } if !ref($self->{range});
-  my $range = $self->SUPER::range(@_);
-  my $rowA1 = Range->RowA1;
-  LOGDIE "Unable to translate '$range' into a worksheet row"
-    if !$self->is_named() && $range !~ qr/$rowA1/;
-  return $range;
+  state $check = compile(RangeRow);
+  try {
+    $check->($self->{range});  # not range() since we don't want the sheet name.
+  } catch {
+    LOGDIE "Unable to translate '$self->{range}' into a worksheet row";
+  };
+
+  return $self;
 }
 
 sub values {
@@ -43,10 +46,10 @@ sub batch_values {
   return $self->SUPER::batch_values(%$p);
 }
 
-sub cell {
+sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, { default => 0 });
-  my ($offset) = $check->(@_);
+  state $check = compile(Int, DimAny);
+  my ($offset) = $check->(@_);     # we're a row, no dim required.
   my $range = $self->range_to_array();
   $range->[0] = ($range->[0] || 1) + $offset;
   return Cell->new(worksheet => $self->worksheet(), range => $range);

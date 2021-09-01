@@ -16,6 +16,7 @@ ToolSet->export(
   'YAML::Any'              => 'Dump',
   'Test::Utils'            => ':all',
   'Test::Tutorial::Utils'  => ':all',
+  'Try::Tiny'              =>  [],
 );
 
 1;

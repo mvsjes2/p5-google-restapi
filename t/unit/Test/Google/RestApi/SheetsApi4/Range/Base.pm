@@ -41,9 +41,4 @@ sub _new_range {
   return $self->class()->new(worksheet => fake_worksheet(), range => shift);
 }
 
-sub _new_config_range {
-  my $self = shift;
-  return $self->class()->new(worksheet => fake_config_worksheet(), range => shift);
-}
-
 1;

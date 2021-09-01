@@ -16,6 +16,7 @@ sub setup : Tests(setup) {
   $self->_fake_http_no_retries();
 
   $self->_uri_responses(qw(
+    get_spreadsheet_named_ranges
     get_worksheet_properties_title_sheetid
     get_worksheet_values_cell
     get_worksheet_values_row
@@ -30,7 +31,7 @@ sub tie_range : Tests(14) {
 
   $self->_fake_http_response_by_uri();
 
-  my $ws0 = fake_config_worksheet();
+  my $ws0 = fake_worksheet();
   my $cols = $ws0->tie_cols();
 
   isa_ok my $iterator = tied(%$cols)->iterator(from => 1), Iterator, "Tie iterator creation";

@@ -20,22 +20,14 @@ sub new {
 
   my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
   state $check = compile_named(
-    spreadsheet => HasMethods[qw(api sheets_api worksheets_config worksheet_properties)],  # if it's got these basics, it must be a duck.
+    spreadsheet => HasApi,
     id          => Str, { optional => 1 },
     name        => Str, { optional => 1 },
     uri         => StrMatch[qr|$qr_worksheet_uri|], { optional => 1 },
-    config_id   => Str, { optional => 1 },
   );
   my $self = $check->(@_);
   $self = bless $self, $class;
 
-  if ($self->config_id()) {
-    my $config = $self->worksheet_config()
-      or LOGDIE "Worksheet config id '" . $self->config_id() . "' is missing";
-    foreach (qw(id name uri)) {
-      $self->{$_} = $config->{$_} if defined $config->{$_};
-    }
-  }
   defined $self->{id} || defined $self->{name} || $self->{uri}
     or LOGDIE "At least one of id, name, or uri must be specified";
 
@@ -89,7 +81,7 @@ sub properties {
 # the following don't return ranges and don't use any batch, they are immediate.
 sub col {
   my $self = shift;
-  state $check = compile(Range->Col, ArrayRef[Str], { optional => 1 });   # A or 1
+  state $check = compile(RangeCol, ArrayRef[Str], { optional => 1 });   # A or 1
   my ($col, $values) = $check->(@_);
   my $range = $self->range_col({ col => $col });
   return $range->values(defined $values ? (values => $values) : ());
@@ -98,7 +90,7 @@ sub col {
 sub cols {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Range->Col], ArrayRef[ArrayRef[Str]], { optional => 1 });
+  state $check = compile(ArrayRef[RangeCol], ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($cols, $values) = $check->(@_);
 
   my @cols = map { $self->range_col($_); } @$cols;
@@ -117,7 +109,7 @@ sub cols {
 
 sub row {
   my $self = shift;
-  state $check = compile(Range->Row, ArrayRef[Str], { optional => 1 });
+  state $check = compile(RangeRow, ArrayRef[Str], { optional => 1 });
   my ($row, $values) = $check->(@_);
   my $range = $self->range_row({row => $row});
   return $range->values(defined $values ? (values => $values) : ());
@@ -126,7 +118,7 @@ sub row {
 sub rows {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Range->Row], ArrayRef[ArrayRef[Str]], { optional => 1 });
+  state $check = compile(ArrayRef[RangeRow], ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($rows, $values) = $check->(@_);
 
   my @rows = map { $self->range_row($_); } @$rows;
@@ -148,11 +140,11 @@ sub cell {
 
   state $check = multisig(
     [
-      Range->Col, Range->Row,
+      RangeCol, RangeRow,
       Str, { optional => 1 },
     ],
     [
-      Range->Range,
+      RangeAny,
       Str, { optional => 1 },
     ],
   );
@@ -240,8 +232,8 @@ sub name_value_pairs {
   my $self = shift;
 
   state $check = compile(
-    Range->Col, { default => 1 },
-    Range->Col, { default => 2 },
+    RangeCol, { default => 1 },
+    RangeCol, { default => 2 },
     Bool, { optional => 1 }
   );
   my ($name_col, $value_col, $has_headers) = $check->(@_);
@@ -268,14 +260,9 @@ sub _tie {
 
   state $check = compile(
     StrMatch[qr/^(cols|rows|cells|)$/],
-    slurpy ArrayRef[Range->Range], { optional => 1 },
+    slurpy ArrayRef[RangeAny], { optional => 1 },
   );
   my ($which, $ranges) = $check->(@_);
-
-  if (!@$ranges) {
-    my $config = $self->worksheet_config($which) || {};
-    $ranges = [ keys %$config ];
-  }
 
   my $method = "range";
   if ($which) {
@@ -309,26 +296,24 @@ sub submit_requests {
   return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
 }
 
-sub worksheet_config {
+sub range_factory {
   my $self = shift;
-  my $key = shift;
-  my $config_id = $self->config_id() or return;
-  my $config = $self->spreadsheet()->worksheets_config()->{$config_id} or return;
-  return defined $key ? $config->{$key} : $config;
+  # can't use aliased here for some reason.
+  return Google::RestApi::SheetsApi4::Range::factory(@_, worksheet => $self);
 }
 
-sub config_id { shift->{config_id}; }
 sub range { Range->new(worksheet => shift, range => shift); }
 sub range_col { Col->new(worksheet => shift, range => shift); }
 sub range_row { Row->new(worksheet => shift, range => shift); }
 sub range_cell { Cell->new(worksheet => shift, range => shift); }
-sub range_all { All->new(worksheet => shift); }
+sub range_all { All->new(worksheet => shift, @_); }
 sub api { shift->spreadsheet()->api(@_); }
 sub sheets_api { shift->spreadsheet()->sheets_api(@_); }
 sub rest_api { shift->spreadsheet()->rest_api(@_); }
 sub spreadsheet { shift->{spreadsheet}; }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(); }
 sub transaction { shift->spreadsheet()->transaction(); }
+sub normalize_named { shift->spreadsheet()->normalize_named(@_); }
 
 1;
 
@@ -346,7 +331,7 @@ See the description and synopsis at Google::RestApi::SheetsApi4.
 
 =over
 
-=item new(spreadsheet => <object>, (id => <string> | name => <string> | uri => <string>), config_id => <string>);
+=item new(spreadsheet => <object>, (id => <string> | name => <string> | uri => <string>));
 
 Creates a new instance of a Worksheet object. You would not normally
 call this directly, you would obtain it from the 
@@ -356,7 +341,6 @@ Spreadsheet->open_worksheet routine.
  id: The id of the worksheet (0, 1, 2 etc).
  name: The name of the worksheet (as shown on the tab).
  uri: The worksheet ID extracted from the overall URI.
- config_id: The custom config for this worksheet.
 
 Only one of id/name/uri should be specified and this API will derive the others
 as necessary.
@@ -554,10 +538,6 @@ Returns the parent Spreadsheet object.
 =item spreadsheet_id();
 
 Returns the parent Spreadsheet id.
-
-=item worksheet_config();
-
-Returns the parent Spreadsheet's worksheet config.
 
 =back
 

@@ -9,7 +9,7 @@ use base 'ToolSet';
 
 ToolSet->use_pragma('strict');
 ToolSet->use_pragma('warnings');
-ToolSet->use_pragma('feature', 'state');
+ToolSet->use_pragma('feature', qw( state ));
 
 ToolSet->no_pragma('autovivification');
 

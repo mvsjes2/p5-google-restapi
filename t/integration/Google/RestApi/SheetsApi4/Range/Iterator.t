@@ -24,7 +24,8 @@ $range->values(values => \@values);
 
 iterate_by_col();
 iterate_by_row();
-iterate_by_2();
+iterate_by_2_by_row();
+iterate_by_10_by_row();
 
 sub iterate_by_col {
   isa_ok $i = $range->iterator(dim => 'col'), Iterator, "Col iterator creation";
@@ -52,7 +53,7 @@ sub iterate_by_row {
   is $cell = $i->next(), undef, "Last row iteration should be undef";
 }
 
-sub iterate_by_2 {
+sub iterate_by_2_by_row {
   isa_ok $i = $range->iterator(by => 2), Iterator, "By 2 iterator creation";
   isa_ok $cell = $i->next(), Cell, "First by 2 iteration";
   is $cell->values(), 1, "First by 2 iteration should be '1'";
@@ -66,6 +67,15 @@ sub iterate_by_2 {
   isa_ok $cell = $i->next(), Cell, "By 2 iteration to last";
   is $cell->values(), 12, "By 2 iteration should be '12'";
   is $cell = $i->next(), undef, "Last by 2 iteration should be undef";
+}
+
+sub iterate_by_10_by_row {
+  isa_ok $i = $range->iterator(by => 10), Iterator, "By 10 iterator creation";
+  isa_ok $cell = $i->next(), Cell, "First by 10 iteration";
+  is $cell->values(), 1, "First by 10 iteration should be '1'";
+  isa_ok $cell = $i->next(), Cell, "Second by 10 iteration";
+  is $cell->values(), 11, "Second by 10 iteration should be '9'";
+  is $cell = $i->next(), undef, "Last by 10 iteration should be undef";
 }
 
 delete_all_spreadsheets($spreadsheet->sheets_api());

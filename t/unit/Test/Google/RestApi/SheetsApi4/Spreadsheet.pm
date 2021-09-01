@@ -168,7 +168,7 @@ sub properties : Tests(4) {
   return;
 }
 
-sub worksheet_properties : Tests(4) {
+sub worksheet_properties : Tests(5) {
   my $self = shift;
   $self->_fake_http_response_by_uri();
   my $ss = $self->_fake_spreadsheet();
