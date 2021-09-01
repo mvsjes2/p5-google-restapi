@@ -15,7 +15,7 @@ use constant {
 sub new {
   my $class = shift;
   state $check = compile_named(
-    api      => HasMethods['api'],
+    api      => HasApi,
     endpoint => Str, { default => Drive_Endpoint },
   );
   return bless $check->(@_), $class;

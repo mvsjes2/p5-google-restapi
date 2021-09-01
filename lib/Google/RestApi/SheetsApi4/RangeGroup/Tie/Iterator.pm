@@ -4,7 +4,6 @@ our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
-use Carp qw(cluck);
 use parent qw(Google::RestApi::SheetsApi4::RangeGroup::Iterator);
 
 sub new {

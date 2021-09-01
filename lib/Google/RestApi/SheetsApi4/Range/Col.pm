@@ -4,23 +4,24 @@ our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
+use Try::Tiny qw( try catch );
+
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 
-use parent 'Google::RestApi::SheetsApi4::Range';
+use parent Range;
 
-sub new { shift->SUPER::new(@_, dim => 'col'); }
+sub new {
+  my $self = shift->SUPER::new(@_, dim => 'col');
 
-sub range {
-  my $self = shift;
-  return $self->{normalized_range} if $self->{normalized_range};
+  state $check = compile(RangeCol);
+  try {
+    $check->($self->{range});  # not range() since we don't want the sheet name.
+  } catch {
+    LOGDIE "Unable to translate '$self->{range}' into a worksheet column";
+  };
 
-  $self->{range} = { col => $self->{range} } if !ref($self->{range});
-  my $range = $self->SUPER::range(@_);
-  my $colA1 = Range->ColA1;
-  LOGDIE "Unable to translate '$range' into a worksheet column"
-    if !$self->is_named() && $range !~ qr/$colA1/;
-  return $range;
+  return $self;
 }
 
 sub values {
@@ -45,10 +46,10 @@ sub batch_values {
   return $self->SUPER::batch_values(%$p);
 }
 
-sub cell {
+sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, { default => 0 });
-  my ($offset) = $check->(@_);
+  state $check = compile(Int, DimAny);
+  my ($offset) = $check->(@_);   # we're a column, no dim required.
   my $range = $self->range_to_array();
   $range->[1] = ($range->[1] || 1) + $offset;
   return Cell->new(worksheet => $self->worksheet(), range => $range);

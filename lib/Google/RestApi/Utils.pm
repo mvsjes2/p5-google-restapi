@@ -8,13 +8,15 @@ our $VERSION = '0.8';
 use feature 'state';
 
 use autodie;
-use File::Spec::Functions;
-use File::Basename;
-use Hash::Merge;
-use Log::Log4perl qw(:easy);
-use Type::Params qw(compile_named compile);
-use Types::Standard qw(Str StrMatch HashRef Any slurpy);
-use YAML::Any qw(Dump LoadFile);
+use File::Spec::Functions qw( catfile );
+use File::Basename qw( dirname );
+use Hash::Merge ();
+use Log::Log4perl qw( :easy );
+use Type::Params qw( compile compile_named );
+use Types::Standard qw( Str StrMatch HashRef Any slurpy );
+use YAML::Any qw( Dump LoadFile );
+
+use Google::RestApi::Types qw( ReadableFile );
 
 no autovivification;
 
@@ -23,7 +25,7 @@ our @EXPORT_OK = qw(
   named_extra
   merge_config_file resolve_config_file_path
   bool
-  dim dims dims_all
+  dim_any dims_any dims_all
   cl_black cl_white
   strip
 );
@@ -49,7 +51,7 @@ sub named_extra {
 
 sub merge_config_file {
   state $check = compile_named(
-    config_file => Str->where( '-f -r $_' ), { optional => 1 },
+    config_file => ReadableFile, { optional => 1 },
     _extra_     => slurpy Any,
   );
   my $passed_config = named_extra($check->(@_));
@@ -112,22 +114,14 @@ sub bool {
   return $bool ? 'true' : 'false';  # converts bold(0) to 'false'.
 }
 
-# allows 'col' and 'row' internally instead of 'COLUMN' and 'ROW'.
-# less shouting.
-sub dim {
-  state $check = compile(StrMatch[qr/^(col|row)/i]);
-  my ($dim) = $check->(@_);
-  return $dim =~ /^col/i ? "COLUMN" : "ROW";
-}
-
-sub dims {
+sub dims_any {
   state $check = compile(StrMatch[qr/^(col|row)/i]);
   my ($dims) = $check->(@_);
   return $dims =~ /^col/i ? "COLUMNS" : "ROWS";
 }
 
 sub dims_all {
-  my $dims = eval { dims(@_); };
+  my $dims = eval { dims_any(@_); };
   return $dims if $dims;
   state $check = compile(StrMatch[qr/^all/i]);
   ($dims) = $check->(@_);

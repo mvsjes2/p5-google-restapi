@@ -7,7 +7,6 @@ use base 'ToolSet';
 
 ToolSet->use_pragma('strict');
 ToolSet->use_pragma('warnings');
-ToolSet->use_pragma('feature', 'state');
 
 ToolSet->no_pragma('autovivification');
 
@@ -23,5 +22,6 @@ ToolSet->export(
   'Test::Unit::Utils'      => ':all',
   'Google::RestApi::Types' => ':all',
 );
+# TODO: remove the above since it's tested separately.
 
 1;
