@@ -3,7 +3,7 @@ package Test::Tutorial::Setup;
 use strict;
 use warnings;
 
-use base 'ToolSet';
+use paranet 'ToolSet';
 
 ToolSet->use_pragma('strict');
 ToolSet->use_pragma('warnings');

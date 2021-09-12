@@ -2,6 +2,8 @@ package Test::Google::RestApi::SheetsApi4::Range;
 
 use Test::Unit::Setup;
 
+use Google::RestApi::Types qw( :all );
+
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Col';
 use aliased 'Google::RestApi::SheetsApi4::Range::Row';
@@ -11,88 +13,24 @@ use parent qw(Test::Google::RestApi::SheetsApi4::Range::Base);
 
 my $sheet = "'Sheet1'";
 
-sub class { Range; }
-
 sub _constructor : Tests(2) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
 
-  my $class = class();
-  my $range = $class->new(
+  my $range = Range->new(
     worksheet => fake_worksheet,
     range     => 'A1:B2',
   );
-  isa_ok $range, $class, 'Constructor returns';
+  isa_ok $range, Range, 'Constructor returns';
   can_ok $range, 'range';
-  return;
-}
-
-sub range : Tests(6) {
-  my $self = shift;
-
-  $self->_fake_http_response_by_uri();
-
-  my $x = "A1:B2";
-
-  my $range;
-  isa_ok $range = $self->_new_range($x), Range, "New range '$x'";
-  is $range->range(), "$sheet!$x", "A1:B2 should be $x";
-
-  $range = $self->_new_range([[1,1], [2,2]]);
-  is $range->range(), "$sheet!$x", "[[1,1], [2,2]] should be $x";
-
-  $range = $self->_new_range([['A',1], ['B',2]]);
-  is $range->range(), "$sheet!$x", "[[A,1], [B,2]] should be $x";
-
-  $range = $self->_new_range([{row => 1, col => 1}, {row => 2, col => 2}]);
-  is $range->range(), "$sheet!$x", "[{row => 1, col => 1}, {row => 2, col => 2}] should be $x";
-
-  $range = $self->_new_range([{row => 1, col => 'A'}, {row => 2, col =>'B'}]);
-  is $range->range(), "$sheet!$x", "[{row => 1, col => A}, {row => 2, col => B}] should be $x";
 
   return;
 }
 
-sub range_named : Tests(3) {
-  my $self = shift;
-
-  $self->_fake_http_response_by_uri();
-
-  is $self->_new_range("George")->is_named(), 1, "George should be a named range";
-  is $self->_new_range("A1")->is_named(), undef, "A1 should not be a named range";
-  is $self->_new_range("A1:B2")->is_named(), undef, "A1:B2 should not be a named range";
-
-  return;
-}
-
-sub range_mixed : Tests(6) {
-  my $self = shift;
-
-  $self->_fake_http_response_by_uri();
-
-  my $range = $self->_new_range(['A1', [2, 2]]);
-  is $range->range(), "$sheet!A1:B2", "[A1, [2, 2]] should be A1:B2";
-
-  $range = $self->_new_range(['A1', {col => 2, row => 2}]);
-  is $range->range(), "$sheet!A1:B2", "[A1, {col => 2, row => 2}] should be A1:B2";
-
-  $range = $self->_new_range([[1, 1], 'B2']);
-  is $range->range(), "$sheet!A1:B2", "[[1, 1], 'B2'] should be A1:B2";
-
-  $range = $self->_new_range([{col => 1, row => 1}, 'B2']);
-  is $range->range(), "$sheet!A1:B2", "[{col => 1, row => 1}, 'B2'] should be A1:B2";
-
-  $range = $self->_new_range([{col => 1, row => 1}, [2, 2]]);
-  is $range->range(), "$sheet!A1:B2", "[{col => 1, row => 1}, [2, 2]] should be A1:B2";
-
-  $range = $self->_new_range([[1, 1], {col => 2, row => 2}]);
-  is $range->range(), "$sheet!A1:B2", "[[1, 1], {col => 2, row => 2}] should be A1:B2";
-
-  return;
-}
-
-sub range_factory : Tests(17) {
+# we don't want to recreate the 'types' tests here, just want to
+# ensure that the factory object returns all the right objects.
+sub factory : Tests(23) {
   my $self = shift;
   
   $self->_fake_http_response_by_uri();
@@ -140,7 +78,66 @@ sub range_factory : Tests(17) {
   is $range->range(), "$sheet!A1", "A1 returns A1";
   isa_ok $range, Cell, "A1 returns a Cell object";
 
+  $range = fake_worksheet()->range_factory(range => "George");
+  is $range->named(), 'George', "George should be a named range";
+  isa_ok $range, Col, "Named range";
+
+  $range = fake_worksheet()->range_factory(range => "A1");
+  is $range->named(), undef, "A1 should not be a named range";
+
   return;
 }
+
+sub clear {
+}
+
+sub values {
+}
+
+sub values_response_from_api {
+}
+
+sub batch_values {
+}
+
+sub append {
+}
+
+sub range : Tests(2) {
+  my $self = shift;
+
+  $self->_fake_http_response_by_uri();
+
+  isa_ok my $range = _new_range('A1:B2'), Range, "New range 'A1:B2'";
+  is $range->range(), "$sheet!A1:B2", "A1:B2 should be '$sheet!A1:B2'";
+
+  return;
+}
+
+sub range_to_array {
+}
+
+sub range_to_hash {
+}
+
+sub range_to_index {
+}
+
+sub range_to_dimension {
+}
+
+sub cell_at_offset {
+}
+
+sub offset {
+}
+
+sub offsets {
+}
+
+sub is_inside {
+}
+
+sub _new_range { fake_worksheet()->range(shift); }
 
 1;

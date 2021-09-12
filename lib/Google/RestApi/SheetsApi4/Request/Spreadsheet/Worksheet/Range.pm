@@ -247,7 +247,7 @@ sub merge_cells {
   my $self = shift;
 
   state $check = compile_named(
-    merge_type => DimAny,
+    merge_type => DimColRow | DimAll,
   );
   my $p = $check->(@_);
   $p->{merge_type} = dims_all($p->{merge_type});

@@ -2,11 +2,9 @@ package Test::Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
 
 use Test::Unit::Setup;
 
-use parent qw(Test::Unit::TestBase);
-
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator';
 
-sub class { Iterator; }
+use parent qw(Test::Unit::TestBase);
 
 sub setup : Tests(setup) {
   my $self = shift;
