@@ -272,12 +272,12 @@ sub named_ranges {
   my $self = shift;
 
   state $check = compile(RangeNamed, { optional => 1 });
-  my ($named_range) = $check->(@_);
+  my ($named_range_name) = $check->(@_);
 
   my $named_ranges = $self->attrs('namedRanges')->{namedRanges};
-  return $named_ranges if !$named_range;
+  return $named_ranges if !$named_range_name;
 
-  ($named_range) = grep { $_->{name} eq $named_range; } @$named_ranges;
+  my ($named_range) = grep { $_->{name} eq $named_range_name; } @$named_ranges;
   return $named_range;
 }
 
@@ -285,9 +285,9 @@ sub normalize_named {
   my $self = shift;
 
   state $check = compile(RangeNamed);
-  my ($named) = $check->(@_);
+  my ($named_range_name) = $check->(@_);
 
-  my $named_range = $self->named_ranges($named) or return;
+  my $named_range = $self->named_ranges($named_range_name) or return;
   $named_range = $named_range->{range};
   my $range = [
     [ $named_range->{startColumnIndex} + 1, $named_range->{startRowIndex} + 1 ],

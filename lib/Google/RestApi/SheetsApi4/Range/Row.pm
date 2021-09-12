@@ -12,16 +12,28 @@ use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 use parent Range;
 
 sub new {
-  my $self = shift->SUPER::new(@_, dim => 'row');
+  my $class = shift;
+  my %self = @_;
 
-  state $check = compile(RangeRow);
+  $self{dim} = 'row';
+
+  # this is fucked up, but want to support creating this object directly and also
+  # via the range::factory method, so have to handle both cases here. so call
+  # rangeany first to invoke any coersions, then coerce the result into a row.
   try {
-    $check->($self->{range});  # not range() since we don't want the sheet name.
+    state $check = compile(RangeAny);
+    ($self{range}) = $check->($self{range});
+  } catch {};
+
+  try {
+    state $check = compile(RangeRow);
+    ($self{range}) = $check->($self{range});
   } catch {
-    LOGDIE "Unable to translate '$self->{range}' into a worksheet row";
+    my $err = $_;
+    LOGDIE sprintf("Unable to translate '%s' into a worksheet row: %s", flatten_range($self{range}), $err);
   };
 
-  return $self;
+  return $class->SUPER::new(%self);
 }
 
 sub values {
@@ -48,7 +60,7 @@ sub batch_values {
 
 sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, DimAny);
+  state $check = compile(Int, DimColRow);
   my ($offset) = $check->(@_);     # we're a row, no dim required.
   my $range = $self->range_to_array();
   $range->[0] = ($range->[0] || 1) + $offset;

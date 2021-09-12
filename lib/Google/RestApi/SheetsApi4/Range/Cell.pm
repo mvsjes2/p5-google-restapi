@@ -12,16 +12,27 @@ use parent Range;
 
 # make sure the translated range refers to a single cell (no ':').
 sub new {
-  my $self = shift->SUPER::new(@_);
+  my $class = shift;
+  my %self = @_;
 
-  state $check = compile(RangeCell);
+  # this is fucked up, but want to support creating this object directly and also
+  # via the range::factory method, so have to handle both cases here. so call
+  # rangeany first to invoke any coersions, then coerce the result into a cell.
   try {
-    $check->($self->{range});  # not range() since we don't want the sheet name.
+    state $check = compile(RangeAny);
+    my ($range) = $check->($self{range});
+    ($self{range}) = $range if $range !~ /:/;
+  } catch {};
+
+  try {
+    state $check = compile(RangeCell);
+    ($self{range}) = $check->($self{range});
   } catch {
-    LOGDIE "Unable to translate '$self->{range}' into a worksheet cell";
+    my $err = $_;
+    LOGDIE sprintf("Unable to translate '%s' into a worksheet cell: %s", flatten_range($self{range}), $err);
   };
 
-  return $self;
+  return $class->SUPER::new(%self);
 }
 
 sub values {
@@ -51,7 +62,7 @@ sub batch_values {
 # is this 0 or infinity? return self if offset is 0, undef otherwise.
 sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, DimAny);
+  state $check = compile(Int, DimColRow);
   my ($offset) = $check->(@_);   # we're a cell, no dim required.
   return $self if !$offset;
   return;

@@ -12,16 +12,37 @@ use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 use parent Range;
 
 sub new {
-  my $self = shift->SUPER::new(@_, dim => 'col');
+  my $class = shift;
+  my %self = @_;
 
-  state $check = compile(RangeCol);
+  $self{dim} = 'col';
+  $self{range} = _col_i2a($self{range});
+
+  # this is fucked up, but want to support creating this object directly and also
+  # via the range::factory method, so have to handle both cases here. so call
+  # rangeany first to invoke any coersions, then coerce the result into a column.
   try {
-    $check->($self->{range});  # not range() since we don't want the sheet name.
+    state $check = compile(RangeAny);
+    ($self{range}) = $check->($self{range});
+  } catch {};
+
+  try {
+    state $check = compile(RangeCol);
+    ($self{range}) = $check->($self{range});
   } catch {
-    LOGDIE "Unable to translate '$self->{range}' into a worksheet column";
+    my $err = $_;
+    LOGDIE sprintf("Unable to translate '%s' into a worksheet column: %s", flatten_range($self{range}), $err);
   };
 
-  return $self;
+  return $class->SUPER::new(%self);
+}
+
+sub _col_i2a {
+  my $col = shift;
+  return $col if $col =~ qr/\D/;  # if any non-digits found, we're good.
+  my $l = int($col / 27);
+  my $r = $col - $l * 26;
+  return $l > 0 ? (pack 'CC', $l+64, $r+64) : (pack 'C', $r+64);
 }
 
 sub values {
@@ -48,7 +69,7 @@ sub batch_values {
 
 sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, DimAny);
+  state $check = compile(Int, DimColRow);
   my ($offset) = $check->(@_);   # we're a column, no dim required.
   my $range = $self->range_to_array();
   $range->[1] = ($range->[1] || 1) + $offset;

@@ -2,10 +2,10 @@ package Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Rang
 
 use Test::Unit::Setup;
 
-use parent 'Test::Unit::TestBase';
-
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range' => 'Request::Range';
+
+use parent 'Test::Unit::TestBase';
 
 my $index = {
   sheetId          => 'Sheet1',
@@ -14,8 +14,6 @@ my $index = {
   endColumnIndex   => 1,
   endRowIndex      => 1,
 };
-
-sub class { Request::Range; }
 
 sub setup : Tests(setup) {
   my $self = shift;

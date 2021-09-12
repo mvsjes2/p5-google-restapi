@@ -84,7 +84,6 @@ use Google::RestApi::Setup;
 
 use Carp qw( confess );
 use List::Util qw( max );
-use List::MoreUtils qw( first_index );
 use Scalar::Util qw( looks_like_number );
 use Try::Tiny qw( try catch );
 
@@ -105,31 +104,27 @@ sub factory {
     compile_named(
       worksheet => HasApi,
       range     => RangeCol,
-      dim       => DimAny, { optional => 1 },  # is switched to 'col'.
-      name      => RangeNamed, { optional => 1 },
+      dim       => DimColRow, { optional => 1 },  # is switched to 'col'.
     ),
     compile_named(
       worksheet => HasApi,
       range     => RangeRow,
-      dim       => DimAny, { optional => 1 },  # is switched to 'row'
-      name      => RangeNamed, { optional => 1 },
+      dim       => DimColRow, { optional => 1 },  # is switched to 'row'
     ),
     compile_named(
       worksheet => HasApi,
       range     => RangeCell,
-      dim       => DimAny, { optional => 1 },  # doesn't matter for cells.
-      name      => RangeNamed, { optional => 1 },
+      dim       => DimColRow, { optional => 1 },  # doesn't matter for cells.
     ),
     compile_named(
       worksheet => HasApi,
       range     => RangeAny,
-      dim       => DimAny, { default => 'row' },
-      name      => RangeNamed, { optional => 1 },
+      dim       => DimColRow, { default => 'row' },
     ),
     compile_named(
       worksheet => HasApi,
       range     => RangeNamed,
-      dim       => DimAny, { default => 'row' },
+      dim       => DimColRow, { default => 'row' },
     ),
   );
   my @range_args = $check->(@_);
@@ -145,7 +140,7 @@ sub factory {
       # convert the range to A1:A1 format and redrive the factory routine to see
       # if it ends up being a col, row, or cell range.
       if ($range ne $original_range) {
-        DEBUG(sprintf("Range '%s' converted to '$range'", _flatten_range($original_range)));
+        DEBUG(sprintf("Range '%s' converted to '$range'", flatten_range($original_range)));
         # resolve cells by collapsing A1:A1 to just A1. also A:A and 1:1 will be
         # properly resolved to cols/rows.
         my ($start, $end) = split(':', $range);
@@ -157,13 +152,22 @@ sub factory {
     }
     when (4) {
       my $worksheet = $range_args->{worksheet};
-      my $range = $worksheet->normalize_named($range)
-        or LOGDIE("Unable to resolve named range '$range'");
+
+      my $named = $range;
+      $range = $worksheet->header_range($named);
+      if ($range) {
+        $range = factory(%$range_args, range => $range);
+        $range->{header_name} = $named;
+        return $range;
+      }
+      
+      $range = $worksheet->normalize_named($named)
+        or LOGDIE("Unable to resolve named range '$named'");
       # we've resolved the name to A1 format, so redrive factory routine to
       # generate a range object with the resolved range.
-      $range_args->{name} = $range;
-      $range = $range;
-      return factory(%$range_args);
+      $range = factory(%$range_args, range => $range);
+      $range->{named} = $named;
+      return $range;
     }
   }
 
@@ -178,7 +182,7 @@ sub new {
   state $check = compile_named(
     worksheet => HasMethods[qw(api worksheet_name)],
     range     => RangeAny,
-    dim       => DimAny, { default => 'row' },
+    dim       => DimColRow, { default => 'row' },
   );
   my $self = $check->(@_);
   $self->{dim} = dims_any($self->{dim});   # convert internally to COLUMN | ROW
@@ -313,7 +317,7 @@ sub _cache_range_values {
   # calculated value.
   if ($p{range}) {
     state $check = compile_named(
-      majorDimension => DimAny,
+      majorDimension => DimColRow,
       range          => StrMatch[qr/.+!/],
       values         => ArrayRef, { optional => 1 }  # will not exist if values aren't set in the ss.
     );
@@ -374,6 +378,58 @@ sub _cache_range_values {
   $self->{cache_range_values}->{values} //= [];  # in case there's nothing set in the ss.
 
   return $self->{cache_range_values};
+}
+
+# for a given range, calculate the offsets from this range. used to share values
+# between ranges when iterating over a range, to reduce network calls (see above).
+sub offsets {
+  my $self = shift;
+
+  state $check = compile(HasRange);
+  my ($other_range) = $check->(@_);
+
+  my $range = $self->range_to_hash();
+  $range = [ $range, $range ] if ref($range) eq 'HASH'; # promote a cell.
+  $other_range = $other_range->range_to_hash();
+  $other_range = [ $other_range, $other_range ] if ref($other_range) eq 'HASH';
+
+  my $top = $range->[0]->{row} - $other_range->[0]->{row};
+  my $left = $range->[0]->{col} - $other_range->[0]->{col};
+  my $bottom = $range->[1]->{row} - $other_range->[0]->{row};
+  my $right = $range->[1]->{col} - $other_range->[0]->{col};
+
+  return ( $top, $left, $bottom, $right );
+}
+
+sub share_values {
+  my $self = shift;
+
+  state $check = compile(HasRange);
+  my ($shared_range) = $check->(@_);
+  return if !$self->is_inside($shared_range);
+
+  $self->{shared} = $shared_range;
+  return $shared_range;
+}
+
+sub is_inside {
+  my $self = shift;
+
+  state $check = compile(HasRange);
+  my ($other_range) = $check->(@_);
+
+  my $range = $self->range_to_hash();
+  $range = [ $range, $range ] if ref($range) eq 'HASH';
+  $other_range = $other_range->range_to_hash();
+  $other_range = [ $other_range, $other_range ] if ref($other_range) eq 'HASH';
+
+  return 1 if 
+    $range->[0]->{col} >= $other_range->[0]->{col} &&
+    $range->[0]->{row} >= $other_range->[0]->{row} &&
+    $range->[1]->{col} <= $other_range->[1]->{col} &&
+    $range->[1]->{row} <= $other_range->[1]->{row}
+  ;
+  return;
 }
 
 # stage batch values get/set for later use by submit_values
@@ -470,38 +526,6 @@ sub _caller_external {
   return "$package:$line => $subroutine";
 }
 
-# these are just used for debug message just above
-# to display the original range in a pretty format.
-sub _flatten_range {
-  my $range = shift;
-  return 'False' if !$range;
-  return $range if !ref($range);
-
-  return _flatten_range_hash($range) if ref($range) eq 'HASH';
-  return _flatten_range_array($range) if ref($range) eq 'ARRAY'
-    && scalar @$range == 2;
-
-  # recursion... here be potential dragons.
-  return sprintf('[ %s, %s ]',
-    _flatten_range($range->[0]),
-    _flatten_range($range->[1]),
-  );
-}
-
-sub _flatten_range_hash {
-  my $range = shift;
-  my @flat = map { "$_ => " . ($range->{$_} || 'False') } keys %$range;
-  my $flat = join(', ', @flat);
-  return "{ $flat }";
-}
-
-sub _flatten_range_array {
-  my $range = shift;
-  my @flat = map { $_ || 'False' } @$range;
-  my $flat = join(', ', @flat);
-  return "[ $flat ]";
-}
-
 # taken from https://metacpan.org/source/DOUGW/Spreadsheet-ParseExcel-0.65/lib/Spreadsheet/ParseExcel/Utility.pm
 sub _col_a2i {
   state $check = compile(StrMatch[qr/^[A-Z]+$/]);
@@ -582,7 +606,7 @@ sub range_to_index {
 sub range_to_dimension {
   my $self = shift;
 
-  state $check = compile(DimAny);
+  state $check = compile(DimColRow);
   my ($dims) = $check->(@_);
   $dims = dims_any($dims);
 
@@ -604,7 +628,7 @@ sub range_to_dimension {
 sub cell_at_offset {
   my $self = shift;
 
-  state $check = compile(Int, DimAny);
+  state $check = compile(Int, DimColRow);
   my ($offset, $dim) = $check->(@_);
 
   my $range = $self->range()->range_to_hash();
@@ -631,7 +655,8 @@ sub cell_at_offset {
   return $new_cell;
 }
 
-sub offset {
+# doesn't seem to be used anywhere internally.
+sub range_at_offset {
   my $self = shift;
 
   state $check = compile_named(
@@ -664,46 +689,8 @@ sub offset {
   return (ref($self))->new(worksheet => $self->worksheet(), range => $range);
 }
 
-sub offsets {
-  my $self = shift;
-  state $check = compile(HasRange);
-  my ($other) = $check->(@_);
-  my $range = $self->range_to_hash();
-  $range = [ $range, $range ] if ref($range) eq 'HASH';
-  $other = $other->range_to_hash();
-  $other = [ $other, $other ] if ref($other) eq 'HASH';
-  my $top = $range->[0]->{row} - $other->[0]->{row};
-  my $left = $range->[0]->{col} - $other->[0]->{col};
-  my $bottom = $range->[1]->{row} - $other->[0]->{row};
-  my $right = $range->[1]->{col} - $other->[0]->{col};
-  return ( $top, $left, $bottom, $right );
-}
-
-sub is_inside {
-  my $self = shift;
-  state $check = compile(HasRange);
-  my ($other) = $check->(@_);
-  my $range = $self->range_to_hash();
-  $range = [ $range, $range ] if ref($range) eq 'HASH';
-  $other = $other->range_to_hash();
-  $other = [ $other, $other ] if ref($other) eq 'HASH';
-  return 1 if 
-    $range->[0]->{col} >= $other->[0]->{col} &&
-    $range->[0]->{row} >= $other->[0]->{row} &&
-    $range->[1]->{col} <= $other->[1]->{col} &&
-    $range->[1]->{row} <= $other->[1]->{row}
-  ;
-  return;
-}
-
-sub share_values {
-  my $self = shift;
-  my $shared = shift;
-  return if !$self->is_inside($shared);
-  $self->{shared} = $shared;
-  return $shared;
-}
-
+sub header_name { shift->{header_name}; }
+sub named { shift->{named}; }
 sub api { shift->worksheet()->api(@_); }
 sub dimension { shift->{dim}; }
 sub has_values { shift->{cache_range_values}; }
