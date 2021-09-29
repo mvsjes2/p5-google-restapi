@@ -118,7 +118,7 @@ sub flatten_range {
 
 sub _flatten_range_hash {
   my $range = shift;
-  my @flat = map { "$_ => " . flatten_range($range->{$_}); } keys %$range;
+  my @flat = map { "$_ => " . flatten_range($range->{$_}); } sort keys %$range;
   my $flat = join(', ', @flat);
   return "{ $flat }";
 }

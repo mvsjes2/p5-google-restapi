@@ -19,22 +19,30 @@ sub new {
   $self{range} = _col_i2a($self{range});
 
   # this is fucked up, but want to support creating this object directly and also
-  # via the range::factory method, so have to handle both cases here. so call
-  # rangeany first to invoke any coersions, then coerce the result into a column.
-  try {
-    state $check = compile(RangeAny);
-    ($self{range}) = $check->($self{range});
-  } catch {};
+  # via the range::factory method, so have to handle both cases here. try to create
+  # the col directly first (which could also come via the factory method, which will
+  # have already translated the address into a col), and failing that, see if the
+  # range factory can create a col (which will resolve any named or header references).
+  # this has the potential of looping between this and factory method.
 
+  # if factory has already been used, then this should resolve here.
+  my $err;
   try {
     state $check = compile(RangeCol);
     ($self{range}) = $check->($self{range});
   } catch {
-    my $err = $_;
-    LOGDIE sprintf("Unable to translate '%s' into a worksheet column: %s", flatten_range($self{range}), $err);
+    $err = $_;
   };
+  return $class->SUPER::new(%self) if !$err;
 
-  return $class->SUPER::new(%self);
+  # see if the range passed can be translated to what we want via the factory.
+  my $factory_range;
+  try {
+    $factory_range = Google::RestApi::SheetsApi4::Range::factory(%self);
+  } catch {};
+  return $factory_range if $factory_range && $factory_range->isa(__PACKAGE__);
+
+  LOGDIE sprintf("Unable to translate '%s' into a worksheet column: $err", flatten_range($self{range}));
 }
 
 sub _col_i2a {
@@ -69,18 +77,18 @@ sub batch_values {
 
 sub cell_at_offset {
   my $self = shift;
+
   state $check = compile(Int, DimColRow);
   my ($offset) = $check->(@_);   # we're a column, no dim required.
-  my $range = $self->range_to_array();
-  $range->[1] = ($range->[1] || 1) + $offset;
-  return Cell->new(worksheet => $self->worksheet(), range => $range);
-}
 
-sub range_to_index {
-  my $self = shift;
-  my $range = $self->SUPER::range_to_index(@_);
-  delete @$range{qw(startRowIndex endRowIndex)};
-  return $range;
+  my $col_range = $self->range_to_array();
+  # expand this is col 'A', expand it out to 'A:A'.
+  $col_range = [ $col_range, $col_range ] if !ref($col_range->[0]);
+  my $cell_range = $col_range->[0];
+  $cell_range->[1] = ($cell_range->[1] || 1) + $offset;
+  return if $col_range->[1]->[1] && $cell_range->[1] > $col_range->[1]->[1];
+
+  return Cell->new(worksheet => $self->worksheet(), range => $cell_range);
 }
 
 sub freeze {

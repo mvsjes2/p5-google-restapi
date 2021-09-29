@@ -142,14 +142,28 @@ sub _cache {
   );
 }
 
+sub _cache_delete {
+  my $self = shift;
+  delete $self->{_cache};
+  return;
+}
+
 # sets the number of seconds that things will be cached.
 sub cache_seconds {
   my $self = shift;
+
   state $check = compile(PositiveOrZeroNum);
   my ($cache_seconds) = $check->(@_);
+
   $self->{_cache}->delete_all() if $self->{_cache};
-  delete $self->{_cache} if !$cache_seconds;
-  $self->{cache_seconds} = $cache_seconds;
+
+  if (!$cache_seconds) {
+    $self->_cache_delete();
+    delete $self->{cache_seconds};
+  } else {
+    $self->{cache_seconds} = $cache_seconds;
+  }
+
   return;
 }
 
@@ -251,7 +265,11 @@ sub submit_requests {
   } @all_requests;
   return if !@batch_requests;
 
-  # call the batch requuest api.
+  # we're about to do a bunch of requests that could affect what's in the cache.
+  # TODO: selectively invalidate the cache based on what's being submitted.
+  $self->_cache_delete();
+
+  # call the batch request api.
   $p->{content}->{requests} = \@batch_requests;
   $p->{method} = 'post';
   $p->{uri} = ':batchUpdate';
@@ -325,6 +343,7 @@ sub delete_all_protected_ranges {
 sub open_worksheet { Worksheet->new(spreadsheet => shift, @_); }
 sub sheets_api { shift->{sheets_api}; }
 sub rest_api { shift->sheets_api()->rest_api(); }
+sub transaction { shift->sheets_api()->transaction(); }
 sub stats { shift->sheets_api()->stats(); }
 
 1;

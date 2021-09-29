@@ -1,14 +1,17 @@
 use Test::Integration::Setup;
 
-use Test::Most tests => 28;
+use Test::Most tests => 34;
 
 use aliased "Google::RestApi::SheetsApi4::Range::Cell";
 use aliased "Google::RestApi::SheetsApi4::Range::Iterator";
 
+# use Carp::Always;
 # init_logger($DEBUG);
 
+delete_all_spreadsheets(sheets_api());
+
 my $spreadsheet = spreadsheet();
-my $worksheet = $spreadsheet->open_worksheet(id => 0);
+my $ws0 = $spreadsheet->open_worksheet(id => 0);
 
 my @values = (
   [ 1,  2,  3,  4],
@@ -19,7 +22,7 @@ my @values = (
 
 my ($range, $i, $cell);
 
-$range = $worksheet->range("A1:D4");
+$range = $ws0->range("A1:D4");
 $range->values(values => \@values);
 
 iterate_by_col();
@@ -38,6 +41,7 @@ sub iterate_by_col {
   $cell = $i->next() for (1..11);
   is $cell->values(), 16, "Col iteration to last cell should be '16'";
   is $cell = $i->next(), undef, "Last col iteration should be undef";
+  return;
 }
 
 sub iterate_by_row {
@@ -51,6 +55,7 @@ sub iterate_by_row {
   $cell = $i->next() for (1..11);
   is $cell->values(), 16, "Row iteration last cell should be '16'";
   is $cell = $i->next(), undef, "Last row iteration should be undef";
+  return;
 }
 
 sub iterate_by_2_by_row {
@@ -67,6 +72,7 @@ sub iterate_by_2_by_row {
   isa_ok $cell = $i->next(), Cell, "By 2 iteration to last";
   is $cell->values(), 12, "By 2 iteration should be '12'";
   is $cell = $i->next(), undef, "Last by 2 iteration should be undef";
+  return;
 }
 
 sub iterate_by_10_by_row {
@@ -76,9 +82,10 @@ sub iterate_by_10_by_row {
   isa_ok $cell = $i->next(), Cell, "Second by 10 iteration";
   is $cell->values(), 11, "Second by 10 iteration should be '9'";
   is $cell = $i->next(), undef, "Last by 10 iteration should be undef";
+  return;
 }
 
-delete_all_spreadsheets($spreadsheet->sheets_api());
+delete_all_spreadsheets(sheets_api());
 
 # use YAML::Any qw(Dump);
 # warn Dump($spreadsheet->stats());

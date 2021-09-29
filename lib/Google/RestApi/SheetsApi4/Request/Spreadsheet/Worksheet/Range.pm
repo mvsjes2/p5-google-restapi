@@ -436,7 +436,7 @@ sub delete_named {
   my $named = $self->named() or LOGDIE "Not a named range";
   $self->batch_requests(
     deleteNamedRange => {
-      namedRangeId => $named->{namedRangeId},
+      namedRangeId => $named,
     },
   );
 
