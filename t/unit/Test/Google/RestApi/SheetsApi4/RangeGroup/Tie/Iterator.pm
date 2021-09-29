@@ -24,13 +24,20 @@ sub setup : Tests(setup) {
   return;
 }
 
-sub tie_range : Tests(14) {
+sub interate : Tests(14) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
 
   my $ws0 = fake_worksheet();
-  my $cols = $ws0->tie_cols();
+  $ws0->enable_header_row();
+
+  my %ties = (
+    id      => 'B',
+    name    => [ 3 ],
+    address => { col => 4 },
+  );
+  my $cols = $ws0->tie_cols(%ties);
 
   isa_ok my $iterator = tied(%$cols)->iterator(from => 1), Iterator, "Tie iterator creation";
 

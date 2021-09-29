@@ -96,15 +96,15 @@ sub range_cell : Tests(30) {
 
   _test_range_cell('A1', 'A1');
 
-  _test_range_cell(['A', '1'], 'A1');
-  _test_range_cell([['A', '1']], 'A1');
-  _test_range_cell(['1', '1'], 'A1');
-  _test_range_cell([['1', '1']], 'A1');
+  _test_range_cell(['A', 1], 'A1');
+  _test_range_cell([['A', 1]], 'A1');
+  _test_range_cell([1, 1], 'A1');
+  _test_range_cell([[1, 1]], 'A1');
 
   _test_range_cell({col => 'A', row => 1}, 'A1');
   _test_range_cell([{col => 'A', row => 1}], 'A1');
-  _test_range_cell({col => '1', row => 1}, 'A1');
-  _test_range_cell([{col => '1', row => 1}], 'A1');
+  _test_range_cell({col => 1, row => 1}, 'A1');
+  _test_range_cell([{col => 1, row => 1}], 'A1');
   
   _test_range_cell('A1:A1', 'A1');
   

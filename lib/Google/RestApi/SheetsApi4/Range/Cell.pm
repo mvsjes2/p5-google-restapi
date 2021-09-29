@@ -16,23 +16,30 @@ sub new {
   my %self = @_;
 
   # this is fucked up, but want to support creating this object directly and also
-  # via the range::factory method, so have to handle both cases here. so call
-  # rangeany first to invoke any coersions, then coerce the result into a cell.
-  try {
-    state $check = compile(RangeAny);
-    my ($range) = $check->($self{range});
-    ($self{range}) = $range if $range !~ /:/;
-  } catch {};
+  # via the range::factory method, so have to handle both cases here. try to create
+  # the cell directly first (which could also come via the factory method, which will
+  # have already translated the address into a cell), and failing that, see if the
+  # range factory can create a cell (which will resolve any named or header references).
+  # this has the potential of looping between this and factory method.
 
+  # if factory has already been used, then this should resolve here.
+  my $err;
   try {
     state $check = compile(RangeCell);
     ($self{range}) = $check->($self{range});
   } catch {
-    my $err = $_;
-    LOGDIE sprintf("Unable to translate '%s' into a worksheet cell: %s", flatten_range($self{range}), $err);
+    $err = $_;
   };
+  return $class->SUPER::new(%self) if !$err;
 
-  return $class->SUPER::new(%self);
+  # see if the range passed can be translated to what we want via the factory.
+  my $factory_range;
+  try {
+    $factory_range = Google::RestApi::SheetsApi4::Range::factory(%self);
+  } catch {};
+  return $factory_range if $factory_range && $factory_range->isa(__PACKAGE__);
+
+  LOGDIE sprintf("Unable to translate '%s' into a worksheet cell: $err", flatten_range($self{range}));
 }
 
 sub values {
@@ -57,6 +64,20 @@ sub batch_values {
 
   $p->{values} = [[ $p->{values} ]] if $p->{values};
   return $self->SUPER::batch_values(%$p);
+}
+
+sub range_to_array {
+  my $self = shift;
+  my $cell = $self->range();
+  ($cell) = $cell =~ /!(.+)/;
+  $cell or LOGDIE "Unable to convert range to array: " . $self->range();
+  return Google::RestApi::SheetsApi4::Range::cell_to_array($cell);
+}
+
+sub range_to_hash {
+  my $self = shift;
+  my $cell = $self->range_to_array();
+  return { col => $cell->[0], row => $cell->[1] };
 }
 
 # is this 0 or infinity? return self if offset is 0, undef otherwise.

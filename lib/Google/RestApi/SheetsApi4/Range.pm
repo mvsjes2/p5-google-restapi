@@ -4,9 +4,8 @@ package Google::RestApi::SheetsApi4::Range;
 # a friend of Range. the routines RangeGroup calls are commented thusly:
 # "private range routine called here!"
 
-# there are different ways to specify ranges. this came
-# about by merging different ideas from different
-# spreadsheet implementations.
+# there are different ways to specify ranges. this came about by merging different
+# ideas from different spreadsheet implementations.
 
 # column:
 # A             ====> A:A
@@ -20,7 +19,7 @@ package Google::RestApi::SheetsApi4::Range;
 # {col => 1}    ====> A:A
 # [{col => 1}]  ====> A:A
 # a partial column is still considered a column
-# A5:A10        ====> A:A
+# A5:A10        ====> A5:A10
 
 # row:
 # 1             ====> 1:1
@@ -33,11 +32,13 @@ package Google::RestApi::SheetsApi4::Range;
 # {row => 1}    ====> 1:1
 # [{row => 1}]  ====> 1:1
 # a partial row is still considered a row
-# D1:1          ====> A:A
+# D1:1          ====> D1:1
 
 # partial rows/columns:
 # [[A, 5], [A]]                       ====> A5:A
 # [{col => A, row => 5}, {col => A}]  ====> A5:A
+# [[A], [A, 5]]                       ====> A:A5
+# [{col => A}, {col => A, row => 5}]  ====> A:A5
 # [[5, 1], [undef, 1]]                ====> E1:1
 # [[5, 1], [0, 1]]                    ====> E1:1
 # [{col => 5, row => 1}, {row => 1}]  ====> E1:1
@@ -68,7 +69,7 @@ package Google::RestApi::SheetsApi4::Range;
 # [{col => 1, row => 1}, {col => 2, row => 2}]  ====> A1:B2
 # [{col => A, row => 1}, {col => B, row => 2}]  ====> A1:B2
 
-# mixing is usually ok:
+# mixing is ok:
 # [A1, [2, 2]]                    ====> A1:B2
 # [{col => 1, row => 1}, [2, 2]]  ====> A1:B2
 # [{col => 1. row => 1}, B2]      ====> A1:B2
@@ -96,6 +97,8 @@ use aliased 'Google::RestApi::SheetsApi4::Range::Iterator';
 
 use parent 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range';
 
+# this routine returns the best fitting object for the range specified.
+# A5:A10 will return a Col object. A5:J5 will return a Row object. Etc.
 sub factory {
   my %original_range_args = @_;
   my $original_range = $original_range_args{range};
@@ -136,6 +139,8 @@ sub factory {
     when (0) { return Col->new(%$range_args); }
     when (1) { return Row->new(%$range_args); }
     when (2) { return Cell->new(%$range_args); }
+
+    # if we've translated a range, it now may be a better fit for one of the above.
     when (3) {
       # convert the range to A1:A1 format and redrive the factory routine to see
       # if it ends up being a col, row, or cell range.
@@ -145,18 +150,21 @@ sub factory {
         # properly resolved to cols/rows.
         my ($start, $end) = split(':', $range);
         $range = $start if $end && $start eq $end;
-        return factory(%$range_args);
+        return factory(%$range_args);                       ##### recursion
       }
       # we're already in A1:A1 format so just create a new range object.
       return __PACKAGE__->new(%$range_args);
     }
+
+    # range could be a named range or a column/row header. we have to resolve the
+    # range first, then see what the best fit will be above.
     when (4) {
       my $worksheet = $range_args->{worksheet};
 
       my $named = $range;
-      $range = $worksheet->header_range($named);
+      $range = $worksheet->resolve_header_range($named);
       if ($range) {
-        $range = factory(%$range_args, range => $range);
+        $range = factory(%$range_args, range => $range);    ##### recursion
         $range->{header_name} = $named;
         return $range;
       }
@@ -165,7 +173,7 @@ sub factory {
         or LOGDIE("Unable to resolve named range '$named'");
       # we've resolved the name to A1 format, so redrive factory routine to
       # generate a range object with the resolved range.
-      $range = factory(%$range_args, range => $range);
+      $range = factory(%$range_args, range => $range);      ##### recursion
       $range->{named} = $named;
       return $range;
     }
@@ -544,7 +552,7 @@ sub _col_a2i {
   return $result;
 }
 
-sub _cell_to_array {
+sub cell_to_array {
   my $cell = shift;
 
   my ($col, $row) = $cell =~ /^([A-Z]*)(\d*)$/;
@@ -559,7 +567,7 @@ sub _cell_to_array {
 # back to object calls...
 
 # returns [[col, row], [col, row]] for a full range.
-# returns [col, row] for a cell.
+# returns [col, row] for a col/row/cell.
 sub range_to_array {
   my $self = shift;
 
@@ -569,19 +577,22 @@ sub range_to_array {
 
   my ($start_cell, $end_cell) = split(':', $range);
   $end_cell = undef if defined $end_cell && $start_cell eq $end_cell;
-  $start_cell = _cell_to_array($start_cell);
-  $end_cell = _cell_to_array($end_cell) if $end_cell;
+  $start_cell = cell_to_array($start_cell);
+  $end_cell = cell_to_array($end_cell) if $end_cell;
 
   return $end_cell ? [$start_cell, $end_cell] : $start_cell;
 }
 
 # returns [{col =>, row =>}, {col =>, row => }] for a full range.
 # returns {col =>, row =>} for a cell.
+# Cell class overrides this but is here in case a general Range class is used
+# to represent a cell.
 sub range_to_hash {
   my $self = shift;
 
   my $range = $self->range_to_array();
-  my @ranges = [ map { { col => $_->[0], row => $_->[1] } } @$range ];
+  $range = [ $range ] if !ref($range->[1]);
+  my @ranges = map { { col => $_->[0], row => $_->[1] } } @$range;
 
   return $ranges[1] ? \@ranges : $ranges[0];
 }
@@ -590,7 +601,7 @@ sub range_to_index {
   my $self = shift;
 
   my $array = $self->range_to_array();
-  $array = [$array, $array] if !ref($array->[0]);
+  $array = [$array, $array] if !ref($array->[1]);
 
   my %range = (
     sheetId          => $self->worksheet()->worksheet_id(),
@@ -611,7 +622,7 @@ sub range_to_dimension {
   $dims = dims_any($dims);
 
   my $array = $self->range_to_array();
-  $array = [$array, $array] if !ref($array->[0]);
+  $array = [$array, $array] if !ref($array->[1]);
   my $start = $dims =~ /^col/i ? $array->[0]->[0] : $array->[0]->[1];
   my $end = $dims =~ /^col/i ? $array->[1]->[0] : $array->[1]->[1];
 
@@ -631,26 +642,29 @@ sub cell_at_offset {
   state $check = compile(Int, DimColRow);
   my ($offset, $dim) = $check->(@_);
 
-  my $range = $self->range()->range_to_hash();
-  $range = [$range, $range] if ref($range) eq 'HASH';  # is just a cell.
-
-  my $cell_range = $self->range()->range_to_hash();
-  $cell_range = $cell_range->[0] if ref($cell_range) eq 'ARRAY';
-
-  my $other_dim = $dim eq 'col' ? 'row' : 'col';
-  my $new_dim = $cell_range->{$dim} + $offset;
-  # if going in a box, reset the col/row to 0 and start again.
-  while ($new_dim > $range->[1]->{$dim}) {
-    $cell_range->{$other_dim}++;
-    $cell_range->{$dim} = $range->[0]->{$dim};
-    return if $cell_range->{$other_dim} > $range->[1]->{$other_dim};
+  my $range = $self->range_to_hash();
+  if (ref($range) eq 'HASH') {  # is just a col, row, or cell.
+    # it's a row, so offset the col.
+    return $self->worksheet()->range_cell({ col => $offset+1, row => $range->{row} }) if !$range->{col};
+    # it's a col, so offset the row.
+    return $self->worksheet()->range_cell({ col => $range->{col}, row => $offset+1 }) if !$range->{row};
+    # it's a cell, so return it on offset 0, undef on anything else.
+    return $offset ? undef : $self->worksheet()->range_cell($range);
   }
-  $cell_range->{$dim} = $new_dim;
 
-  # if parent range is a col or row, col or row will be 0 and we won't be
-  # able to calculate a cell address from it.
-  $cell_range->{$_} ||= 1 for (qw(col row));
-  my $new_cell = $self->worksheet()->range_cell($cell_range);
+  # it's an a1:b2 range.
+  my $other_dim = $dim =~ /col/i ? 'row' : 'col';
+  # TODO: this is really brain dead, figure this out with a bit of arithmetic...
+  my @ranges = map {
+    my $outside = $_;
+    map {
+      my $inside = $_;
+      my $r = { $dim => $inside, $other_dim => $outside }; $r; # for some reason have to stage the ref to a scalar.
+    } ($range->[0]->{$other_dim} .. $range->[1]->{$other_dim});
+  } ($range->[0]->{$dim} .. $range->[1]->{$dim});
+
+  my $offset_range = $ranges[$offset] or return;
+  my $new_cell = $self->worksheet()->range_cell($offset_range);
   $new_cell->share_values($self);
   return $new_cell;
 }
@@ -700,7 +714,7 @@ sub worksheet_id { shift->worksheet()->worksheet_id(@_); }
 sub spreadsheet { shift->worksheet()->spreadsheet(@_); }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(@_); }
 sub transaction { shift->spreadsheet()->transaction(); }
-sub iterator { Iterator->new(@_, range => shift); }
+sub iterator { Iterator->new(range => shift, @_); }
 
 1;
 
@@ -817,11 +831,6 @@ represents.
 =item named();
 
 Returns the 'named range' for this range, if any.
-
-=item is_named();
-
-Returns a true value if this range represents a 'named range'. See:
-https://support.google.com/docs/answer/63175?co=GENIE.Platform%3DDesktop&hl=en
 
 =item range();
 

@@ -16,14 +16,18 @@ sub new {
 
   my $ptied = delete $p->{tied};
   my $tied = tied(%$ptied);
-  my $ranges = $tied->ranges();
-  my $range_group = $tied->spreadsheet()->range_group(values %$ranges);
 
+  my $ranges = $tied->ranges();
+  my @keys = keys %$ranges;
+  my @values = values %$ranges;
+
+  my $range_group = $tied->spreadsheet()->range_group(@values);
   my $self = $class->SUPER::new(
     %$p,
     range_group => $range_group,
   );
-  $self->{keys} = [ keys %$ranges ];
+
+  $self->{keys} = \@keys;
   $self->{tied} = $ptied;
 
   return bless $self, $class;
@@ -31,11 +35,13 @@ sub new {
 
 sub iterate {
   my $self = shift;
-  my $iterate = $self->SUPER::iterate(@_) or return;
-  my @ranges = $iterate->ranges();
+  my $range_group = $self->SUPER::iterate(@_) or return;
+
+  my @ranges = $range_group->ranges();
   my %ranges = map {
     $self->{keys}->[$_] => $ranges[$_];
   } (0..$#ranges);
+
   my $tied = tied( %{ $self->{tied} });
   return $tied->default_worksheet()->tie(%ranges);
 }

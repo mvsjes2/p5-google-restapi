@@ -75,14 +75,14 @@ my $search = 'Freddie Mercury';
 
 {
   start("Now we can will do a lookup of $search\'s customer Id by using a tied hash with column headings for keys.");
-  my $cols = $ws0->tie_cols(qw(Id Name));
+  my $cols = $ws0->tie_cols(id => 'Id', name => 'Name');
   tied(%$cols)->values();      # prefetch the columns.
   my $i = tied(%$cols)->iterator(from => 1); # from 1 to skip the header row.
   while (my $row = $i->iterate()) {
     tied(%$row)->values();
-    last if $row->{Name} eq $search;
+    last if $row->{name} eq $search;
   }
-  die "Unable to find '$search', has 20_worksheet.pl been run first?" if !$row->{Name};
+  die "Unable to find '$search', has 20_worksheet.pl been run first?" if !$row->{name};
   end("$search\'s customer Id is $row->{Id}.");
 }
 

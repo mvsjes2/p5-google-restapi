@@ -18,22 +18,30 @@ sub new {
   $self{dim} = 'row';
 
   # this is fucked up, but want to support creating this object directly and also
-  # via the range::factory method, so have to handle both cases here. so call
-  # rangeany first to invoke any coersions, then coerce the result into a row.
-  try {
-    state $check = compile(RangeAny);
-    ($self{range}) = $check->($self{range});
-  } catch {};
+  # via the range::factory method, so have to handle both cases here. try to create
+  # the row directly first (which could also come via the factory method, which will
+  # have already translated the address into a row), and failing that, see if the
+  # range factory can create a row (which will resolve any named or header references).
+  # this has the potential of looping between this and factory method.
 
+  # if factory has already been used, then this should resolve here.
+  my $err;
   try {
     state $check = compile(RangeRow);
     ($self{range}) = $check->($self{range});
   } catch {
-    my $err = $_;
-    LOGDIE sprintf("Unable to translate '%s' into a worksheet row: %s", flatten_range($self{range}), $err);
+    $err = $_;
   };
+  return $class->SUPER::new(%self) if !$err;
 
-  return $class->SUPER::new(%self);
+  # see if the range passed can be translated to what we want via the factory.
+  my $factory_range;
+  try {
+    $factory_range = Google::RestApi::SheetsApi4::Range::factory(%self);
+  } catch {};
+  return $factory_range if $factory_range && $factory_range->isa(__PACKAGE__);
+
+  LOGDIE sprintf("Unable to translate '%s' into a worksheet row: $err", flatten_range($self{range}));
 }
 
 sub values {
@@ -60,18 +68,18 @@ sub batch_values {
 
 sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, DimColRow);
-  my ($offset) = $check->(@_);     # we're a row, no dim required.
-  my $range = $self->range_to_array();
-  $range->[0] = ($range->[0] || 1) + $offset;
-  return Cell->new(worksheet => $self->worksheet(), range => $range);
-}
 
-sub range_to_index {
-  my $self = shift;
-  my $range = $self->SUPER::range_to_index(@_);
-  delete @$range{qw(startColumnIndex endColumnIndex)};
-  return $range;
+  state $check = compile(Int, DimColRow);
+  my ($offset) = $check->(@_);   # we're a column, no dim required.
+
+  my $row_range = $self->range_to_array();
+  # if this is row '1', expand it out to '1:1'.
+  $row_range = [ $row_range, $row_range ] if !ref($row_range->[0]);
+  my $cell_range = $row_range->[0];
+  $cell_range->[0] = ($cell_range->[0] || 1) + $offset;
+  return if $row_range->[1]->[0] && $cell_range->[0] > $row_range->[1]->[0];
+
+  return Cell->new(worksheet => $self->worksheet(), range => $cell_range);
 }
 
 sub freeze {

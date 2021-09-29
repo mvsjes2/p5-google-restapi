@@ -12,7 +12,7 @@ GET:
               "sheetId": 0,
               "startRowIndex": 0,
               "startColumnIndex": 0,
-              "endRowIndex": 1,
+              "endRowIndex": 999,
               "endColumnIndex": 1
             }
           }

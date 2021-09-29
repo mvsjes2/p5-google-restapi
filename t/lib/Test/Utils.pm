@@ -20,7 +20,7 @@ our @EXPORT_OK = qw(
   init_logger
   $OFF $FATAL $WARN $ERROR $INFO $DEBUG $TRACE
   debug_on debug_off
-  is_array is_hash is_valid_n is_valid is_not_valid
+  is_array is_hash is_valid_n is_valid is_not_valid is_deeply_tied
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
@@ -132,6 +132,13 @@ sub is_valid_n {
     fail "$test_name: $err";
   };
   return;
+}
+
+sub is_deeply_tied {
+  my ($got, $expected, $title) = @_;
+  my %got;
+  @got{ keys %$got } = values %$got;
+  return is_deeply \%got, $expected, $title;
 }
 
 1;

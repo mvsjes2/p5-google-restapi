@@ -95,7 +95,7 @@ sub cols {
   state $check = compile(ArrayRef, ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($cols, $values) = $check->(@_);
 
-  my $range_group = $self->range_cols($cols);
+  my $range_group = $self->range_group_cols($cols);
   return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
@@ -122,7 +122,7 @@ sub rows {
   state $check = compile(ArrayRef, ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($rows, $values) = $check->(@_);
 
-  my $range_group = $self->range_rows($rows);
+  my $range_group = $self->range_group_rows($rows);
   return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
@@ -137,29 +137,9 @@ sub rows {
 
 sub cell {
   my $self = shift;
-
-  state $check = multisig(
-    [
-      RangeCol, RangeRow,
-      Str, { optional => 1 },
-    ],
-    [
-      Str,
-      Str, { optional => 1 },
-    ],
-  );
-  my @check = $check->(@_);
-  my $range;
-  if (${^TYPE_PARAMS_MULTISIG} == 0) {
-    my $col = shift(@check);
-    my $row = shift(@check);
-    $range = $self->range_cell([$col, $row]);
-  } else {
-    my $cell = shift(@check);
-    $range = $self->range_cell($cell);
-  }
-  my $value = shift(@check);
-
+  state $check = compile(Defined, Str, { optional => 1 });
+  my ($cell, $value) = $check->(@_);
+  my $range = $self->range_cell($cell);
   return $range->values(defined $value ? (values => $value) : ());
 }
 
@@ -169,7 +149,7 @@ sub cells {
   state $check = compile(ArrayRef, ArrayRef[Str], { optional => 1 });
   my ($cells, $values) = $check->(@_);
 
-  my $range_group = $self->range_cells($cells);
+  my $range_group = $self->range_group_cells($cells);
   return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
@@ -182,24 +162,36 @@ sub cells {
   return $range_group->submit_values();
 }
 
-sub header_range {
+sub resolve_header_range {
+  my $self = shift;
+  return
+    $self->resolve_header_range_col(@_) ||
+    $self->resolve_header_range_row(@_);
+}
+
+sub resolve_header_range_col {
   my $self = shift;
 
-  state $check = compile(RangeNamed, { optional => 1 });
+  state $check = compile(RangeNamed);
   my ($header) = $check->(@_);
   
-  my $headers = $self->header_row();
-  if ($headers) {
-    my $i = first_index { $_ eq $header; } @$headers;
-    return [{col => $i, row => 2}, {col => $i}] if ++$i > 0;
-  }
+  my $headers = $self->header_col() or return;
+  my $i = first_index { $_ eq $header; } @$headers;
+  return [{col => 2, row => $i}, {row => $i}] if ++$i > 0;
+
+  return;
+}
+
+sub resolve_header_range_row {
+  my $self = shift;
+
+  state $check = compile(RangeNamed);
+  my ($header) = $check->(@_);
   
-  $headers = $self->header_col();
-  if ($headers) {
-    my $i = first_index { $_ eq $header; } @$headers;
-    return [{col => 2, row => $i}, {row => $i}] if ++$i > 0;
-  }
-  
+  my $headers = $self->header_row() or return;
+  my $i = first_index { $_ eq $header; } @$headers;
+  return [{col => $i, row => 2}, {col => $i}] if ++$i > 0;
+
   return;
 }
 
@@ -219,12 +211,13 @@ sub enable_header_col {
   } else {
     delete @{$self}{qw(header_col header_col_enabled)};
   }
-  return 1;
+  return $enable;
 }
 
-# call with 1 to refresh the row.
+# call with true to refresh.
 sub header_col {
   my $self = shift;
+  my $refresh = shift;
 
   if (!$self->{header_col_enabled}) {
     DEBUG("Header column is not enabled, call 'enable_header_col' first.");
@@ -232,7 +225,7 @@ sub header_col {
     return;
   }
 
-  delete $self->{header_col} if shift;
+  delete $self->{header_col} if $refresh;
 
   if (!$self->{header_col}) {
     $self->{header_col} = $self->col(1);
@@ -242,7 +235,7 @@ sub header_col {
   return $self->{header_col};
 }
 
-# call this before calling tie_cols or header_row.
+# call this before calling tie_cols (to use headings) or header_row.
 # () or (1) turns it on, (0) turns it off.
 sub enable_header_row {
   my $self = shift;
@@ -252,12 +245,13 @@ sub enable_header_row {
   } else {
     delete @{$self}{qw(header_row header_row_enabled)};
   }
-  return 1;
+  return $enable;
 }
 
-# call with 1 to refresh the row.
+# call with 1 to refresh.
 sub header_row {
   my $self = shift;
+  my $refresh = shift;
 
   if (!$self->{header_row_enabled}) {
     DEBUG("Header row is not enabled, call 'enable_header_row' first.");
@@ -265,7 +259,7 @@ sub header_row {
     return;
   }
 
-  delete $self->{header_row} if shift;
+  delete $self->{header_row} if $refresh;
 
   if (!$self->{header_row}) {
     $self->{header_row} = $self->row(1);
@@ -274,15 +268,17 @@ sub header_row {
   return $self->{header_row};
 }
 
+sub header_col_enabled { shift->{header_col_enabled}; }
+sub header_row_enabled { shift->{header_row_enabled}; }
+
 sub name_value_pairs {
   my $self = shift;
 
   state $check = compile(
-    RangeCol, { default => 1 },
-    RangeCol, { default => 2 },
-    Bool, { optional => 1 }
+    Defined, { default => 1 },
+    Defined, { default => 2 },
   );
-  my ($name_col, $value_col, $has_headers) = $check->(@_);
+  my ($name_col, $value_col) = $check->(@_);
 
   my $cols = $self->cols([$name_col, $value_col]);
   my %pairs = map {
@@ -291,7 +287,7 @@ sub name_value_pairs {
     ( strip($cols->[0]->[$_]) => strip($cols->[1]->[$_]) )
     :
     ();
-  } (($has_headers ? 1 : 0)..$#{ $cols->[0] });
+  } (($self->header_row_enabled() ? 1 : 0)..$#{ $cols->[0] });
 
   return \%pairs;
 }
@@ -304,25 +300,13 @@ sub tie_ranges { shift->_tie('range_factory', @_); }
 sub _tie {
   my $self = shift;
 
-  my $check_method = Str->where( sub { /^range/ && $self->can($_) or die "Must be a range method"; } );
-
-  state $check = multisig(
-    [
-      $check_method, HashRef,
-    ],
-    [
-      $check_method, slurpy ArrayRef,
-    ],
+  state $check = compile(
+    Str->where( sub { /^range/ && $self->can($_) or die "Must be a 'range' method"; } ),
+    slurpy HashRef,
   );
   my ($method, $ranges) = $check->(@_);
 
-  my %ranges;
-  if (${^TYPE_PARAMS_MULTISIG} == 0) {
-    %ranges = map { $_ => $self->$method($ranges->{$_}); } keys %$ranges;
-  } else {
-    %ranges  = map { $_ => $self->$method($_); } @$ranges;
-  }
-
+  my %ranges = map { $_ => $self->$method( $ranges->{$_} ); } keys %$ranges;
   return $self->tie(%ranges);
 }
 
@@ -338,10 +322,7 @@ sub submit_requests {
   return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
 }
 
-# can't use aliased here for some reason.
-sub range_factory { Google::RestApi::SheetsApi4::Range::factory(@_, worksheet => shift); }
-
-sub range_cols {
+sub range_group_cols {
   my $self = shift;
   state $check = compile(ArrayRef);
   my ($cols) = $check->(@_);
@@ -349,7 +330,7 @@ sub range_cols {
   return $self->spreadsheet()->range_group(@cols);
 }
 
-sub range_rows {
+sub range_group_rows {
   my $self = shift;
   state $check = compile(ArrayRef);
   my ($rows) = $check->(@_);
@@ -357,7 +338,7 @@ sub range_rows {
   return $self->spreadsheet()->range_group(@rows);
 }
 
-sub range_cells {
+sub range_group_cells {
   my $self = shift;
   state $check = compile(ArrayRef);
   my ($cells) = $check->(@_);
@@ -365,7 +346,10 @@ sub range_cells {
   return $self->spreadsheet()->range_group(@cells);
 }
 
-sub range { Range->new(worksheet => shift, range => shift); }
+# can't use aliased here for some reason.
+sub range_factory { Google::RestApi::SheetsApi4::Range::factory(worksheet => shift, range => shift, @_); }
+
+sub range { Range->new(worksheet => shift, range => shift, @_); }
 sub range_col { Col->new(worksheet => shift, range => shift); }
 sub range_row { Row->new(worksheet => shift, range => shift); }
 sub range_cell { Cell->new(worksheet => shift, range => shift); }
