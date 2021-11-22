@@ -85,6 +85,7 @@ use Google::RestApi::Setup;
 
 use Carp qw( confess );
 use List::Util qw( max );
+use Readonly;
 use Scalar::Util qw( looks_like_number );
 use Try::Tiny qw( try catch );
 
@@ -96,6 +97,8 @@ use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 use aliased 'Google::RestApi::SheetsApi4::Range::Iterator';
 
 use parent 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range';
+
+Readonly::Scalar our $RANGE_EXPANDED => 1;
 
 # this routine returns the best fitting object for the range specified.
 # A5:A10 will return a Col object. A5:J5 will return a Row object. Etc.
@@ -168,7 +171,7 @@ sub factory {
         $range->{header_name} = $named;
         return $range;
       }
-      
+
       $range = $worksheet->normalize_named($named)
         or LOGDIE("Unable to resolve named range '$named'");
       # we've resolved the name to A1 format, so redrive factory routine to
@@ -182,6 +185,8 @@ sub factory {
   LOGDIE("Unable to resolve '$range_args->{range}' to a range object");
 }
 
+# this should not normally be called directly, everything should be created via
+# the factory method above or more commonly via the 'worksheet::range*' methods.
 sub new {
   my $class = shift;
 
@@ -194,6 +199,7 @@ sub new {
   );
   my $self = $check->(@_);
   $self->{dim} = dims_any($self->{dim});   # convert internally to COLUMN | ROW
+  DEBUG("New range " . flatten_range($self->{range}) . " has been created");
 
   return bless $self, $class;
 }
@@ -233,7 +239,7 @@ sub _send_values {
   my $self = shift;
 
   state $check = compile_named(
-    values  => ArrayRef[ArrayRef[Str]], { optional => 1 }, # ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
+    values  => ArrayRef[ArrayRef[Str]], { optional => 1 },
     params  => HashRef, { default => {} },
     content => HashRef, { default => {} },
     _extra_ => slurpy Any,
@@ -310,6 +316,7 @@ sub values_response_from_api {
 # from an update if includeValuesInResponse was included.
 # cache is in the format:
 # majorDimension: ROWS
+# range: Sheet1!A1    # only on an api return value.
 # values:
 # - - Fred
 # if a range is included it's a flag that the dim and values are present from
@@ -340,6 +347,9 @@ sub _cache_range_values {
 
     LOGDIE "Setting range data to worksheet name '$worksheet_name' that doesn't belong to this range: " . $self->worksheet_name()
       if $worksheet_name ne $self->worksheet_name();
+    # TODO: sometimes the api returns a range that is different from the one we sent to the api.
+    # a column A:A can be returned as A1:A1000 by the api, so have to come up with a way
+    # of identifying when a returned range is a close enough match to the one we have.
     #LOGDIE "Setting range data to '$range' which is not this range: " . $self_range
     #  if $range ne $self_range;
     LOGDIE "Setting major dimention to '$p->{majorDimension}' that doesn't belong to this range: " . $self->dimention()
@@ -372,6 +382,7 @@ sub _cache_range_values {
     }
 
     # return a subsection of the cached value for the iterator.
+    DEBUG("Returning shared values");
     return {
       majorDimension => $dim,
       values         => $data,
@@ -388,18 +399,15 @@ sub _cache_range_values {
   return $self->{cache_range_values};
 }
 
-# for a given range, calculate the offsets from this range. used to share values
-# between ranges when iterating over a range, to reduce network calls (see above).
+# for a given range, calculate the offsets from this range.
 sub offsets {
   my $self = shift;
 
   state $check = compile(HasRange);
   my ($other_range) = $check->(@_);
 
-  my $range = $self->range_to_hash();
-  $range = [ $range, $range ] if ref($range) eq 'HASH'; # promote a cell.
-  $other_range = $other_range->range_to_hash();
-  $other_range = [ $other_range, $other_range ] if ref($other_range) eq 'HASH';
+  my $range = $self->range_to_hash($RANGE_EXPANDED);
+  $other_range = $other_range->range_to_hash($RANGE_EXPANDED);
 
   my $top = $range->[0]->{row} - $other_range->[0]->{row};
   my $left = $range->[0]->{col} - $other_range->[0]->{col};
@@ -414,28 +422,27 @@ sub share_values {
 
   state $check = compile(HasRange);
   my ($shared_range) = $check->(@_);
-  return if !$self->is_inside($shared_range);
+  return if !$shared_range->is_other_inside($self);
 
+  DEBUG(flatten_range($self) . " is sharing values with " . flatten_range($shared_range));
   $self->{shared} = $shared_range;
   return $shared_range;
 }
 
-sub is_inside {
+sub is_other_inside {
   my $self = shift;
 
   state $check = compile(HasRange);
-  my ($other_range) = $check->(@_);
+  my ($inside_range) = $check->(@_);
 
-  my $range = $self->range_to_hash();
-  $range = [ $range, $range ] if ref($range) eq 'HASH';
-  $other_range = $other_range->range_to_hash();
-  $other_range = [ $other_range, $other_range ] if ref($other_range) eq 'HASH';
+  my $range = $self->range_to_hash($RANGE_EXPANDED);
+  $inside_range = $inside_range->range_to_hash($RANGE_EXPANDED);
 
   return 1 if 
-    $range->[0]->{col} >= $other_range->[0]->{col} &&
-    $range->[0]->{row} >= $other_range->[0]->{row} &&
-    $range->[1]->{col} <= $other_range->[1]->{col} &&
-    $range->[1]->{row} <= $other_range->[1]->{row}
+    $range->[0]->{col} <= $inside_range->[0]->{col} &&
+    $range->[0]->{row} <= $inside_range->[0]->{row} &&
+    $range->[1]->{col} >= $inside_range->[1]->{col} &&
+    $range->[1]->{row} >= $inside_range->[1]->{row}
   ;
   return;
 }
@@ -567,9 +574,13 @@ sub cell_to_array {
 # back to object calls...
 
 # returns [[col, row], [col, row]] for a full range.
-# returns [col, row] for a col/row/cell.
+# returns [col, row] for a col or col(a2:a) or row(a2:2).
+# passing $RANGE_EXPANDED will always return the former.
 sub range_to_array {
   my $self = shift;
+
+  state $check = compile(Bool, { optional => 1 });
+  my ($expand_range) = $check->(@_);
 
   my $range = $self->range();
   ($range) = $range =~ /!(.+)/;
@@ -579,18 +590,19 @@ sub range_to_array {
   $end_cell = undef if defined $end_cell && $start_cell eq $end_cell;
   $start_cell = cell_to_array($start_cell);
   $end_cell = cell_to_array($end_cell) if $end_cell;
+  
+  $end_cell = $start_cell if !$end_cell && $expand_range;
 
   return $end_cell ? [$start_cell, $end_cell] : $start_cell;
 }
 
-# returns [{col =>, row =>}, {col =>, row => }] for a full range.
-# returns {col =>, row =>} for a cell.
-# Cell class overrides this but is here in case a general Range class is used
-# to represent a cell.
+# returns [{col =>, row =>}, {col =>, row => }] for an expanded range.
+# returns {col =>, row =>} for a cell or col(a2:a) or row(a2:2).
+# passing $RANGE_EXPANDED will always return the former.
 sub range_to_hash {
   my $self = shift;
 
-  my $range = $self->range_to_array();
+  my $range = $self->range_to_array(@_);
   $range = [ $range ] if !ref($range->[1]);
   my @ranges = map { { col => $_->[0], row => $_->[1] } } @$range;
 
@@ -610,6 +622,10 @@ sub range_to_index {
     endColumnIndex   => $array->[1]->[0],
     endRowIndex      => $array->[1]->[1],
   );
+  delete $range{endColumnIndex}
+    if $range{endColumnIndex} < $range{startColumnIndex};
+  delete $range{endRowIndex}
+    if $range{endRowIndex} < $range{startRowIndex};
   
   return \%range;
 }
@@ -642,17 +658,8 @@ sub cell_at_offset {
   state $check = compile(Int, DimColRow);
   my ($offset, $dim) = $check->(@_);
 
-  my $range = $self->range_to_hash();
-  if (ref($range) eq 'HASH') {  # is just a col, row, or cell.
-    # it's a row, so offset the col.
-    return $self->worksheet()->range_cell({ col => $offset+1, row => $range->{row} }) if !$range->{col};
-    # it's a col, so offset the row.
-    return $self->worksheet()->range_cell({ col => $range->{col}, row => $offset+1 }) if !$range->{row};
-    # it's a cell, so return it on offset 0, undef on anything else.
-    return $offset ? undef : $self->worksheet()->range_cell($range);
-  }
-
-  # it's an a1:b2 range.
+  # it's an a1:b2 range. col/row/cell handle this in the subclass.
+  my $range = $self->range_to_hash($RANGE_EXPANDED);
   my $other_dim = $dim =~ /col/i ? 'row' : 'col';
   # TODO: this is really brain dead, figure this out with a bit of arithmetic...
   my @ranges = map {
@@ -666,6 +673,7 @@ sub cell_at_offset {
   my $offset_range = $ranges[$offset] or return;
   my $new_cell = $self->worksheet()->range_cell($offset_range);
   $new_cell->share_values($self);
+
   return $new_cell;
 }
 
@@ -838,7 +846,8 @@ Returns the A1 notation for this range.
 
 =item range_to_hash();
 
-Returns the hash representation for this range (e.g. {col => 1, row => 1}).
+Returns the hash representation for this range (e.g. {col => 1, row => 1}). Passing $RANGE_EXPANDED
+will always return a double cell notations: [{col => 1, row => 1}, {col => 1, row => 1}].
 
 =item range_to_array();
 
@@ -875,10 +884,9 @@ array (top, left, bottom, right).
 Returns an iterator for this range. Any 'args' are passed to the
 'new' routine for the iterator.
 
-=item is_inside(range<Range>);
+=item is_other_inside(range<Range>);
 
-Returns a true value if the given range fits entirely inside this
-range.
+Returns a true value if the given range fits entirely inside this range.
 
 =item share_values(range<Range>);
 

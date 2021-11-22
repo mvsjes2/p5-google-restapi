@@ -19,7 +19,9 @@ sub setup : Tests(setup) {
     get_worksheet_properties_title_sheetid
     get_worksheet_values_cell
     get_worksheet_values_row
+    get_worksheet_values_a1_c3
     post_worksheet_values_x_y_z
+    put_worksheet_values_a1_c3
   ));
 
   return;

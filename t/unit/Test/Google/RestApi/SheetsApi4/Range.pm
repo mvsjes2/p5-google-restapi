@@ -3,6 +3,7 @@ package Test::Google::RestApi::SheetsApi4::Range;
 use Test::Unit::Setup;
 
 use Google::RestApi::Types qw( :all );
+use Google::RestApi::Utils qw( :all );
 
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Col';
@@ -18,7 +19,7 @@ sub _constructor : Tests(2) {
 
   $self->_fake_http_response_by_uri();
 
-  my $range = Range->new(
+  my $range = Google::RestApi::SheetsApi4::Range::factory(
     worksheet => fake_worksheet,
     range     => 'A1:B2',
   );
@@ -166,7 +167,79 @@ sub offset {
 sub offsets {
 }
 
-sub is_inside {
+sub is_other_inside : Tests() {
+  my $self = shift;
+  
+  $self->_fake_http_response_by_uri();
+
+  my $outside = _new_range('A1:B2');
+  my $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 1 is inside " . flatten_range($outside);
+
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 2 is inside " . flatten_range($outside);
+
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 3 is inside " . flatten_range($outside);
+
+  $inside = _new_range('B2');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 4 is inside " . flatten_range($outside);
+
+  $inside = _new_range('C1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 5 is not inside " . flatten_range($outside);
+
+  $inside = _new_range('B3');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 6 is not inside " . flatten_range($outside);
+  
+  $outside = _new_range('A');
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 7 is inside " . flatten_range($outside);
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 8 is not inside " . flatten_range($outside);
+  
+  $outside = _new_range('A2:A');
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 9 is inside " . flatten_range($outside);
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 10 is not inside " . flatten_range($outside);
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 11 is not inside " . flatten_range($outside);
+
+  $outside = _new_range('A2:A3');
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 9 is inside " . flatten_range($outside);
+  $inside = _new_range('A3');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 9 is inside " . flatten_range($outside);
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 10 is not inside " . flatten_range($outside);
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 11 is not inside " . flatten_range($outside);
+
+  $outside = _new_range('1');
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 12 is inside " . flatten_range($outside);
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 13 is not inside " . flatten_range($outside);
+
+  $outside = _new_range('B1:1');
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 14 is inside " . flatten_range($outside);
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 15 is not inside " . flatten_range($outside);
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 16 is not inside " . flatten_range($outside);
+
+  $outside = _new_range('B1:C1');
+  $inside = _new_range('B1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 14 is inside " . flatten_range($outside);
+  $inside = _new_range('C1');
+  is $outside->is_other_inside($inside), 1, flatten_range($inside) . " 14 is inside " . flatten_range($outside);
+  $inside = _new_range('A1');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 15 is not inside " . flatten_range($outside);
+  $inside = _new_range('A2');
+  is $outside->is_other_inside($inside), undef, flatten_range($inside) . " 16 is not inside " . flatten_range($outside);
+
+  return;
 }
 
 sub _new_range { fake_worksheet()->range(shift); }

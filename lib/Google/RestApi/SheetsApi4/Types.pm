@@ -3,6 +3,11 @@ package Google::RestApi::SheetsApi4::Types;
 # custom type constrants. see Type::Library.
 # NOTE: can't use Google::RestApi::Setup here because that module imports this one.
 
+# this handles the complex coercions of different formats for specifying ranges
+# using type::library to handle it. having different formats for ranges is probably
+# more comlicated that it's worth, it grew in complexity organically, but it works
+# and we have it now.
+
 use strict;
 use warnings;
 

@@ -6,7 +6,7 @@ use lib "$FindBin::RealBin/../../../lib";
 
 use Test::Tutorial::Setup;
 
-# init_logger($TRACE);
+init_logger($DEBUG);
 
 my $name = "Sheet1";
 my $spreadsheet_name = spreadsheet_name();
@@ -25,12 +25,12 @@ my $ws0 = $ss->open_worksheet(id => 0);
 end_go("Worksheet is now open.");
 
 my $search = 'Freddie Mercury';
+my $count = 0;
 # simple iterator on a single column.
 {
   start("We will now iterate through the name column with a simple iterator looking for '$search'");
   my $name_col = $ws0->range_col('B');
   my $i = $name_col->iterator();
-  my $count = 0;
   while (my $cell = $i->next()) {
     $count++;
     my $name = $cell->values();
@@ -54,15 +54,13 @@ my $search = 'Freddie Mercury';
   end("'$search' is customer $count.");
 }
 
+my $row;
 # iterator on two columns using a range group to look up a customer id.
 {
-  start("Now we can do a lookup of $search\'s customer Id by using a range group to iterate.");
-  my $id_col = $ws0->range_col('A');
-  my $name_col = $ws0->range_col('B');
-  my $rg = $ws0->range_group($id_col, $name_col);
+  start("Now we can do a lookup of $search\'s customer ID by using a range group to iterate.");
+  my $rg = $ws0->range_group_cols(['A', 'B']);
   $rg->values();             # prefetch the columns.
   my $i = $rg->iterator();
-  my $row;
   while (1) {
     $row = $i->next();
     my $name = (($row->ranges())[1])->values();
@@ -70,20 +68,21 @@ my $search = 'Freddie Mercury';
     die "Unable to find '$search', has 20_worksheet.pl been run first?" if !$name;
   }
   my $id = (($row->ranges())[0])->values();
-  end("$search\'s customer Id is $id.");
+  end("$search\'s customer ID is $id.");
 }
 
 {
-  start("Now we can will do a lookup of $search\'s customer Id by using a tied hash with column headings for keys.");
+  start("Now we can will do a lookup of $search\'s customer ID by using a tied hash with column headings for keys.");
+  $ws0->enable_header_row();
   my $cols = $ws0->tie_cols(id => 'Id', name => 'Name');
   tied(%$cols)->values();      # prefetch the columns.
   my $i = tied(%$cols)->iterator(from => 1); # from 1 to skip the header row.
-  while (my $row = $i->iterate()) {
+  while ($row = $i->iterate()) {
     tied(%$row)->values();
     last if $row->{name} eq $search;
   }
   die "Unable to find '$search', has 20_worksheet.pl been run first?" if !$row->{name};
-  end("$search\'s customer Id is $row->{Id}.");
+  end("$search\'s customer ID is $row->{id}.");
 }
 
 message('blue', "We are done, here are some api stats:\n", Dump($ss->stats()));

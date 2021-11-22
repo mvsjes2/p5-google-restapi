@@ -12,6 +12,7 @@ use File::Spec::Functions qw( catfile );
 use File::Basename qw( dirname );
 use Hash::Merge ();
 use Log::Log4perl qw( :easy );
+use Scalar::Util qw( blessed );
 use Type::Params qw( compile compile_named );
 use Types::Standard qw( Str StrMatch HashRef Any slurpy );
 use YAML::Any qw( Dump LoadFile );
@@ -109,6 +110,7 @@ sub resolve_config_file_path {
 # to display the original range in a pretty format.
 sub flatten_range {
   my $range = shift;
+  $range = $range->range_to_hash() if blessed($range);
   return 'False' if !$range;
   return $range if !ref($range);
   return _flatten_range_hash($range) if ref($range) eq 'HASH';

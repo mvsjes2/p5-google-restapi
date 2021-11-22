@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# uncomment the specific ones you want to run, then run with 'prove -v run_unit_some'.
+
 use strict;
 use warnings;
 
@@ -13,10 +15,10 @@ use lib "$FindBin::RealBin/unit";
 #use Test::Google::RestApi::Types;
 #use Test::Google::RestApi::Utils;
 #use Test::Google::RestApi::SheetsApi4;
-use Test::Google::RestApi::SheetsApi4::Types;
+#use Test::Google::RestApi::SheetsApi4::Types;
 #use Test::Google::RestApi::SheetsApi4::Spreadsheet;
 #use Test::Google::RestApi::SheetsApi4::Worksheet;
-#use Test::Google::RestApi::SheetsApi4::Range;
+use Test::Google::RestApi::SheetsApi4::Range;
 #use Test::Google::RestApi::SheetsApi4::Range::Col;
 #use Test::Google::RestApi::SheetsApi4::Range::Row;
 #use Test::Google::RestApi::SheetsApi4::Range::Cell;

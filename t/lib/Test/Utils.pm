@@ -55,7 +55,7 @@ sub log_file_name {
   make_path($logdir);
 
   my $logpath = File::Spec->catfile($logdir, $logfile);
-  # warn "File logging will be sent to $logpath\n";
+  warn "File logging will be sent to $logpath\n";
   return $logpath;
 }
 
