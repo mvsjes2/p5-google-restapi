@@ -28,7 +28,7 @@ sub setup : Tests(setup) {
   return;
 }
 
-sub _constructor : Tests(3) {
+sub _constructor : Tests(2) {
   my $self = shift;
 
   ok my $spreadsheets = SheetsApi4->new(api => fake_rest_api()), 'Constructor should succeed';

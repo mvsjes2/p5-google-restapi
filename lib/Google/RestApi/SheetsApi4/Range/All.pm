@@ -1,5 +1,7 @@
 package Google::RestApi::SheetsApi4::Range::All;
 
+# TODO: this class has not been fully tested. use at your own risk.
+
 our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
@@ -8,16 +10,16 @@ use parent 'Google::RestApi::SheetsApi4::Range';
 
 sub new {
   my $class = shift;
-
   state $check = compile_named(
     worksheet => HasMethods[qw(api worksheet_name)],
   );
   my $self = $check->(@_);
-
   return bless $self, $class;
 }
 
 sub range { shift->worksheet_name(); }
+
+sub is_other_inside { 1; }
 
 1;
 

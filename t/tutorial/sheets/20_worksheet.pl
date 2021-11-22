@@ -50,9 +50,10 @@ $ws0->rows([1, 2, 3], \@rows);
 end("'Payroll' worksheet should now have some data.");
 
 # still points to row 1 after the insert.
-# no batch used, values instantly update.
+# insert a row and freeze it using batch request.
 start("Now we will insert some column headings.");
 $row->insert_d()->freeze()->submit_requests();
+# no batch used, values instantly update.
 $row->values(values => [qw(Id Name Tax Salary)]);
 end("'Payroll' worksheet should now have headings.");
 

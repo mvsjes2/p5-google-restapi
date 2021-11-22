@@ -11,7 +11,7 @@ use parent 'Test::Unit::TestBase';
 
 # init_logger($DEBUG);
 
-sub _constructor : Tests(4) {
+sub _constructor : Tests(3) {
   my $self = shift;
 
   throws_ok sub { RestApi->new(config_file => 'x'); }, qr/did not pass type constraint/i, 'Constructor from bad config file should throw';

@@ -81,6 +81,7 @@ sub properties {
 }
 
 # the following don't return ranges and don't use any batch, they are immediate.
+# first arg is a range in any format. allow the range_col call to verify it.
 sub col {
   my $self = shift;
   state $check = compile(Defined, ArrayRef[Str], { optional => 1 });   # A or 1
@@ -92,7 +93,7 @@ sub col {
 sub cols {
   my $self = shift;
 
-  state $check = compile(ArrayRef, ArrayRef[ArrayRef[Str]], { optional => 1 });
+  state $check = compile(ArrayRef[Defined], ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($cols, $values) = $check->(@_);
 
   my $range_group = $self->range_group_cols($cols);
@@ -119,7 +120,7 @@ sub row {
 sub rows {
   my $self = shift;
 
-  state $check = compile(ArrayRef, ArrayRef[ArrayRef[Str]], { optional => 1 });
+  state $check = compile(ArrayRef[Defined], ArrayRef[ArrayRef[Str]], { optional => 1 });
   my ($rows, $values) = $check->(@_);
 
   my $range_group = $self->range_group_rows($rows);
@@ -146,7 +147,7 @@ sub cell {
 sub cells {
   my $self = shift;
 
-  state $check = compile(ArrayRef, ArrayRef[Str], { optional => 1 });
+  state $check = compile(ArrayRef[Defined], ArrayRef[Str], { optional => 1 });
   my ($cells, $values) = $check->(@_);
 
   my $range_group = $self->range_group_cells($cells);
@@ -162,6 +163,12 @@ sub cells {
   return $range_group->submit_values();
 }
 
+sub submit_requests {
+  my $self = shift;
+  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
+}
+
+# this is used by range to see if there is a match for a header col or row.
 sub resolve_header_range {
   my $self = shift;
   return
@@ -196,11 +203,10 @@ sub resolve_header_range_row {
 }
 
 # call this before calling tie_rows or header_col.
-# ('i really want to do this') turns it on, (0) turns it off.
-# you must pass 'i really want to do this' to enable it.
-# this is because you may have a worksheet with thousands
-# of rows that end up being 'headers'. this is less of an
-# issue with header row.
+# ('i really want to do this') turns it on, (false) turns it off.
+# you must pass 'i really want to do this' to enable it. this is because you
+# may have a worksheet with thousands of rows that end up being 'headers'.
+# this is less of an issue with header row.
 sub enable_header_col {
   my $self = shift;
   my $enable = shift // 1;
@@ -236,7 +242,7 @@ sub header_col {
 }
 
 # call this before calling tie_cols (to use headings) or header_row.
-# () or (1) turns it on, (0) turns it off.
+# () or (true) turns it on, (false) turns it off.
 sub enable_header_row {
   my $self = shift;
   my $enable = shift // 1;
@@ -270,6 +276,20 @@ sub header_row {
 
 sub header_col_enabled { shift->{header_col_enabled}; }
 sub header_row_enabled { shift->{header_row_enabled}; }
+
+sub normalize_named {
+  my $self = shift;
+
+  state $check = compile(RangeNamed);
+  my ($named_range_name) = $check->(@_);
+
+  my ($sheet_id, $range) = $self->spreadsheet()->normalize_named($named_range_name);
+  my $this_sheet_id = $self->worksheet_id();
+  LOGDIE "Named range '$named_range_name' sheet ID is '$sheet_id', this sheet ID is '$this_sheet_id'"
+    if $sheet_id && $sheet_id != $this_sheet_id;
+
+  return $range;
+}
 
 sub name_value_pairs {
   my $self = shift;
@@ -317,14 +337,9 @@ sub tie {
   return $tie;
 }
 
-sub submit_requests {
-  my $self = shift;
-  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
-}
-
 sub range_group_cols {
   my $self = shift;
-  state $check = compile(ArrayRef);
+  state $check = compile(ArrayRef[Defined]);
   my ($cols) = $check->(@_);
   my @cols = map { $self->range_col($_); } @$cols;
   return $self->spreadsheet()->range_group(@cols);
@@ -332,7 +347,7 @@ sub range_group_cols {
 
 sub range_group_rows {
   my $self = shift;
-  state $check = compile(ArrayRef);
+  state $check = compile(ArrayRef[Defined]);
   my ($rows) = $check->(@_);
   my @rows = map { $self->range_row($_); } @$rows;
   return $self->spreadsheet()->range_group(@rows);
@@ -340,16 +355,25 @@ sub range_group_rows {
 
 sub range_group_cells {
   my $self = shift;
-  state $check = compile(ArrayRef);
+  state $check = compile(ArrayRef[Defined]);
   my ($cells) = $check->(@_);
   my @cells = map { $self->range_cell($_); } @$cells;
   return $self->spreadsheet()->range_group(@cells);
 }
 
+sub range_group {
+  my $self = shift;
+  state $check = compile(ArrayRef[Defined]);
+  my ($ranges) = $check->(@_);
+  my @ranges = map { $self->range_factory($_); } @$ranges;
+  return $self->spreadsheet()->range_group(@ranges);
+}
+
 # can't use aliased here for some reason.
 sub range_factory { Google::RestApi::SheetsApi4::Range::factory(worksheet => shift, range => shift, @_); }
 
-sub range { Range->new(worksheet => shift, range => shift, @_); }
+sub range { shift->range_factory(@_); }
+# create these spcific subclasses so that invalid ranges will get caught.
 sub range_col { Col->new(worksheet => shift, range => shift); }
 sub range_row { Row->new(worksheet => shift, range => shift); }
 sub range_cell { Cell->new(worksheet => shift, range => shift); }
@@ -360,7 +384,6 @@ sub rest_api { shift->spreadsheet()->rest_api(@_); }
 sub spreadsheet { shift->{spreadsheet}; }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(); }
 sub transaction { shift->spreadsheet()->transaction(); }
-sub normalize_named { shift->spreadsheet()->normalize_named(@_); }
 
 1;
 

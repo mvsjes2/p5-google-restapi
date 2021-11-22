@@ -69,17 +69,34 @@ sub batch_values {
 sub cell_at_offset {
   my $self = shift;
 
-  state $check = compile(Int, DimColRow);
+  state $check = compile(Int, DimColRow, { optional => 1 });
   my ($offset) = $check->(@_);   # we're a column, no dim required.
 
-  my $row_range = $self->range_to_array();
-  # if this is row '1', expand it out to '1:1'.
-  $row_range = [ $row_range, $row_range ] if !ref($row_range->[0]);
+  my $row_range = $self->range_to_array($Google::RestApi::SheetsApi4::Range::RANGE_EXPANDED); # can't use aliased
   my $cell_range = $row_range->[0];
   $cell_range->[0] = ($cell_range->[0] || 1) + $offset;
   return if $row_range->[1]->[0] && $cell_range->[0] > $row_range->[1]->[0];
 
-  return Cell->new(worksheet => $self->worksheet(), range => $cell_range);
+  my $cell = Cell->new(worksheet => $self->worksheet(), range => $cell_range);
+  $cell->share_values($self);
+  return $cell;
+}
+
+sub is_other_inside {
+  my $self = shift;
+
+  state $check = compile(HasRange);
+  my ($inside_range) = $check->(@_);
+
+  my $range = $self->range_to_hash($Google::RestApi::SheetsApi4::Range::RANGE_EXPANDED);
+  $inside_range = $inside_range->range_to_hash($Google::RestApi::SheetsApi4::Range::RANGE_EXPANDED); # can't use aliased.
+
+  return if $range->[0]->{row} ne $inside_range->[0]->{row};
+  return if $range->[1]->{row} ne $inside_range->[1]->{row};
+  return if $range->[0]->{col} && $range->[0]->{col} > $inside_range->[0]->{col};
+  return if $range->[1]->{col} && $range->[1]->{col} < $inside_range->[1]->{col};
+  
+  return 1;
 }
 
 sub freeze {

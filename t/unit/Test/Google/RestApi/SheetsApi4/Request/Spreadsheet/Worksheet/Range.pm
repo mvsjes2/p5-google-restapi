@@ -460,7 +460,7 @@ sub range_merge : Tests(6) {
 
 sub _new_range {
   my $self = shift;
-  return Range->new(worksheet => fake_worksheet(), range => shift);
+  return Google::RestApi::SheetsApi4::Range::factory(worksheet => fake_worksheet(), range => shift);
 }
 
 sub _add_field {

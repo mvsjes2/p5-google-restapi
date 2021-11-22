@@ -66,27 +66,20 @@ sub batch_values {
   return $self->SUPER::batch_values(%$p);
 }
 
-sub range_to_array {
-  my $self = shift;
-  my $cell = $self->range();
-  ($cell) = $cell =~ /!(.+)/;
-  $cell or LOGDIE "Unable to convert range to array: " . $self->range();
-  return Google::RestApi::SheetsApi4::Range::cell_to_array($cell);
-}
-
-sub range_to_hash {
-  my $self = shift;
-  my $cell = $self->range_to_array();
-  return { col => $cell->[0], row => $cell->[1] };
-}
-
 # is this 0 or infinity? return self if offset is 0, undef otherwise.
 sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, DimColRow);
+  state $check = compile(Int, DimColRow, { optional => 1 });
   my ($offset) = $check->(@_);   # we're a cell, no dim required.
   return $self if !$offset;
   return;
+}
+
+sub is_other_inside {
+  my $self = shift;
+  state $check = compile(HasRange);
+  my ($inside_range) = $check->(@_);
+  return $self->range() eq $inside_range->range();
 }
 
 1;

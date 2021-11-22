@@ -312,7 +312,7 @@ sub normalize_named {
     [ $named_range->{endColumnIndex}, $named_range->{endRowIndex} ],
   ];
 
-  return $range;
+  return ($named_range->{sheetId}, $range);
 }
 
 sub protected_ranges { shift->attrs('sheets.protectedRanges')->{sheets}; }
