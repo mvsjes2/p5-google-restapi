@@ -91,17 +91,13 @@ t/perlcriticrc
 t/run_integration
 t/run_unit_some
 t/run_unit_tests.t
-t/tutorial/Sheets/10_spreadsheet.pl
 t/tutorial/sheets/10_spreadsheet.pl
-t/tutorial/Sheets/20_worksheet.pl
 t/tutorial/sheets/20_worksheet.pl
 t/tutorial/sheets/25_iterators.pl
-t/tutorial/sheets/999_unit.pl
 t/tutorial/sheets/99_delete_all.pl
 t/unit/perlcritic.t
 t/unit/Test/Google/RestApi.pm
 t/unit/Test/Google/RestApi/SheetsApi4.pm
-t/unit/Test/Google/RestApi/SheetsApi4/Base.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Range.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Range/Base.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Range/Cell.pm
