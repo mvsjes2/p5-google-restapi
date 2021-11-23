@@ -41,7 +41,6 @@ sub iterate {
   my %ranges = map {
     $self->{keys}->[$_] => $ranges[$_];
   } (0..$#ranges);
-
   my $tied = tied( %{ $self->{tied} });
   return $tied->default_worksheet()->tie(%ranges);
 }

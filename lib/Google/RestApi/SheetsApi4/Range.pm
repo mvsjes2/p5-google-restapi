@@ -357,10 +357,12 @@ sub _cache_range_values {
 
     delete $p->{range};  # we only cache the values and dimensions.
     $self->{cache_range_values} = $p;
+    DEBUG("Saved cached values for range " . $self->range());
   }
 
   # if the value range was just stored (above) or was previously stored, return it.
   return $self->{cache_range_values} if $self->{cache_range_values};
+  DEBUG("No local cache values exist for range " . $self->range() . ", checking for shared values");
 
   # used by iterators to use a 'parent' range to query the values for this 'child'
   # range. this is to reduce network calls when iterating through a range.
@@ -382,21 +384,28 @@ sub _cache_range_values {
     }
 
     # return a subsection of the cached value for the iterator.
-    DEBUG("Returning shared values");
+    DEBUG("Returning shared values for range " . $self->range());
     return {
       majorDimension => $dim,
       values         => $data,
     };
   }
+  DEBUG("No shared values exist for range " . $self->range());
 
   # no values are found for this range, go get them from the api immediately.
   $p{uri} = sprintf("/values/%s", $self->range());
   $p{params}->{majorDimension} = $self->dimension();
   $self->{cache_range_values} = $self->api(%p);
+  DEBUG("Cached values loaded from api for range " . $self->range());
 
   $self->{cache_range_values}->{values} //= [];  # in case there's nothing set in the ss.
 
   return $self->{cache_range_values};
+}
+
+sub has_values {
+  my $self = shift;
+  return $self->{cache_range_values} || ($self->{shared} && $self->{shared}->has_values());
 }
 
 # for a given range, calculate the offsets from this range.
@@ -715,7 +724,6 @@ sub header_name { shift->{header_name}; }
 sub named { shift->{named}; }
 sub api { shift->worksheet()->api(@_); }
 sub dimension { shift->{dim}; }
-sub has_values { shift->{cache_range_values}; }
 sub worksheet { shift->{worksheet}; }
 sub worksheet_name { shift->worksheet()->worksheet_name(@_); }
 sub worksheet_id { shift->worksheet()->worksheet_id(@_); }
