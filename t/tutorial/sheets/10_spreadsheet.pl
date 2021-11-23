@@ -17,7 +17,7 @@ use lib "$FindBin::RealBin/../../../lib";
 use Test::Tutorial::Setup;   # in t/lib
 
 # see Test::Utils::init_logger.
-# init_logger();
+# init_logger($TRACE);
 
 my $name = spreadsheet_name();
 my $sheets_api = sheets_api();
