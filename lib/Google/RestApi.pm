@@ -318,6 +318,7 @@ Any passed-in arguments will override what is in the config file.
 The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::*
 classes, or, for convenience sake, you can specify a hash of the required
 arguments to create an instance of that class:
+
   auth:
     class: OAuth2Client
     client_id: xxxxxx
@@ -325,6 +326,7 @@ arguments to create an instance of that class:
     token_file: <path_to_token_file>
 
 Note that the auth hash itself can also contain a config_file:
+
   auth:
     class: OAuth2Client
     config_file: <path_to_oauth_config_file>
@@ -375,6 +377,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019, Robin Murray. All rights reserved.
+Copyright (c) 2021, Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.
