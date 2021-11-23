@@ -236,7 +236,7 @@ sub _caller_external {
   my ($package, $subroutine, $line, $i) = ('', '', 0);
   do {
     ($package, undef, $line, $subroutine) = caller(++$i);
-  } while($package && $package =~ m[^(Google::RestApi|Cache)]);
+  } while($package && $package =~ m[^(Google::RestApi|Cache|Try)]);
   return "$package:$line => $subroutine";
 }
 

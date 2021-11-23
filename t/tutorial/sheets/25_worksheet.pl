@@ -6,7 +6,7 @@ use lib "$FindBin::RealBin/../../../lib";
 
 use Test::Tutorial::Setup;
 
-init_logger($DEBUG);
+# init_logger($TRACE);
 
 my $name = "Sheet1";
 my $spreadsheet_name = spreadsheet_name();
