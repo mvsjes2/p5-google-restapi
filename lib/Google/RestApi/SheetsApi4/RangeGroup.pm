@@ -5,7 +5,7 @@ package Google::RestApi::SheetsApi4::RangeGroup;
 # called are commented thusly:
 # "private range routine called here!"
 
-our $VERSION = '0.9';
+our $VERSION = '0.9.1';
 
 use Google::RestApi::Setup;
 
