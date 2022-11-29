@@ -79,7 +79,7 @@ package Google::RestApi::SheetsApi4::Range;
 # too complex, and the simple workaround is to just A1:B2.
 # [A1, B2]
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.4';
 
 use Google::RestApi::Setup;
 
@@ -140,7 +140,7 @@ sub factory {
   my $range = $range_args->{range};
   
   # be careful here, recursive.
-  given (${^_TYPE_PARAMS_MULTISIG}) {
+  given (${^_TYPE_PARAMS_MULTISIG} || ${^TYPE_PARAMS_MULTISIG}) {
     when (0) { return Col->new(%$range_args); }
     when (1) { return Row->new(%$range_args); }
     when (2) { return Cell->new(%$range_args); }
