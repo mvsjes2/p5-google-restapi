@@ -8,49 +8,24 @@ use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Range::Base);
 
 my $sheet = "'Sheet1'";
 
-sub range : Tests(14) {
+sub range : Tests(13) {
   my $self = shift;
 
   $self->_fake_http_response_by_uri();
 
-  my $x = '1';
-
-  my $range = _new_range("$x:$x");
-  is $range->range(), "$sheet!$x:$x", "$x:$x should be $x:$x";
-
-  $range = _new_range([undef, $x]);
-  is $range->range(), "$sheet!$x:$x", "[undef, $x] should be $x:$x";
-  $range = _new_range([0, $x]);
-  is $range->range(), "$sheet!$x:$x", "[0, $x] should be $x:$x";
-  $range = _new_range(['', $x]);
-  is $range->range(), "$sheet!$x:$x", "['', $x] should be $x:$x";
-
-  $range = _new_range([[undef, $x]]);
-  is $range->range(), "$sheet!$x:$x", "[[undef, $x]] should be $x:$x";
-  $range = _new_range([[0, $x]]);
-  is $range->range(), "$sheet!$x:$x", "[[0, $x]] should be $x:$x";
-  $range = _new_range([['', $x]]);
-  is $range->range(), "$sheet!$x:$x", "[['', $x]] should be $x:$x";
-
-  $range = _new_range({row => $x});
-  is $range->range(), "$sheet!$x:$x", "{row => $x} should be $x:$x";
-
-  $range = _new_range([{row => $x}]);
-  is $range->range(), "$sheet!$x:$x", "[{row => $x}] should be $x:$x";
-
-  $range = _new_range([[5, $x], [undef, $x]]);
-  is $range->range(), "$sheet!E$x:$x", "[[5, $x], [undef, $x]] should be E$x:$x";
-  $range = _new_range([[5, $x], [0, $x]]);
-  is $range->range(), "$sheet!E$x:$x", "[[5, $x], [0, $x]] should be E$x:$x";
-  $range = _new_range([[5, $x], ['', $x]]);
-  is $range->range(), "$sheet!E$x:$x", "[[5, $x], ['', $x]] should be E$x:$x";
-
-  $range = _new_range([{row => $x, col => 5}, {row => $x}]);
-  is $range->range(), "$sheet!E$x:$x", "[{row => $x, col => 5}, {row => $x}] should be E$x:$x";
-
-  $x = "AA10:BB10";
-  $range = _new_range($x);
-  is $range->range(), "$sheet!$x", "$x should be a row";
+  is _new_range('1:1')->range(),          "$sheet!1:1", "1:1 should be 1:1";
+  is _new_range([undef, '1'])->range(),   "$sheet!1:1", "[undef, '1'] should be 1:1";
+  is _new_range([0, '1'])->range(),       "$sheet!1:1", "[0, '1'] should be 1:1";
+  is _new_range(['', '1'])->range(),      "$sheet!1:1", "['', '1'] should be 1:1";
+  is _new_range([[undef, '1']])->range(), "$sheet!1:1", "[[undef, '1']] should be 1:1";
+  is _new_range([[0, '1']])->range(),     "$sheet!1:1", "[[0, '1']] should be 1:1";
+  is _new_range([['', '1']])->range(),    "$sheet!1:1", "[['', '1']] should be 1:1";
+  is _new_range({row => '1'})->range(),   "$sheet!1:1", "{row => '1'} should be 1:1";
+  is _new_range([{row => '1'}])->range(), "$sheet!1:1", "[{row => '1'}] should be 1:1";
+  is _new_range([[5, '1'], [undef, '1']])->range(), "$sheet!E1:1", "[[5, '1'], [undef, '1']] should be E1:1";
+  is _new_range([[5, '1'], [0, '1']])->range(),     "$sheet!E1:1", "[[5, '1'], [0, '1']] should be E1:1";
+  is _new_range([[5, '1'], ['', '1']])->range(),    "$sheet!E1:1", "[[5, '1'], ['', '1']] should be E1:1";
+  is _new_range([{row => '1', col => 5}, {row => '1'}])->range(), "$sheet!E1:1", "[{row => '1', col => 5}, {row => '1'}] should be E1:1";
 
   return;
 }

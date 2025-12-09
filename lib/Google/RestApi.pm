@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.5';
 
 use Google::RestApi::Setup;
 
@@ -335,6 +335,8 @@ to send API requests to the Google API endpoint on behalf of the underlying API 
 =item * L<Google::RestApi::SheetsApi4::Range::Row>
 
 =item * L<Google::RestApi::SheetsApi4::Range::Cell>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Iterator>
 
 =item * L<Google::RestApi::SheetsApi4::RangeGroup>
 

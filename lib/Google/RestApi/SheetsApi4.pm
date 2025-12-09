@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.5';
 
 use Google::RestApi::Setup;
 
@@ -14,11 +14,11 @@ use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
 # TODO: switch to ReadOnly
 use constant {
   Sheets_Endpoint    => "https://sheets.googleapis.com/v4/spreadsheets",
-  Spreadsheet_Filter => "mimeType='application/vnd.google-apps.spreadsheet'",
   Spreadsheet_Id     => DriveApi3->Drive_File_Id,
   Spreadsheet_Uri    => "https://docs.google.com/spreadsheets/d",
   Worksheet_Id       => "[0-9]+",
   Worksheet_Uri      => "[#&]gid=([0-9]+)",
+  Spreadsheet_Filter => "mimeType = 'application/vnd.google-apps.spreadsheet'",
 };
 
 sub new {
@@ -26,7 +26,7 @@ sub new {
 
   state $check = compile_named(
     api           => HasApi,                                           # the G::RestApi object that will be used to send http calls.
-    drive         => HasMethods[qw(filter_files)], { optional => 1 },  # a drive instnace, could be your own, defaults to G::R::DriveApi3.
+    drive         => HasMethods[qw(list)], { optional => 1 },  # a drive instnace, could be your own, defaults to G::R::DriveApi3.
     endpoint      => Str, { default => Sheets_Endpoint },              # this gets tacked on to the api uri to reach the sheets endpoint.
   );
   my $self = $check->(@_);
@@ -100,7 +100,7 @@ sub delete_spreadsheet {
 }
 
 # delete all the spreadsheets by the names passed.
-sub delete_all_spreadsheets {
+sub delete_all_spreadsheets_by_names {
   my $self = shift;
 
   state $check = compile(ArrayRef->plus_coercions(Str, sub { [$_]; }));
@@ -108,29 +108,32 @@ sub delete_all_spreadsheets {
 
   my $count = 0;
   foreach my $name (@$names) {
-    my @spreadsheets = grep { $_->{name} eq $name; } $self->spreadsheets();
+    my @spreadsheets = $self->spreadsheets("name = '$name'");
     $count += scalar @spreadsheets;
     DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
     $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
   }
   return $count;
 }
+# backward compatibility.
+*delete_all_spreadsheets = *delete_all_spreadsheets_by_names{CODE};
 
 # list all spreadsheets.
 sub spreadsheets {
   my $self = shift;
+
+  state $check = compile(Optional[Str]);
+  my ($extra_filter) = $check->(@_);
+
   my $drive = $self->drive();
-  my $spreadsheets = $drive->filter_files(Spreadsheet_Filter);
-  my @spreadsheets = map { { id => $_->{id}, name => $_->{name} }; } @{ $spreadsheets->{files} };
-  return @spreadsheets;
+  my $filter = Spreadsheet_Filter;
+  $filter .= "and ($extra_filter)" if $extra_filter;
+  return $drive->list($filter);
 }
 
 sub drive {
   my $self = shift;
-  if (!$self->{drive}) {
-    load DriveApi3;
-    $self->{drive} = DriveApi3->new(api => $self->rest_api());
-  }
+  $self->{drive} //= DriveApi3->new(api => $self->rest_api());
   return $self->{drive};
 }
 
@@ -309,6 +312,8 @@ C<t/tutorial/sheets/*> also has a step-by-step tutorial of creating and updating
 
 =item * L<Google::RestApi::SheetsApi4::Range::Cell>
 
+=item * L<Google::RestApi::SheetsApi4::Range::Iterator>
+
 =item * L<Google::RestApi::SheetsApi4::RangeGroup>
 
 =item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
@@ -405,9 +410,9 @@ spreadsheet_id is the file ID in Google Drive of the spreadsheet you want to del
 
 Returns the Google API response.
 
-=item delete_all_spreadsheets(spreadsheet_name<string>);
+=item delete_all_spreadsheets_by_names([spreadsheet_name<string>]);
 
-Deletes all spreadsheets with the given name from Google Drive. 
+Deletes all spreadsheets with the given names from Google Drive. 
 
 Returns the number of spreadsheets deleted.
 

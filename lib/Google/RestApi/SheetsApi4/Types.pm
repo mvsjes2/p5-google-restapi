@@ -11,12 +11,12 @@ package Google::RestApi::SheetsApi4::Types;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.5';
 
 use feature qw( state );
 
 use Type::Params qw( compile );
-use Types::Standard qw( Undef Defined Value Str StrMatch Int ArrayRef HashRef Tuple Dict HasMethods );
+use Types::Standard qw( Undef Defined Value Str StrMatch Int ArrayRef HashRef Tuple Dict HasMethods);
 use Types::Common::Numeric qw( PositiveInt PositiveOrZeroInt );
 
 use Google::RestApi::Types qw( :all );

@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Spreadsheet;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.5';
 
 use Google::RestApi::Setup;
 
@@ -64,8 +64,8 @@ sub spreadsheet_id {
       LOGDIE "Unable to extract a sheet id from uri" if !$self->{id};
       DEBUG("Got sheet ID '$self->{id}' via URI '$self->{uri}'.");
     } else {
-      my @spreadsheets = grep { $_->{name} eq $self->{name}; } $self->sheets_api()->spreadsheets();
-      LOGDIE "Sheet '$self->{name}' not found on Google Drive" if !@spreadsheets;
+      my @spreadsheets = $self->sheets_api()->spreadsheets("name = '$self->{name}'");
+      LOGDIE "Sheet '$self->{name}' not found on Google Drive" unless @spreadsheets;
       LOGDIE "More than one spreadsheet found with name '$self->{name}'. Specify 'id' or 'uri' instead."
         if scalar @spreadsheets > 1;
       $self->{id} = $spreadsheets[0]->{id};

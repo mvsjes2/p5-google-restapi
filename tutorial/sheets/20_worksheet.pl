@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
 
 use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use lib "$FindBin::RealBin/../../t/lib";
 use lib "$FindBin::RealBin/../../lib";
-use lib "$FindBin::RealBin/../../../lib";
 
-use Test::Tutorial::Setup;
+use Tutorial::Setup;
 
 # init_logger($TRACE);
 
@@ -20,11 +21,17 @@ end("Spreadsheet successfully opened, enter url '$uri' in your browser to follow
 
 $sheets_api->rest_api()->api_callback(\&show_api);
 
-start("Now we will open the spreadsheet and worksheet");
+start("We will open the spreadsheet, add worksheet 'Fred', delete 'Sheet1'");
 $ss->add_worksheet(name => 'Fred')->submit_requests();
-my $ws0 = $ss->open_worksheet(name => 'Fred');
-$ws0->ws_rename('Joe');
-end_go("Worksheet 'Joe' is now open.");
+my $ws0 = $ss->open_worksheet(name => 'Sheet1');
+$ws0->delete_worksheet->submit_requests;
+end("We added worksheet 'Fred' and then renamed it to 'Payroll'");
+
+start("Now we will rename the worksheet 'Fred' to 'Payroll'");
+$ws0 = $ss->open_worksheet(name => 'Fred');
+$ws0->ws_rename('Payroll')->submit_requests;
+$ws0 = $ss->open_worksheet(name => 'Payroll');
+end("We renamed worksheet 'Fred' to 'Payroll'");
 
 # resets the spreadsheet. collects up a bunch of batch requests, then
 # gets the spreadsheet to run them. running 'submit_requests' against

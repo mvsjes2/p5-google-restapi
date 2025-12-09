@@ -1,16 +1,17 @@
 #!/usr/bin/env perl
 
 use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use lib "$FindBin::RealBin/../../t/lib";
 use lib "$FindBin::RealBin/../../lib";
-use lib "$FindBin::RealBin/../../../lib";
 
-use Test::Tutorial::Setup;
+use Tutorial::Setup;
 
 # init_logger($TRACE);
 
-my $name = "Sheet1";
-my $spreadsheet_name = spreadsheet_name();
 my $sheets_api = sheets_api();
+my $spreadsheet_name = spreadsheet_name();
+my $worksheet_name = "Payroll";
 
 start_note("20_worksheet.pl to load data into the worksheet to work with");
 
@@ -21,36 +22,42 @@ end("Spreadsheet successfully opened, enter url '$uri' in your browser to follow
 $sheets_api->rest_api()->api_callback(\&show_api);
 
 start("Now we will open the spreadsheet and worksheet.");
-my $ws0 = $ss->open_worksheet(name => 'Fred');
+my $ws0 = $ss->open_worksheet(name => $worksheet_name);
 end_go("Worksheet is now open.");
 
 my $search = 'Freddie Mercury';
 my $count = 0;
 # simple iterator on a single column.
 {
-  start("We will now iterate through the name column with a simple iterator looking for '$search'");
+  start("We will now iterate through the 'Name' column with a simple iterator looking for '$search'");
+  my $found_name;
   my $name_col = $ws0->range_col('B');
   my $i = $name_col->iterator();
   while (my $cell = $i->next()) {
     $count++;
     my $name = $cell->values();
-    last if $name eq $search;
+    next if $name ne $search;
+    $found_name = $name;
+    last;
   }
-  die "Unable to find '$search', has 20_worksheet.pl been run first?" if !$name;
+  die "Unable to find '$search', has 20_worksheet.pl been run first?" unless $found_name;
   end("'$search' is at offset $count.");
 }
 
 # simple iterator on a single column, prefetched.
 {
   start("Notice the previous iteration required an API call to fetch each cell. You can prevent that by pre-fectching the column by calling 'values()' before iterating it. Let's look for '$search' again but see how many calls it takes this time.");
+  my $found_name;
   my $name_col = $ws0->range_col('B');
   $name_col->values();       # prefetch the column.
   my $i = $name_col->iterator();
   while (my $cell = $i->next()) {
     my $name = $cell->values();
-    last if $name eq $search;
+    next if $name ne $search;
+    $found_name = $name;
+    last;
   }
-  die "Unable to find '$search', has 20_worksheet.pl been run first?" if !$name;
+  die "Unable to find '$search', has 20_worksheet.pl been run first?" unless $found_name;
   end("'$search' is customer $count.");
 }
 

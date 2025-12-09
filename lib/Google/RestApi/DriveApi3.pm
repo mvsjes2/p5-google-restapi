@@ -1,9 +1,10 @@
 package Google::RestApi::DriveApi3;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.5';
 
 use Google::RestApi::Setup;
 
+use URI;
 use aliased 'Google::RestApi::DriveApi3::File';
 
 # TODO: switch to ReadOnly
@@ -33,13 +34,28 @@ sub api {
   return $self->{api}->api(%$p, uri => $uri);
 }
 
-sub filter_files {
+sub list {
   my $self = shift;
   state $check = compile(Str, HashRef, { default => {} });
   my ($filter, $params) = $check->(@_);
-  $params->{'q'} = $filter;
-  return $self->api(params => $params, uri => 'files');
+
+  $params->{q} = $filter;
+  $params->{fields} = 'files(id, name)' unless $params->{fields};
+  $params->{fields} = 'nextPageToken, ' . $params->{fields};
+
+  my @list;
+  my $next_page_token;
+  do {
+    $params->{pageToken} = $next_page_token if $next_page_token;
+    my $result = $self->api(uri => 'files', params => $params);
+    push(@list, $result->{files}->@*) if $result->{files};
+    $next_page_token = $result->{nextPageToken};
+  } until !$next_page_token;
+
+  return @list;
 }
+# backward compatibility.
+*filter_files = *list{CODE};
 
 sub upload_endpoint {
   my $self = shift;

@@ -1,6 +1,4 @@
-package Test::Tutorial::Utils;
-
-# just a common set of utilities for unit and integration tests, and tutorial.
+package Tutorial::Utils;
 
 use strict;
 use warnings;
@@ -33,8 +31,14 @@ sub sheets_api { SheetsApi4->new(@_, api => rest_api()); }
 # for integration and tutorials to run. unit tests are mocked so is not needed
 # for them.
 sub config_file {
-  my $config_file = $ENV{GOOGLE_RESTAPI_CONFIG}
-    or die "No testing config file found: set env var GOOGLE_RESTAPI_CONFIG first";
+  my $config_file = $ENV{GOOGLE_RESTAPI_CONFIG} or do {
+    message('red', "No testing config file found: set env var GOOGLE_RESTAPI_CONFIG first.");
+    message('yellow', "Run 'bin/google_restapi_oauth_token_creator' and set your env var 'GOOGLE_RESTAPI_CONFIG' " .
+        "to point to the config file it creates (e.g. 'GOOGLE_RESTAPI_CONFIG=~/.google/sheets.yaml $0'. " .
+        "Taking you to the perldoc now.");
+    end();
+    exec 'perldoc ../../bin/google_restapi_oauth_token_creator';
+  };
   return $config_file;
 }
 

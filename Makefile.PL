@@ -34,6 +34,7 @@ WriteMakefile(
       'Retry::Backoff'                  => 0,
       'Scalar::Util'                    => 0,
       'Storable'                        => 0,
+      'Term::Prompt'                    => 0,
       'Tie::Hash'                       => 0,
       'Try::Tiny'                       => 0,
       'ToolSet'                         => 0,
