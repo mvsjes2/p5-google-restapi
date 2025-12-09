@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # see perldoc below for instructions on how to use this script.
 
@@ -21,7 +21,7 @@ my @scope = (
   'https://www.googleapis.com/auth/spreadsheets',
 );
 
-my $config_file = $ARGV[0] or die "A config file name must be provided. See perldoc.\n";
+my $config_file = $ARGV[0] or die "A config file name must be provided. See 'perldoc $0'.\n";
 my $config = eval { LoadFile($config_file); };
 die "Unable to load YAML config file '$config_file': $@\n" if $@;
 

@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Range::Col;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.5';
 
 use Google::RestApi::Setup;
 
@@ -47,10 +47,20 @@ sub new {
 
 sub _col_i2a {
   my $col = shift;
-  return $col if $col =~ qr/\D/;  # if any non-digits found, we're good.
-  my $l = int($col / 27);
-  my $r = $col - $l * 26;
-  return $l > 0 ? (pack 'CC', $l+64, $r+64) : (pack 'C', $r+64);
+
+  return $col if ref($col);
+  return $col if $col =~ qr/\D/;
+
+  my $result = "";
+  while ($col > 0) {
+    # The logic requires decrementing first to handle the missing zero symbol in the A-Z system
+    my $remainder = ($col - 1) % 26;
+    # Get the ASCII character for the letter (A is 65)
+    $result = chr($remainder + ord('A')) . $result;
+    # Update the column number for the next iteration
+    $col = int(($col - 1) / 26);
+  }
+  return $result;
 }
 
 sub values {

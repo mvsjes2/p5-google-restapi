@@ -13,46 +13,19 @@ sub range : Tests(13) {
 
   $self->_fake_http_response_by_uri();
 
-  my $x = 'A1';
-
-  my $range = _new_range($x);
-  is $range->range(), "$sheet!$x", "$x should be $x";
-
-  $range = _new_range(['A', 1]);
-  is $range->range(), "$sheet!$x", "['A', 1] should be $x";
-
-  $range = _new_range([['A', 1]]);
-  is $range->range(), "$sheet!$x", "[['A', 1]] should be $x";
-
-  $range = _new_range([1, 1]);
-  is $range->range(), "$sheet!$x", "[1, 1] should be $x";
-
-  $range = _new_range([[1, 1]]);
-  is $range->range(), "$sheet!$x", "[[1, 1]] should be $x";
-
-  $range = _new_range({row => 1, col => 'A'});
-  is $range->range(), "$sheet!$x", "{row => 1, col => 'A'} should be $x";
-
-  $range = _new_range([ {row => 1, col => 'A'} ]);
-  is $range->range(), "$sheet!$x", "[{row => 1, col => 'A'}] should be $x";
-
-  $range = _new_range({row => 1, col => 1});
-  is $range->range(), "$sheet!$x", "{row => 1, col => 1} should be $x";
-
-  $range = _new_range([ {row => 1, col => 1} ]);
-  is $range->range(), "$sheet!$x", "[{row => 1, col => 1}] should be $x";
-
-  $range = _new_range([['A', 1], ['A', 1]]);
-  is $range->range(), "$sheet!$x", "[['A', 1], ['A', 1]] should be $x";
-
-  $range = _new_range([[1, 1], [1, 1]]);
-  is $range->range(), "$sheet!$x", "[[1, 1], [1, 1]] should be $x";
-
-  $range = _new_range( {row => 1, col => 'A'}, {row => 1, col => 'A'} );
-  is $range->range(), "$sheet!$x", "{row => 1, col => 'A'}, {row => 1, col => 'A'} should be $x";
-
-  $range = _new_range( {row => 1, col => 1}, {row => 1, col => 1} );
-  is $range->range(), "$sheet!$x", "{row => 1, col => 1}, {row => 1, col => 1} should be $x";
+  is _new_range('A1')->range(),       "$sheet!A1", "A1 should be A1";
+  is _new_range(['A', 1])->range(),   "$sheet!A1", "['A', 1] should be A1";
+  is _new_range([['A', 1]])->range(), "$sheet!A1", "[['A', 1]] should be A1";
+  is _new_range([1, 1])->range(),     "$sheet!A1", "[1, 1] should be A1";
+  is _new_range([[1, 1]])->range(),   "$sheet!A1", "[[1, 1]] should be A1";
+  is _new_range({row => 1, col => 'A'})->range(),     "$sheet!A1", "{row => 1, col => 'A'} should be A1";
+  is _new_range([ {row => 1, col => 'A'} ])->range(), "$sheet!A1", "[{row => 1, col => 'A'}] should be A1";
+  is _new_range({row => 1, col => 1})->range(),       "$sheet!A1", "{row => 1, col => 1} should be A1";
+  is _new_range([ {row => 1, col => 1} ])->range(),   "$sheet!A1", "[{row => 1, col => 1}] should be A1";
+  is _new_range([['A', 1], ['A', 1]])->range(),       "$sheet!A1", "[['A', 1], ['A', 1]] should be A1";
+  is _new_range([[1, 1], [1, 1]])->range(),           "$sheet!A1", "[[1, 1], [1, 1]] should be A1";
+  is _new_range( {row => 1, col => 'A'}, {row => 1, col => 'A'} )->range(), "$sheet!A1", "{row => 1, col => 'A'}, {row => 1, col => 'A'} should be A1";
+  is _new_range( {row => 1, col => 1}, {row => 1, col => 1} )->range(), "$sheet!A1", "{row => 1, col => 1}, {row => 1, col => 1} should be A1";
 
   return;
 }
