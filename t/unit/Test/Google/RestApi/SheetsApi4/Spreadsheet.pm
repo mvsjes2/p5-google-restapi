@@ -2,7 +2,7 @@ package Test::Google::RestApi::SheetsApi4::Spreadsheet;
 
 use Test::Unit::Setup;
 
-use Time::HiRes qw(sleep);
+use Time::HiRes qw( sleep );
 
 use Google::RestApi::Types qw( :all );
 
@@ -90,7 +90,7 @@ sub spreadsheet_id : Tests(5) {
   $self->_fake_http_response_by_uri();
   throws_ok sub { $ss->spreadsheet_id(); }, qr/More than one/i, 'Spreadsheet with more than one name should throw';
 
-  $ss = $self->_fake_spreadsheet(name => 'no_shuch_spreadsheet');
+  $ss = $self->_fake_spreadsheet(name => 'no_such_spreadsheet');
   $self->_fake_http_response_by_uri();
   throws_ok sub { $ss->spreadsheet_id(); }, qr/not found/i, 'Spreadsheet with no such name should throw';
 

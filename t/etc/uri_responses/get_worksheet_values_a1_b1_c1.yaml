@@ -20,3 +20,25 @@ GET:
       }
     tweaks:
     - batch_get_values
+
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values:batchGet?ranges='Sheet1'!A1&ranges='Sheet1'!B2&ranges='Sheet1'!C3:
+    response: |
+      {
+        "spreadsheetId": "fake_spreadsheet_id1",
+        "valueRanges": [
+          {
+            "range": "Sheet1!A1",
+            "majorDimension": "ROWS"
+          },
+          {
+            "range": "Sheet1!B2",
+            "majorDimension": "ROWS"
+          },
+          {
+            "range": "Sheet1!C3",
+            "majorDimension": "ROWS"
+          }
+        ]
+      }
+    tweaks:
+    - batch_get_values

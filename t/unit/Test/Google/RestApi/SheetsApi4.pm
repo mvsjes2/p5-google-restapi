@@ -116,10 +116,10 @@ sub delete_all_spreadsheets_by_names : Tests(4) {
   my $sheets_api = fake_sheets_api();
   $self->_fake_http_response_by_uri();
 
-  is $sheets_api->delete_all_spreadsheets_by_names("no_such_spreadsheet"), 0, 'Delete non-existant should return 0';
-  is $sheets_api->delete_all_spreadsheets_by_names("fake_spreadsheet"), 0, 'Delete common prefix should return 0';
-  is $sheets_api->delete_all_spreadsheets_by_names("fake_spreadsheet1"), 1, 'Delete existing should return 1';
-  is $sheets_api->delete_all_spreadsheets_by_names("fake_spreadsheet2"), 2, 'Delete existing duplicate name should return 2';
+  is $sheets_api->delete_all_spreadsheets_by_names("no_such_spreadsheet"), 0, 'Delete non-existant no_such_spreadsheet should return 0';
+  is $sheets_api->delete_all_spreadsheets_by_names("fake_spreadsheet"), 0, 'Delete common prefix fake_spreadsheet should return 0';
+  is $sheets_api->delete_all_spreadsheets_by_names("fake_spreadsheet1"), 1, 'Delete existing fake_spreadsheet1 should return 1';
+  is $sheets_api->delete_all_spreadsheets_by_names("fake_spreadsheet2"), 2, 'Delete existing duplicate name fake_spreadsheet2 should return 2';
 
   return;
 }

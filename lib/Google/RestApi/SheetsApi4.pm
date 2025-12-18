@@ -127,7 +127,7 @@ sub spreadsheets {
 
   my $drive = $self->drive();
   my $filter = Spreadsheet_Filter;
-  $filter .= "and ($extra_filter)" if $extra_filter;
+  $filter .= " and ($extra_filter)" if $extra_filter;
   return $drive->list($filter);
 }
 

@@ -7,11 +7,11 @@ package Test::Unit::UriResponse;
 
 use Test::Unit::Setup;
 
+use Data::Compare;
 use File::Slurp qw(read_file);
 use Hash::Merge qw(merge);
 use JSON::MaybeXS qw(JSON encode_json decode_json);
 use List::Util qw(pairs);
-use Text::Levenshtein::Flexible qw(levenshtein_lc);
 use Try::Tiny;
 use URI;
 use YAML::Any qw(LoadFile);
@@ -45,37 +45,40 @@ sub _response {
   my $req = $self->{request};
   my $req_method = $req->method();
   my $req_uri = $req->uri();
-  my $req_content_json = $req->content() ?
-    JSON->new->ascii->pretty->canonical->encode(decode_json($req->content()))
-    : '';
 
   my $matched_response = $self->find_response_by_uri($req_method, $req_uri);
   die "No response found for $req_method => $req_uri" if !defined $matched_response; # can be '' for deletes.
 
   # can be a simple response string, or a hash of content/response to match contents.
-  my $response_item = $req_content_json ?
-    $self->find_response_by_content($matched_response, $req_content_json) : $matched_response;
-  my $response_json = $response_item->{response};
-  die "No response/content found for $req_method => $req_uri"
-    if !defined $response_json; # a response of '' is valid (e.g. for DELETE).
+  my $req_content = $req->content() ? decode_json($req->content()) : {};
+  my $response_item = %$req_content
+    ? $self->find_response_by_content($matched_response, $req_content)
+    : $matched_response;
 
-  my $response_file = fake_response_json_file($response_json);
-  $response_json = read_file($response_file) if -f $response_file;
+  my $response = $response_item->{response};
+  die "No response/content found for $req_method => $req_uri"
+    if !defined $response; # a response of '' is valid (e.g. for DELETE).
+
+  my $response_file = fake_response_json_file($response);
+  $response = read_file($response_file) if -f $response_file;
 
   my $tweaks = $response_item->{tweaks} || [];
   foreach my $tweak (@$tweaks) {
     my $method = "tweak_$tweak";
-    $response_json = $self->$method($response_json, $req_uri, $req_content_json);
+    $response = $self->$method($response, $req_uri, $req->content());
   }
   
   my $code = 200; my $message = 'ok';
-  if ($response_json) {
-    my $decoded = decode_json($response_json);
-    $code = $decoded->{error}->{code} || $code;
-    $message = $decoded->{error}->{message} || $message;
+  if ($response) {
+    # it may be a text response.
+    my $decoded = eval { decode_json($response) } || $response;
+    if (ref($decoded)) {
+      $code = $decoded->{error}->{code} || $code;
+      $message = $decoded->{error}->{message} || $message;
+    }
   }
 
-  return ($response_json, $code, $message);
+  return ($response, $code, $message);
 }
 
 # see if the uri in the registered uris matches the one we're processing.
@@ -87,44 +90,41 @@ sub find_response_by_uri {
   my $cmp_uris = $self->{responses}->{$method}
     or die "No matching method found for $method => $uri";
 
-  my ($matched_uri) =
-    map { $_->[0]; }
-    sort { $a->[1] <=> $b->[1]; }
-    grep { defined $_->[1]; }
-    # max_distance, cost of insert, delete, substitution.
-    # for the uri, if we have to insert or delete anything, reject it.
-    # accept only substitutions.
-    map { [ $_, levenshtein_lc($_, $uri, 999, 1000, 1000, 1) ]; }
-    keys %$cmp_uris;
-  $matched_uri or die "No matching uri found for $method => $uri";
+  my $search_for_uri = URI->new($uri);
+  my $search_for_params = $search_for_uri->query_form_hash;
+  for (keys %$cmp_uris) {
+    my $matched_uri = URI->new($_);
+    next unless $search_for_uri->path eq $matched_uri->path;
 
-  return $self->{responses}->{$method}->{$matched_uri}
+    my $matched_params = $matched_uri->query_form_hash;
+    next if %$search_for_params && !%$matched_params;
+    next if %$matched_params && !%$search_for_params;
+
+    next unless Compare($search_for_params, $matched_params);
+
+    return $self->{responses}->{$method}->{$matched_uri};
+  }
+  die "No matching uri found for $method => $uri";
 }
 
 # now that we have the correct uri, see if the content hash also has a match.
 sub find_response_by_content {
   my $self = shift;
-  my ($responses, $req_content_json) = @_;
+  my ($responses, $req_content) = @_;
 
   # there is no array of content to query in this case, we're responding with the same
   # thing no matter what is in the post content.
   return $responses if ref($responses) ne 'ARRAY';
-  
-  my ($response) =
-    map { $_->[0] }
-    sort { $a->[1] <=> $b->[1] }
-    grep { defined $_->[1]; }
-    map {
-      my $cmp_content_json = $_->{content};
-      my $cmp_content_file = fake_response_json_file($cmp_content_json);
-      $cmp_content_json = read_file($cmp_content_file) if -f $cmp_content_file;
-      $cmp_content_json = JSON->new->ascii->pretty->canonical->encode(decode_json($cmp_content_json));
-      # max_distance, cost of insert, delete, substitution. inserting is ok for values
-      # in the content. if we have to delete, reject it. substitution can occur for ranges.
-      [ $_, levenshtein_lc($cmp_content_json, $req_content_json, 999, 1, 1000, 1) ]
-    } @$responses;
-  $response or die "No matching uri content found";
-  
+
+  my ($response) = grep {
+    my $cmp_content_json = $_->{content};
+    my $cmp_content_file = fake_response_json_file($cmp_content_json);
+    $cmp_content_json = read_file($cmp_content_file) if -f $cmp_content_file;
+    my $cmp_content = decode_json($cmp_content_json);
+    Compare($req_content, $cmp_content);
+  } @$responses;
+  $response or die "No matching uri content found for content";
+
   return $response;
 }
 
