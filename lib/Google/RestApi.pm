@@ -75,8 +75,10 @@ sub api {
   my $req = HTTP::Request->new(
     $request->{method}, $request->{uri}, \@headers, $request_json
   );
+
   # this is where the action is.
   my ($response, $tries, $last_error) = $self->_api($req);
+
   # save the api call details so that the user can examine it in detail if necessary.
   # further information is also recorded below in this routine.
   $self->{transaction} = {

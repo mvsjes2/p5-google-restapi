@@ -4,6 +4,8 @@
 
 # to test a single class:
 # TEST_CLASS='Test::Google::RestApi::SheetsApi4::Range::Col' prove -v t/run_unit_tests.t
+# to test a single method:
+# TEST_CLASS='Test::Google::RestApi::SheetsApi4::Spreadsheet' TEST_METHOD=spreadsheet_id prove -v t/run_unit_tests.t
 
 use strict;
 use warnings;

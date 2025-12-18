@@ -95,7 +95,6 @@ sub _batch_get {
 
   my ($dim, $p, $ranges) = @_;
   return if !$ranges || !@$ranges;
-
   my @ranges = map { $_->range(); } @$ranges;
   $p->{params}->{ranges} = \@ranges;
   $p->{params}->{majorDimension} = 'COLUMNS' if $dim =~ /^col/i;
@@ -104,7 +103,6 @@ sub _batch_get {
   my $response = $self->api(%$p);
 
   my $value_ranges = $response->{valueRanges};
-  # private range routine called here!
   my @ranges2 = map { $_->range(); } @$ranges;
   $ranges->[$_]->_cache_range_values(%{ $value_ranges->[$_] })
     foreach (0..$#$ranges);

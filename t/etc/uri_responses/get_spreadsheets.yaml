@@ -1,28 +1,70 @@
 GET:
-  https://www.googleapis.com/drive/v3/files?q=mimeType%3D'application%2Fvnd.google-apps.spreadsheet':
+  "https://www.googleapis.com/drive/v3/files?q=mimeType+%3D+'application%2Fvnd.google-apps.spreadsheet'&fields=nextPageToken%2C+files(id%2C+name)":
     response: |
       {
         "kind": "drive#fileList",
-        "nextPageToken": "~!!~AI9FV7RSz8JIcNT1cb04IcwE1jyooLMzYnsZt4eBpW7BcOqLLbePzSVgygtwxUgp41MJx4TYoacK_FIwLmI_RveOuQqmM5P3c6_9ro2ItWGCNq4ilZskeVtbfnSmY0xTwLLarPHQiECJsOAUtnNumSpc7cbjcDjTxg6mwBYwnxtGfBPt_go90GV_4lRvBTkiBS-a5j061cLZjDQ_LRL0lXR03mevPzHK7Ezhze-jndiloq_pXLJrl4JjMQ2ZCeftgjn97mbNKgP4PpPkU25LxHBUZVO6i9bLP99rRt-qjqIkBBdIaWWvOaS3V-e2BMdJM6AZUENVJ2lK8W-W_Go-uJ_5EqSJxBKw6uCS889uiWjIzC3-VvGainddHTSKZrm38KWp6i1O3tpebPkevGi3JyOnwqER_hBTrg==",
         "incompleteSearch": false,
         "files": [
           {
-            "kind": "drive#file",
             "id": "fake_spreadsheet_id1",
-            "name": "fake_spreadsheet1",
-            "mimeType": "application/vnd.google-apps.spreadsheet"
+            "name": "fake_spreadsheet1"
           },
           {
-            "kind": "drive#file",
             "id": "fake_spreadsheet_id2",
-            "name": "fake_spreadsheet2",
-            "mimeType": "application/vnd.google-apps.spreadsheet"
+            "name": "fake_spreadsheet2"
           },
           {
-            "kind": "drive#file",
             "id": "fake_spreadsheet_id3",
-            "name": "fake_spreadsheet2",
-            "mimeType": "application/vnd.google-apps.spreadsheet"
+            "name": "fake_spreadsheet2"
+          }
+        ]
+      }
+
+  "https://www.googleapis.com/drive/v3/files?q=mimeType+%3D+'application%2Fvnd.google-apps.spreadsheet'+and+(name+%3D+'fake_spreadsheet2')&fields=nextPageToken%2C+files(id%2C+name)":
+    response: |
+      {
+        "kind": "drive#fileList",
+        "incompleteSearch": false,
+        "files": [
+          {
+            "id": "fake_spreadsheet_id2",
+            "name": "fake_spreadsheet2"
+          },
+          {
+            "id": "fake_spreadsheet_id3",
+            "name": "fake_spreadsheet2"
+          }
+        ]
+      }
+
+  "https://www.googleapis.com/drive/v3/files?q=mimeType+%3D+'application%2Fvnd.google-apps.spreadsheet'+and+(name+%3D+'fake_spreadsheet')&fields=nextPageToken%2C+files(id%2C+name)":
+    response: |
+      {
+        "kind": "drive#fileList",
+        "incompleteSearch": false,
+        "files": [
+          {
+            "id": "fake_spreadsheet",
+            "name": "fake_spreadsheet"
+          }
+        ]
+      }
+  "https://www.googleapis.com/drive/v3/files?q=mimeType+%3D+'application%2Fvnd.google-apps.spreadsheet'+and+(name+%3D+'no_such_spreadsheet')&fields=nextPageToken%2C+files(id%2C+name)":
+    response: |
+      {
+        "kind": "drive#fileList",
+        "incompleteSearch": false,
+        "files": []
+      }
+  "https://www.googleapis.com/drive/v3/files?q=mimeType+%3D+'application%2Fvnd.google-apps.spreadsheet'+and+(name+%3D+'fake_spreadsheet1')&fields=nextPageToken%2C+files(id%2C+name)":
+    response: |
+      {
+        "kind": "drive#fileList",
+        "incompleteSearch": false,
+        "files": [
+          {
+            "id": "fake_spreadsheet_id1",
+            "name": "fake_spreadsheet1"
           }
         ]
       }
