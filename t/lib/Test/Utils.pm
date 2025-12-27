@@ -26,19 +26,18 @@ our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
 # if you pass a logger level, it will be used with easy_init and ignore GOOGLE_RESTAPI_LOGGER.
 # if you want your own logger, specify the logger config file in GOOGLE_RESTAPI_LOGGER env var
-# and pass nothing to this routine. if no level and no env var set, default to deug level.
+# and pass nothing to this routine. if no level and no env var set, do nothing.
 # levels are: $OFF $FATAL $WARN $ERROR $INFO $DEBUG $TRACE. all these log4perl scalars
 # scalars are expored above.
 sub init_logger {
-  my $level = shift;
+  my $level = shift || $ENV{GOOGLE_RESTAPI_LOG_LEVEL};
   my $logger_conf = $ENV{GOOGLE_RESTAPI_LOGGER};
 
-  if ($level) {
-    Log::Log4perl->easy_init($level);
-  } elsif ($logger_conf) {
+  if ($logger_conf) {
+    die "'$logger_conf' is not a readable file" unless -f $logger_conf;
     Log::Log4perl->init($logger_conf);
-  } else {
-    Log::Log4perl->easy_init($DEBUG);
+  } elsif ($level) {
+    Log::Log4perl->easy_init($level);
   }
 
   return;

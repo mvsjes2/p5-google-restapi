@@ -11,7 +11,7 @@ my $sheet = "'Sheet1'";
 sub range : Tests(13) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   is _new_range('1:1')->range(),          "$sheet!1:1", "1:1 should be 1:1";
   is _new_range([undef, '1'])->range(),   "$sheet!1:1", "[undef, '1'] should be 1:1";
@@ -30,6 +30,6 @@ sub range : Tests(13) {
   return;
 }
 
-sub _new_range { fake_worksheet()->range_row(shift); }
+sub _new_range { mock_worksheet()->range_row(shift); }
 
 1;

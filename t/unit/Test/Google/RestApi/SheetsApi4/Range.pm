@@ -17,10 +17,10 @@ my $sheet = "'Sheet1'";
 sub _constructor : Tests(2) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $range = Google::RestApi::SheetsApi4::Range::factory(
-    worksheet => fake_worksheet,
+    worksheet => mock_worksheet,
     range     => 'A1:B2',
   );
   isa_ok $range, Range, 'Constructor returns';
@@ -34,56 +34,56 @@ sub _constructor : Tests(2) {
 sub factory : Tests(23) {
   my $self = shift;
   
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
-  my $range = fake_worksheet()->range_factory('A1:B2');
+  my $range = mock_worksheet()->range_factory('A1:B2');
   is $range->range(), "$sheet!A1:B2", "A1:B2 returns A1:B2";
   isa_ok $range, Range, "A1:B2 returns a Range object";
 
   
-  $range = fake_worksheet()->range_factory('A:A');
+  $range = mock_worksheet()->range_factory('A:A');
   is $range->range(), "$sheet!A:A", "A:A returns A:A";
   isa_ok $range, Col, "A:A returns a Col object";
 
-  $range = fake_worksheet()->range_factory('A1:A');
+  $range = mock_worksheet()->range_factory('A1:A');
   is $range->range(), "$sheet!A1:A", "A1:A returns A1:A";
   isa_ok $range, Col, "A1:A returns a Col object";
 
-  $range = fake_worksheet()->range_factory('A:A2');
+  $range = mock_worksheet()->range_factory('A:A2');
   is $range->range(), "$sheet!A:A2", "A:A2 returns A:A2";
   isa_ok $range, Col, "A:A2 returns a Col object";
 
-  $range = fake_worksheet()->range_factory('A');
+  $range = mock_worksheet()->range_factory('A');
   is $range->range(), "$sheet!A:A", "A returns A:A";
   isa_ok $range, Col, "A returns a Col object";
 
   
-  $range = fake_worksheet()->range_factory('1:1');
+  $range = mock_worksheet()->range_factory('1:1');
   is $range->range(), "$sheet!1:1", "1:1 returns 1:1";
   isa_ok $range, Row, "1:1 returns a Row object";
 
-  $range = fake_worksheet()->range_factory('A1:1');
+  $range = mock_worksheet()->range_factory('A1:1');
   is $range->range(), "$sheet!A1:1", "A1:1 returns A1:1";
   isa_ok $range, Row, "A1:1 returns a Row object";
 
-  $range = fake_worksheet()->range_factory('1:B1');
+  $range = mock_worksheet()->range_factory('1:B1');
   is $range->range(), "$sheet!1:B1", "1:B1 returns 1:B1";
   isa_ok $range, Row, "1:B1 returns a Row object";
 
-  $range = fake_worksheet()->range_factory('1');
+  $range = mock_worksheet()->range_factory('1');
   is $range->range(), "$sheet!1:1", "1 returns 1:1";
   isa_ok $range, Row, "1 returns a Row object";
 
 
-  $range = fake_worksheet()->range_factory('A1');
+  $range = mock_worksheet()->range_factory('A1');
   is $range->range(), "$sheet!A1", "A1 returns A1";
   isa_ok $range, Cell, "A1 returns a Cell object";
 
-  $range = fake_worksheet()->range_factory("George");
+  $range = mock_worksheet()->range_factory("George");
   is $range->named(), 'George', "George should be a named range";
   isa_ok $range, Col, "Named range";
 
-  $range = fake_worksheet()->range_factory("A1");
+  $range = mock_worksheet()->range_factory("A1");
   is $range->named(), undef, "A1 should not be a named range";
 
   return;
@@ -107,7 +107,7 @@ sub append {
 sub range : Tests(2) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   isa_ok my $range = _new_range('A1:B2'), Range, "New range 'A1:B2'";
   is $range->range(), "$sheet!A1:B2", "A1:B2 should be '$sheet!A1:B2'";
@@ -130,7 +130,7 @@ sub range_to_dimension {
 sub cell_at_offset : Tests(24) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   for my $col_row (qw(A:A 1:1)) {
     my $range = _new_range($col_row);
@@ -170,7 +170,7 @@ sub offsets {
 sub is_other_inside : Tests() {
   my $self = shift;
   
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $outside = _new_range('A1:B2');
   my $inside = _new_range('A1');
@@ -242,6 +242,6 @@ sub is_other_inside : Tests() {
   return;
 }
 
-sub _new_range { fake_worksheet()->range(shift); }
+sub _new_range { mock_worksheet()->range(shift); }
 
 1;

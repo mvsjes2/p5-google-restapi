@@ -99,27 +99,30 @@ sub delete_spreadsheet {
   return $self->drive()->file(id => $spreadsheet_id)->delete();
 }
 
-# delete all the spreadsheets by the names passed.
-sub delete_all_spreadsheets_by_names {
+sub delete_all_spreadsheets_by_filters {
   my $self = shift;
 
   state $check = compile(ArrayRef->plus_coercions(Str, sub { [$_]; }));
-  my ($names) = $check->(@_);
+  my ($filter) = $check->(@_);
 
   my $count = 0;
-  foreach my $name (@$names) {
-    my @spreadsheets = $self->spreadsheets("name = '$name'");
+  foreach my $filter (@$filter) {
+    my @spreadsheets = $self->spreadsheets_by_filter($filter);
     $count += scalar @spreadsheets;
-    DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
+    DEBUG(sprintf("Deleting %d spreadsheets for filter '$filter'", scalar @spreadsheets));
     $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
   }
   return $count;
 }
-# backward compatibility.
-*delete_all_spreadsheets = *delete_all_spreadsheets_by_names{CODE};
 
-# list all spreadsheets.
-sub spreadsheets {
+sub delete_all_spreadsheets {
+  my $self = shift;
+  my @names = @_;
+  @names = map { "name = '$_"; } @names;
+  return $self->delete_all_spreadsheets_by_filters(@names);
+}
+
+sub spreadsheets_by_filter {
   my $self = shift;
 
   state $check = compile(Optional[Str]);
@@ -131,6 +134,13 @@ sub spreadsheets {
   return $drive->list($filter);
 }
 
+sub spreadsheets {
+  my $self = shift;
+  my ($name) = @_;
+  $name = "name = '$name'" if $name;
+  return $self->spreadsheets_by_filter($name);
+}
+
 sub drive {
   my $self = shift;
   $self->{drive} //= DriveApi3->new(api => $self->rest_api());
@@ -140,6 +150,7 @@ sub drive {
 sub open_spreadsheet { Spreadsheet->new(sheets_api => shift, @_); }
 sub transaction { shift->rest_api()->transaction(); }
 sub stats { shift->rest_api()->stats(); }
+sub reset_stats { shift->rest_api->reset_stats(); }
 sub rest_api { shift->{api}; }
 
 1;
@@ -410,7 +421,7 @@ spreadsheet_id is the file ID in Google Drive of the spreadsheet you want to del
 
 Returns the Google API response.
 
-=item delete_all_spreadsheets_by_names([spreadsheet_name<string>]);
+=item delete_all_spreadsheets_by_filters([spreadsheet_name<string>]);
 
 Deletes all spreadsheets with the given names from Google Drive. 
 

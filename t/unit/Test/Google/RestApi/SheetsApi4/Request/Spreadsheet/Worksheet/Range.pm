@@ -19,8 +19,8 @@ sub setup : Tests(setup) {
   my $self = shift;
   $self->SUPER::setup(@_);
 
-  $self->_fake_http_auth();
-  $self->_fake_http_no_retries();
+  $self->_mock_http_auth();
+  $self->_mock_http_no_retries();
 
   $self->_uri_responses(qw(
     get_worksheet_properties_title_sheetid
@@ -33,7 +33,7 @@ sub setup : Tests(setup) {
 sub range_text_format : Tests(29) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $cell = {
     repeatCell => {
@@ -125,7 +125,7 @@ sub _range_text_format_color {
 sub range_background_color : Tests(13) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $cell = {
     repeatCell => {
@@ -178,7 +178,7 @@ sub _range_background_color {
 sub range_misc : Tests(12) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $cell = {
     repeatCell => {
@@ -242,7 +242,7 @@ sub range_misc : Tests(12) {
 sub range_borders : Tests(22) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $cell = {
     updateBorders => {
@@ -300,7 +300,7 @@ sub _range_borders {
 sub range_border_style : Tests(14) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $cell = {
     updateBorders => {
@@ -338,7 +338,7 @@ sub _range_border_style {
 sub range_border_colors : Tests(13) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $cell = {
     updateBorders => {
@@ -386,7 +386,7 @@ sub _range_border_colors {
 sub range_border_cells : Tests(7) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $cell = {
     repeatCell => {
@@ -424,7 +424,7 @@ sub range_border_cells : Tests(7) {
 sub range_merge : Tests(6) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   my $cell = {
     mergeCells => {
@@ -460,7 +460,7 @@ sub range_merge : Tests(6) {
 
 sub _new_range {
   my $self = shift;
-  return Google::RestApi::SheetsApi4::Range::factory(worksheet => fake_worksheet(), range => shift);
+  return Google::RestApi::SheetsApi4::Range::factory(worksheet => mock_worksheet(), range => shift);
 }
 
 sub _add_field {

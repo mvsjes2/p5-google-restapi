@@ -8,12 +8,12 @@ use parent qw(Test::Google::RestApi::SheetsApi4::Range::Base);
 
 my $sheet = "'Sheet1'";
 
-# init_logger($TRACE);
+init_logger;
 
 sub range : Tests(16) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
+  $self->_mock_http_response_by_uri();
 
   is _new_range("A:A")->range(),     "$sheet!A:A", "A:A should be A:A";
   is _new_range(['A'])->range(),     "$sheet!A:A", "['A'] should be A:A";
@@ -36,6 +36,6 @@ sub range : Tests(16) {
   return;
 }
 
-sub _new_range { fake_worksheet()->range_col(shift); }
+sub _new_range { mock_worksheet()->range_col(shift); }
 
 1;

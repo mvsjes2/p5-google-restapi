@@ -14,15 +14,13 @@ sub setup : Tests(setup) {
 
   $self->{err} = qr/Unable to translate/;
 
-  $self->_fake_http_auth();
-  $self->_fake_http_no_retries();
+  $self->_mock_http_auth();
+  $self->_mock_http_no_retries();
 
   $self->_uri_responses(qw(
     get_spreadsheet_named_range_george
     get_worksheet_properties_title_sheetid
-    get_worksheet_values_col
-    get_worksheet_values_row
-    get_worksheet_values_cell
+    get_worksheet_values
   ));
 
   return;

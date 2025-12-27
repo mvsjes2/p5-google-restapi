@@ -7,7 +7,7 @@ use lib "$FindBin::RealBin/../../lib";
 
 use Tutorial::Setup;
 
-# init_logger($TRACE);
+init_logger($TRACE) if $ENV{DEBUG};
 
 my $sheets_api = sheets_api();
 my $spreadsheet_name = spreadsheet_name();
