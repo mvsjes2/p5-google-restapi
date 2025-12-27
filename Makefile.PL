@@ -50,6 +50,7 @@ WriteMakefile(
       'Mock::MonkeyPatch'           => 0,
       'Test::Class'                 => 0,
       'Test::Class::Load'           => 0,
+      'Test::Deep'                  => 0,
       'Test::Most'                  => 0,
       'Text::Levenshtein::Flexible' => 0,
     },

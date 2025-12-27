@@ -15,15 +15,13 @@ sub setup : Tests(setup) {
 
   $self->_uri_responses(qw(
     get_worksheet_properties_title_sheetid
-    get_worksheet_values_cell
-    get_worksheet_values_a1_b1_c1
-    get_worksheet_values_range
+    get_worksheet_values
     post_worksheet_values_x_y_z
     post_worksheet_batch_request
     put_worksheet_values_range
   ));
-  $self->_fake_http_auth();
-  $self->_fake_http_no_retries();
+  $self->_mock_http_auth();
+  $self->_mock_http_no_retries();
 
   return;
 }
@@ -31,9 +29,9 @@ sub setup : Tests(setup) {
 sub tie : Tests(16) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
-  my $ws0_name = fake_worksheet_name();
+  $self->_mock_http_response_by_uri();
+  my $ws0 = mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
   $ws0->rest_api()->max_attempts(1);
 
   is_hash my $tied = $ws0->tie_cells(A1 => 'A1', B1 => 'B1', C1 => 'C1'), "Tie some cells";
@@ -68,9 +66,9 @@ sub tie : Tests(16) {
 sub tie_cols : Tests(18) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
-  my $ws0_name = fake_worksheet_name();
+  $self->_mock_http_response_by_uri();
+  my $ws0 = mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
   $ws0->rest_api()->max_attempts(1);
   $ws0->enable_header_row();
 
@@ -114,9 +112,9 @@ sub tie_cols : Tests(18) {
 sub tie_rows : Tests(18) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
-  my $ws0_name = fake_worksheet_name();
+  $self->_mock_http_response_by_uri();
+  my $ws0 = mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
   $ws0->rest_api()->max_attempts(1);
 
   my %ties = (
@@ -162,8 +160,8 @@ sub tie_rows : Tests(18) {
 sub tie_cells : Tests(7) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
+  $self->_mock_http_response_by_uri();
+  my $ws0 = mock_worksheet();
   $ws0->rest_api()->max_attempts(1);
 
   my $tied;
@@ -188,8 +186,8 @@ sub tie_cells : Tests(7) {
 sub tie_slice : Tests(10) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
+  $self->_mock_http_response_by_uri();
+  my $ws0 = mock_worksheet();
   $ws0->rest_api()->max_attempts(1);
 
   is_hash my $tied = $ws0->tie(), "Create blank tie";
@@ -213,9 +211,9 @@ sub tie_slice : Tests(10) {
 sub tie_named : Tests(16) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
-  my $ws0_name = fake_worksheet_name();
+  $self->_mock_http_response_by_uri();
+  my $ws0 = mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
   $ws0->rest_api()->max_attempts(1);
 
   my %ties = (
@@ -256,8 +254,8 @@ sub tie_named : Tests(16) {
 sub tie_return_objects : Tests(6) {
   my $self = shift;
 
-  $self->_fake_http_response_by_uri();
-  my $ws0 = fake_worksheet();
+  $self->_mock_http_response_by_uri();
+  my $ws0 = mock_worksheet();
   $ws0->rest_api()->max_attempts(1);
 
   my $cols = $ws0->tie_cols(id => 'B:B', name => 'C:C', address => 'D:D');
