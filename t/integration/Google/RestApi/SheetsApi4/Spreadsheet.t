@@ -5,7 +5,7 @@ use Test::Most tests => 15;
 use aliased "Google::RestApi::SheetsApi4";
 
 # use Carp::Always;
-init_logger($DEBUG) if $ENV{DEBUG};
+init_logger;
 
 delete_all_spreadsheets(sheets_api());
 

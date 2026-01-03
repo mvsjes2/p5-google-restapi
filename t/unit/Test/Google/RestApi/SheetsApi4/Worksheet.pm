@@ -8,27 +8,12 @@ use parent 'Test::Unit::TestBase';
 
 init_logger;
 
-sub startup : Tests(startup) {
-  my $self = shift;
-  $self->SUPER::startup(@_);
-  $self->mock_http_no_retries();
-  $self->create_mock_spreadsheets();
-  return;
-}
-
-sub shutdown : Tests(shutdown) {
-  my $self = shift;
-  $self->delete_mock_spreadsheets;
-  $self->SUPER::shutdown(@_);
-  return;
-}
-
 sub setup : Tests(setup) {
   my $self = shift;
 
   my $ws0 = $self->mock_worksheet();
   my $all = $ws0->range("A1:C1000");
-  $all->reset();
+  $all->reset()->submit_requests;
 
   return;
 }

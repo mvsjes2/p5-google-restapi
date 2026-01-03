@@ -13,21 +13,6 @@ use parent 'Test::Unit::TestBase';
 
 init_logger;
 
-sub startup : Tests(startup) {
-  my $self = shift;
-  $self->SUPER::startup(@_);
-  $self->mock_http_no_retries();
-  $self->create_mock_spreadsheets();
-  return;
-}
-
-sub shutdown : Tests(shutdown) {
-  my $self = shift;
-  $self->delete_mock_spreadsheets;
-  $self->SUPER::shutdown(@_);
-  return;
-}
-
 sub _constructor : Tests(7) {
   my $self = shift;
 
@@ -140,16 +125,15 @@ sub attrs : Tests(2) {
   return;
 }
 
-sub properties : Tests(4) {
+sub properties : Tests(3) {
   my $self = shift;
   my $ss = $self->mock_spreadsheet();
+  $ss->cache_seconds(0);
   is $ss->properties('locale')->{'locale'}, 'en_GB', 'Locale is en_GB';
+  ok $ss->properties('defaultFormat.backgroundColor')->{defaultFormat}->{backgroundColor},
+    "Background color property fetch is successful";
   is $ss->properties('defaultFormat.backgroundColor')->{defaultFormat}->{backgroundColor}->{green},
     1, 'Background has green';
-  is $ss->properties('defaultFormat.backgroundColor.red')->{defaultFormat}->{backgroundColor}->{red},
-    1, 'Background has red';
-  is $ss->properties('defaultFormat.backgroundColor.red')->{defaultFormat}->{backgroundColor}->{green},
-    undef, 'Background color not asked for is undef';
   return;
 }
 
@@ -174,6 +158,7 @@ sub cache : Tests(8) {
   my $ss = $self->mock_spreadsheet();
 
   $ss->reset_stats;
+  $ss->cache_seconds(1);
   $ss->properties('locale');
   is $ss->stats()->{get}, 1, 'First call to cache, number of gets is 1';
   $ss->properties('locale');

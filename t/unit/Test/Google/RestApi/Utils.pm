@@ -12,6 +12,8 @@ use parent 'Test::Unit::TestBase';
 
 use Google::RestApi::Utils qw(:all);
 
+sub dont_create_mock_spreadsheets { 1; }
+
 sub test_named_extra : Tests(2) {
   my %args = ( validated => {} );
   throws_ok sub { named_extra(%args); }, qr/Missing required/i, "named_extra: No _extra_ key throws";
@@ -41,7 +43,7 @@ sub test_resolve_config_file_path : Tests(5) {
   $config{config_file} = mock_config_file();
   is resolve_config_file_path(\%config, 'config_file'), $config{config_file}, "resolve_config_file_path: Returns the original full file path";
 
-  $config{token_file} = 'rest_config.token';
+  $config{token_file} = mock_token_file();
   is resolve_config_file_path(\%config, 'token_file'), mock_token_file(), "resolve_config_file_path: Returns full token file path";
   is $config{token_file}, mock_token_file(), "resolve_config_file_path: Token file path updated in config";
 

@@ -18,6 +18,8 @@ use Try::Tiny qw( catch try );
 use URI ();
 use URI::QueryParam ();
 
+use Test::Utils qw( find_test_caller );
+
 sub new {
   my $class = shift;
 
@@ -101,19 +103,10 @@ sub api {
 
   # this is for capturing request/responses for unit tests.
   if ($response && Log::Log4perl::appenders->{'UnitTestCapture'}) {
-    my $test_method;
-    for (0..20) {
-      my ($package, undef, undef, $subroutine) = caller($_);
-      last unless $package;
-      next unless $subroutine =~ /^Test::Google::RestApi::/;
-      $test_method = $subroutine;
-      last;
-    }
-    die "Unable to locate test subroutine" unless $test_method;
-
     # special log category for this. it should be tied to the UnitTestCapture appender.
     # we want to dump this in the same format as what we need to store in
     # t/etc/uri_responses.
+    my $test_method = find_test_caller();
     my %exchange = (
       source  => $test_method,
       request => $request->{method} . ' ' . $uri->path,

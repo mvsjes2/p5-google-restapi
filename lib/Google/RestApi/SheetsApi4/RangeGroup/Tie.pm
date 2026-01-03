@@ -120,7 +120,7 @@ sub STORE {
   if (!$self->ranges()->{$key}) {
     my $worksheet = $self->worksheet()
       or LOGDIE "No default worksheet provided for new range '$key'. Call default_worksheet() first.";    
-    my $tied = $worksheet->tie_ranges({ $key => $key });
+    my $tied = $worksheet->tie_ranges($key => $key);
     $self->add_tied($tied);
   }
 
