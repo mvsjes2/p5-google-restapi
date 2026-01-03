@@ -25,7 +25,7 @@ start("We will open the spreadsheet, add worksheet 'Fred', delete 'Sheet1'");
 $ss->add_worksheet(name => 'Fred')->submit_requests();
 my $ws0 = $ss->open_worksheet(name => 'Sheet1');
 $ws0->delete_worksheet->submit_requests;
-end("We added worksheet 'Fred' and then renamed it to 'Payroll'");
+end("We added worksheet 'Fred' and deleted worksheet 'Sheet1'");
 
 start("Now we will rename the worksheet 'Fred' to 'Payroll'");
 $ws0 = $ss->open_worksheet(name => 'Fred');
