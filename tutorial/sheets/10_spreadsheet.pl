@@ -22,7 +22,7 @@ init_logger($TRACE) if $ENV{DEBUG};
 my $name = spreadsheet_name();
 my $sheets_api = sheets_api();
 # clean up any failed previous runs.
-$sheets_api->delete_all_spreadsheets_by_names($name);
+$sheets_api->delete_all_spreadsheets_by_filters("name = '$name'");
 # now set a callback to display the api request/response.
 $sheets_api->rest_api()->api_callback(\&show_api);
 
