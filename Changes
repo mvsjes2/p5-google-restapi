@@ -1,13 +1,14 @@
 Revision history for Perl extension Google::RestApi.
 
-1.0.5 2025-12-07
+1.0.5 2026-01-02
         - Fixed bug in converting int columns to alpha for any columns > 52 (AZ).
         - Moved tutorial out of t dir as it never really belonged there.
         - Cleaned up tutorial.
+        - Renamed Drive filter_files to list.
         - Added pagination support for Drive->list.
         - Fixed listing/deleting spreadsheets by name.
-        - Renamed Drive filter_files to list.
-        - Renamed SheetsApi4 delete_all_spreadsheets to delete_all_spreadsheets_by_names.
+        - Renamed SheetsApi4 delete_all_spreadsheets to delete_all_spreadsheets_by_filters.
+        - Complete makeover of testing framework to automatically load mock data from live api.
 
 1.0.4 2022-11-29
         - Support both multisig variables in Type::Params
