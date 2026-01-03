@@ -9,8 +9,8 @@ use URI;
 
 use aliased 'Google::RestApi::DriveApi3::File';
 
-Readonly our $Drive_Endpoint => "https://www.googleapis.com/drive/v3";
-Readonly our $Drive_File_Id  => "[a-zA-Z0-9-_]+";
+Readonly our $Drive_Endpoint => 'https://www.googleapis.com/drive/v3';
+Readonly our $Drive_File_Id  => '[a-zA-Z0-9-_]+';
 
 sub new {
   my $class = shift;
