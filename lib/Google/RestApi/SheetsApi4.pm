@@ -5,21 +5,19 @@ our $VERSION = '1.0.5';
 use Google::RestApi::Setup;
 
 use Module::Load qw( load );
+use Readonly;
 use Try::Tiny ();
 use YAML::Any ();
 
 use aliased 'Google::RestApi::DriveApi3';
 use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
 
-# TODO: switch to ReadOnly
-use constant {
-  Sheets_Endpoint    => "https://sheets.googleapis.com/v4/spreadsheets",
-  Spreadsheet_Id     => DriveApi3->Drive_File_Id,
-  Spreadsheet_Uri    => "https://docs.google.com/spreadsheets/d",
-  Worksheet_Id       => "[0-9]+",
-  Worksheet_Uri      => "[#&]gid=([0-9]+)",
-  Spreadsheet_Filter => "mimeType = 'application/vnd.google-apps.spreadsheet'",
-};
+Readonly our $Sheets_Endpoint    => "https://sheets.googleapis.com/v4/spreadsheets";
+Readonly our $Spreadsheet_Id     => $Google::RestApi::DriveApi3::Drive_File_Id;
+Readonly our $Spreadsheet_Uri    => "https://docs.google.com/spreadsheets/d";
+Readonly our $Worksheet_Id       => "[0-9]+";
+Readonly our $Worksheet_Uri      => "[#&]gid=([0-9]+)";
+Readonly our $Spreadsheet_Filter => "mimeType = 'application/vnd.google-apps.spreadsheet'";
 
 sub new {
   my $class = shift;
@@ -27,7 +25,7 @@ sub new {
   state $check = compile_named(
     api           => HasApi,                                           # the G::RestApi object that will be used to send http calls.
     drive         => HasMethods[qw(list)], { optional => 1 },  # a drive instnace, could be your own, defaults to G::R::DriveApi3.
-    endpoint      => Str, { default => Sheets_Endpoint },              # this gets tacked on to the api uri to reach the sheets endpoint.
+    endpoint      => Str, { default => $Sheets_Endpoint },              # this gets tacked on to the api uri to reach the sheets endpoint.
   );
   my $self = $check->(@_);
 
@@ -79,7 +77,7 @@ sub create_spreadsheet {
 
 sub copy_spreadsheet {
   my $self = shift;
-  my $id = Spreadsheet_Id;
+  my $id = $Spreadsheet_Id;
   state $check = compile_named(
     spreadsheet_id => StrMatch[qr/$id/],
     _extra_        => slurpy Any,
@@ -93,7 +91,7 @@ sub copy_spreadsheet {
 
 sub delete_spreadsheet {
   my $self = shift;
-  my $id = Spreadsheet_Id;
+  my $id = $Spreadsheet_Id;
   state $check = compile(StrMatch[qr/$id/]);
   my ($spreadsheet_id) = $check->(@_);
   return $self->drive()->file(id => $spreadsheet_id)->delete();
@@ -129,7 +127,7 @@ sub spreadsheets_by_filter {
   my ($extra_filter) = $check->(@_);
 
   my $drive = $self->drive();
-  my $filter = Spreadsheet_Filter;
+  my $filter = $Spreadsheet_Filter;
   $filter .= " and ($extra_filter)" if $extra_filter;
   return $drive->list($filter);
 }

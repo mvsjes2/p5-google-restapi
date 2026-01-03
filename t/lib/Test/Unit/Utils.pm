@@ -28,8 +28,8 @@ sub mock_worksheet_name { 'Sheet1'; }
 sub mock_rest_api { _load_and_new('Google::RestApi', config_file => mock_config_file(), @_); }
 sub mock_sheets_api { _load_and_new('Google::RestApi::SheetsApi4', api => mock_rest_api(), @_); }
 
-sub drive_endpoint { Google::RestApi::DriveApi3->Drive_Endpoint; }
-sub sheets_endpoint { Google::RestApi::SheetsApi4->Sheets_Endpoint; }
+sub drive_endpoint { $Google::RestApi::DriveApi3::Drive_Endpoint; }
+sub sheets_endpoint { $Google::RestApi::SheetsApi4::Sheets_Endpoint; }
 
 sub _load_and_new {
   my $class = shift;

@@ -3,6 +3,7 @@ severity = 4
 verbose = %f: [%p] %m at line %l, column %c.\n%d\n
 theme = core
 
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
 [-Subroutines::ProhibitBuiltinHomonyms]
 [-Subroutines::RequireFinalReturn]
 [-Subroutines::RequireArgUnpacking]

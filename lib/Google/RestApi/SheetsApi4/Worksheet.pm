@@ -20,7 +20,7 @@ use parent 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet';
 sub new {
   my $class = shift;
 
-  my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
+  my $qr_worksheet_uri = $Google::RestApi::SheetsApi4::Worksheet_Uri;
   state $check = compile_named(
     spreadsheet => HasApi,
     id          => Str, { optional => 1 },    # the worksheet id (1, 2, 3 etc).
@@ -45,7 +45,7 @@ sub worksheet_id {
   my $self = shift;
   if (!defined $self->{id}) {
     if ($self->{uri}) {
-      my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
+      my $qr_worksheet_uri = $Google::RestApi::SheetsApi4::Worksheet_Uri;
       ($self->{id}) = $self->{uri} =~ m|$qr_worksheet_uri|;
       LOGDIE "Unable to extract a worksheet id from URI '$self->{uri}'" if !defined $self->{id};
     } else {

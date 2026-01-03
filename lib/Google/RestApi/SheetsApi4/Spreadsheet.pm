@@ -16,8 +16,8 @@ use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet";
 sub new {
   my $class = shift;
 
-  my $qr_id = SheetsApi4->Spreadsheet_Id;
-  my $qr_uri = SheetsApi4->Spreadsheet_Uri;
+  my $qr_id = $Google::RestApi::SheetsApi4::Spreadsheet_Id;
+  my $qr_uri = $Google::RestApi::SheetsApi4::Spreadsheet_Uri;
   # pass one of id/name/title/uri and this will work out the others.
   state $check = compile_named(
     sheets_api => HasApi,
@@ -58,8 +58,8 @@ sub spreadsheet_id {
 
   if (!$self->{id}) {
     if ($self->{uri}) {
-      my $qr_id = SheetsApi4->Spreadsheet_Id;
-      my $qr_uri = SheetsApi4->Spreadsheet_Uri;
+      my $qr_id = $Google::RestApi::SheetsApi4::Spreadsheet_Id;
+      my $qr_uri = $Google::RestApi::SheetsApi4::Spreadsheet_Uri;
       ($self->{id}) = $self->{uri} =~ m|^$qr_uri/($qr_id)|;   # can end with '/edit'
       LOGDIE "Unable to extract a sheet id from uri" if !$self->{id};
       DEBUG("Got sheet ID '$self->{id}' via URI '$self->{uri}'.");

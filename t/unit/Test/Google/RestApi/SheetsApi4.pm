@@ -78,7 +78,7 @@ sub spreadsheets {
 
   my @spreadsheets = $sheets_api->spreadsheets(mock_spreadsheet_name());
   ok scalar @spreadsheets >= 2, "There are two (or more) spreadsheets named " . mock_spreadsheet_name();
-  my $qr_id = SheetsApi4->Spreadsheet_Id;
+  my $qr_id = $Google::RestApi::SheetsApi4::Spreadsheet_Id;
   is_valid \@spreadsheets, ArrayRef[Dict[id => StrMatch[qr/$qr_id/], name => Str]], "Spreadsheets return";
 
   @spreadsheets = $sheets_api->spreadsheets_by_filter("name contains 'mock_spreadsheet'");
