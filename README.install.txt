@@ -17,7 +17,7 @@ See Makefile.PL for a current list of dependencies.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2021 by Test User
+Copyright (c) 2019-2026 Test User. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.1 or,
