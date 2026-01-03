@@ -52,6 +52,7 @@ WriteMakefile(
       'Test::Deep'                  => 0,
       'Test::Most'                  => 0,
       'Test::Perl::Critic'          => 0,
+      'Perl::Critic::TooMuchCode'   => 0,
     },
     EXE_FILES         => [qw(bin/google_restapi_oauth_token_creator)],
     META_MERGE        => {

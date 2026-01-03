@@ -3,12 +3,13 @@ severity = 4
 verbose = %f: [%p] %m at line %l, column %c.\n%d\n
 theme = core
 
-[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
 [-Subroutines::ProhibitBuiltinHomonyms]
-[-Subroutines::RequireFinalReturn]
 [-Subroutines::RequireArgUnpacking]
 [-TestingAndDebugging::RequireUseStrict]
 [-TestingAndDebugging::RequireUseWarnings]
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
 
-#[Subroutines::RequireFinalReturn]
-#terminal_funcs = LOGDIE
+[-Subroutines::RequireFinalReturn]
+terminal_funcs = LOGDIE
+
+[TooMuchCode::ProhibitUnusedImport]

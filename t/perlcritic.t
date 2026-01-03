@@ -9,4 +9,4 @@ use Test::Perl::Critic;
 
 my $rcfile = File::Spec->catfile( $FindBin::RealBin, 'etc', 'perlcriticrc' );
 Test::Perl::Critic->import( -profile => $rcfile );
-all_critic_ok();
+all_critic_ok( "$FindBin::RealBin/../lib", "$FindBin::RealBin/unit" );
