@@ -46,7 +46,6 @@ WriteMakefile(
       'YAML::Any'                       => 0,
     },
     TEST_REQUIRES     => {
-      'Capture::Tiny'               => 0,
       'Sub::Override'               => 0,
       'Test::Class'                 => 0,
       'Test::Class::Load'           => 0,

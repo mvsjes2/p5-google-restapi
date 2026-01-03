@@ -21,7 +21,7 @@ requires 'Term::Prompt';
 requires 'Tie::Hash';
 requires 'ToolSet';
 requires 'Try::Tiny';
-requires 'Type::Params', '1.004004';
+requires 'Type::Params', '== 1.004004';
 requires 'Types::Standard';
 requires 'URI';
 requires 'URI::QueryParam';
@@ -41,7 +41,6 @@ on build => sub {
 };
 
 on test => sub {
-    requires 'Capture::Tiny';
     requires 'Sub::Override';
     requires 'Test::Class';
     requires 'Test::Class::Load';
