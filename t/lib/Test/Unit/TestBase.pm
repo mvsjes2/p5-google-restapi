@@ -11,7 +11,6 @@ use FindBin;
 use Furl::Response;
 use Hash::Merge qw(merge);
 use HTTP::Status qw(:constants status_message);
-use Mock::MonkeyPatch;
 use Module::Load qw(load);
 use PerlX::Maybe;
 use Sub::Override;
