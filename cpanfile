@@ -42,9 +42,9 @@ on build => sub {
 
 on test => sub {
     requires 'Capture::Tiny';
-    requires 'Mock::MonkeyPatch';
+    requires 'Sub::Override';
     requires 'Test::Class';
     requires 'Test::Class::Load';
-    required 'Test::Deep';
+    requires 'Test::Deep';
     requires 'Test::Most';
 };

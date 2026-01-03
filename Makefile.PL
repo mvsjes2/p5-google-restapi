@@ -38,7 +38,7 @@ WriteMakefile(
       'Tie::Hash'                       => 0,
       'Try::Tiny'                       => 0,
       'ToolSet'                         => 0,
-      'Type::Params'                    => 1.004004, # minimum version, not sure why
+      'Type::Params'                    => 1.004004,
       'Types::Standard'                 => 0,
       'URI'                             => 0,
       'URI::QueryParam'                 => 0,
@@ -47,12 +47,11 @@ WriteMakefile(
     },
     TEST_REQUIRES     => {
       'Capture::Tiny'               => 0,
-      'Mock::MonkeyPatch'           => 0,
+      'Sub::Override'               => 0,
       'Test::Class'                 => 0,
       'Test::Class::Load'           => 0,
       'Test::Deep'                  => 0,
       'Test::Most'                  => 0,
-      'Text::Levenshtein::Flexible' => 0,
     },
     EXE_FILES         => [qw(bin/google_restapi_oauth_token_creator)],
     META_MERGE        => {
