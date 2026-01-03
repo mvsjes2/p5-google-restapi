@@ -38,7 +38,7 @@ Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 >     # values. this is less efficient but the simplest way to
 >     # interface with the api. you don't deal with any intermediate
 >     # api objects.
->     
+>
 >     # add some data to the worksheet:
 >     @values = (
 >       [ 1001, "Herb Ellis", "100", "10000" ],
@@ -137,6 +137,6 @@ its completeness.
 
 # COPYRIGHT
 
-Copyright (c) 2021, 2026 Robin Murray. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.
