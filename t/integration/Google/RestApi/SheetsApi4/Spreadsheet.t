@@ -13,8 +13,8 @@ my $name = spreadsheet_name();
 my $spreadsheet = sheets_api()->create_spreadsheet(title => $name);
 
 my ($id, $uri);
-my $qr_id = SheetsApi4->Spreadsheet_Id;
-my $qr_uri = SheetsApi4->Spreadsheet_Uri;
+my $qr_id = $SheetsApi4::Spreadsheet_Id;
+my $qr_uri = $SheetsApi4::Spreadsheet_Uri;
 
 like $id = $spreadsheet->spreadsheet_id(), qr/^$qr_id$/, "Should find spreadsheet ID";
 like $uri = $spreadsheet->spreadsheet_uri(), qr/^$qr_uri/, "Should find spreadsheet URI";

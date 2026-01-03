@@ -14,8 +14,8 @@ my $spreadsheet = sheets_api()->create_spreadsheet(title => spreadsheet_name());
 
 my $ws0;
 my $name = "Sheet1";
-my $qr_id = SheetsApi4->Worksheet_Id;
-my $qr_uri = SheetsApi4->Worksheet_Uri;
+my $qr_id = $SheetsApi4::Worksheet_Id;
+my $qr_uri = $SheetsApi4::Worksheet_Uri;
 
 open_worksheet(); # this must be run to populate the worksheet var.
 identifiers();

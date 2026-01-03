@@ -8,7 +8,7 @@ use aliased 'Google::RestApi::DriveApi3';
 
 sub new {
   my $class = shift;
-  my $qr_id = DriveApi3->Drive_File_Id;
+  my $qr_id = $Google::RestApi::DriveApi3::Drive_File_Id;
   state $check = compile_named(
     drive => HasApi,
     id    => StrMatch[qr/$qr_id/],

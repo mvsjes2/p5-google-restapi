@@ -564,8 +564,8 @@ sub _col_a2i {
   my $incr = 0;
   for (my $i = length($a); $i > 0 ; $i--) {
     my $char = substr($a, $i - 1);
-    my $curr += ord(lc($char)) - ord('a') + 1;
-    $curr *= $incr if ($incr);
+    my $curr = ord(lc($char)) - ord('a') + 1;
+    $curr *= $incr if $incr;
     $result += $curr;
     $incr += 26;
   }

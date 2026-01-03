@@ -37,6 +37,7 @@ README.md
 t/99_changes.t
 t/etc/log4perl.conf
 t/etc/log4perl_debug.conf
+t/etc/perlcriticrc
 t/etc/rest_config.token
 t/etc/rest_config.yaml
 t/integration/Google/RestApi.t
@@ -55,10 +56,9 @@ t/lib/Test/Unit/Setup.pm
 t/lib/Test/Unit/TestBase.pm
 t/lib/Test/Unit/Utils.pm
 t/lib/Test/Utils.pm
-t/perlcriticrc
+t/perlcritic.t
 t/run_integration
 t/run_unit_tests.t
-t/unit/perlcritic.t
 t/unit/Test/Google/RestApi.pm
 t/unit/Test/Google/RestApi.pm.exchanges
 t/unit/Test/Google/RestApi/SheetsApi4.pm
