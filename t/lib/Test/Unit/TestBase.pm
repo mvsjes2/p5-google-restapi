@@ -7,11 +7,10 @@ package Test::Unit::TestBase;
 use Test::Unit::Setup;
 
 use Carp qw(confess);
-use File::Slurp qw(read_file);
 use FindBin;
 use Furl::Response;
 use Hash::Merge qw(merge);
-use HTTP::Status qw(:constants);
+use HTTP::Status qw(:constants status_message);
 use Mock::MonkeyPatch;
 use Module::Load qw(load);
 use PerlX::Maybe;
@@ -21,7 +20,9 @@ use YAML::Any qw(LoadFile);
 
 use parent 'Test::Class';
 
-# coordinate this with Google::RestApi::api.
+sub dont_suppress_retries { 0; }
+sub dont_create_mock_spreadsheets { 0; }
+
 sub startup : Tests(startup) {
   my $self = shift;
 
@@ -39,16 +40,7 @@ sub startup : Tests(startup) {
     }
   
     $self->_sub_override('Furl', 'request', sub {
-      my $test_method;
-      for (0..20) {
-        my ($package, undef, undef, $subroutine) = caller($_);
-        last unless $package;
-        next unless $subroutine =~ /^Test::Google::RestApi::/;
-        $test_method = $subroutine;
-        last;
-      }
-      confess "Unable to locate test subroutine" unless $test_method;
-
+      my $test_method = find_test_caller();
       my $exchange = shift $self->{exchanges}->{$test_method}->@*
         or confess "Out of exchanges for $test_method";
       my $response = $exchange->{response};
@@ -58,9 +50,6 @@ sub startup : Tests(startup) {
       return $furl;
     });
 
-    # we don't need to process auth requests for local auths.
-    $self->_sub_override('Google::RestApi::Auth::OAuth2Client', 'headers', sub { []; });
-
     # if we are not capturing exchanges, ensure that we don't send any network
     # traffic during our unit tests. this can happen if we don't have
     # 'Furl::request' overridden with a canned response.
@@ -68,16 +57,29 @@ sub startup : Tests(startup) {
       sub { confess "For unit testing you need to capture exchanges first"; }
     );
 
+    $self->mock_auth;
+    $self->mock_http_no_retries() unless $self->dont_suppress_retries;
+
     # this allows the tests to check on rest failures without having to wait for retries.
     # sets the right part of retry::backoff to only wait for .1 seconds between retries.
     # otherwise unit tests take ages to run.
     $self->_sub_override('Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
+  } else {
+    $self->mock_auth;
+    $self->mock_http_no_retries() unless $self->dont_suppress_retries;
   }
+
+  $self->create_mock_spreadsheets() unless $self->dont_create_mock_spreadsheets;
 
   return;
 }
 
-sub shutdown : Tests(shutdown) { shift->_sub_restore(); return; }
+sub shutdown : Tests(shutdown) {
+  my $self = shift;
+  $self->delete_mock_spreadsheets unless $self->dont_create_mock_spreadsheets;
+  $self->_sub_restore();
+  return;
+}
 
 sub create_mock_spreadsheets {
   my $self = shift;
@@ -93,7 +95,13 @@ sub delete_mock_spreadsheets {
   my $sheets_api = mock_sheets_api();
   $sheets_api->delete_spreadsheet($_->spreadsheet_id) for (values $self->{mock_spreadsheets}->%*);
   delete $self->{mock_spreadsheets};
+  $sheets_api->delete_all_spreadsheets_by_filters("name contains 'mock_spreadsheet'");
   return;
+}
+
+sub mock_auth {
+  my $self = shift;
+  $self->_sub_override('Google::RestApi::Auth::OAuth2Client', 'headers', sub { []; });
 }
 
 sub mock_spreadsheet {
@@ -129,6 +137,33 @@ sub mock_worksheet_uri {
 sub mock_http_no_retries {
   my $self = shift;
   $self->_sub_override('Google::RestApi', 'max_attempts', sub { 1; });
+  return;
+}
+
+sub mock_http_response {
+  my $self = shift;
+
+  my $p = validate_named(\@_,
+    code     => Int|StrMatch[qr/^die$/], { default => HTTP_OK },
+    response => Str, { default => '{}' },
+    message  => Str, { optional => 1 },
+  );
+
+  my $code = $p->{code};
+  my $response = $p->{response};
+  my $message = $p->{code} eq 'die' ? "Furl died" : status_message($code);
+
+  my $sub = $code eq 'die' ?
+    sub { die $message; }
+      :
+    sub { Furl::Response->new(1, $code, $message, [], $response); };
+
+  $self->_sub_override('Furl', 'request', $sub);
+  # this allows the tests to check on rest failures without having to wait for retries.
+  # sets the right part of retry::backoff to only wait for .1 seconds between retries.
+  # otherwise unit tests take ages to run.
+  $self->_sub_override('Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
+
   return;
 }
 

@@ -11,12 +11,7 @@ use parent 'Test::Unit::TestBase';
 
 init_logger;
 
-sub startup : Tests(startup) {
-  my $self = shift;
-  $self->SUPER::startup(@_);
-  $self->mock_http_no_retries();
-  return;
-}
+sub dont_create_mock_spreadsheets { 1; }
 
 sub _constructor : Tests(2) {
   my $self = shift;

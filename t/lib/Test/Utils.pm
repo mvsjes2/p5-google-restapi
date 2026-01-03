@@ -5,6 +5,7 @@ package Test::Utils;
 use strict;
 use warnings;
 
+use Carp qw(confess);
 use FindBin;
 use File::Path qw(make_path);
 use File::Spec;
@@ -17,8 +18,8 @@ use YAML::Any qw(Dump);
 use Exporter qw(import);
 our @EXPORT_OK = qw(
   Dump
-  init_logger
-  $OFF $FATAL $WARN $ERROR $INFO $DEBUG $TRACE
+  init_logger $OFF $FATAL $WARN $ERROR $INFO $DEBUG $TRACE
+  find_test_caller
   debug_on debug_off
   is_array is_hash is_valid_n is_valid is_not_valid is_deeply_tied
 );
@@ -56,6 +57,30 @@ sub log_file_name {
   my $logpath = File::Spec->catfile($logdir, $logfile);
   warn "File logging will be sent to $logpath\n";
   return $logpath;
+}
+
+# used for building/reading exchanges for unit testing. finds the calling
+# subroutine under the testing framework to associate with the exchange. would
+# normally be just the T::G::RestApi caller, but to support mock spreadsheets,
+# also check Test::Unit::TestBase::startup|shutdown.
+sub find_test_caller {
+  my $test_base_method;
+  my $test_child_method;
+  for (0..30) {
+    my ($package, undef, undef, $subroutine) = caller($_);
+    last unless $package;
+    next unless $subroutine =~ /^(Test::Google::RestApi::|Test::Unit::TestBase::startup|Test::Unit::TestBase::shutdown)/;
+    if ($subroutine =~ /^Test::Unit::TestBase::/) {
+      $test_base_method = $subroutine;
+    } else {
+      $test_child_method = $subroutine;
+      last;
+    }
+  }
+  my $test_method = $test_child_method || $test_base_method;
+  confess "Unable to locate test subroutine to find exchanges" unless $test_method;
+
+  return $test_child_method || $test_base_method;
 }
 
 # call these to temporarily toggle debug-level logger messages around particular tests so you

@@ -6,26 +6,12 @@ use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet';
 
 use parent 'Test::Unit::TestBase';
 
-sub setup : Tests(setup) {
-  my $self = shift;
-  $self->SUPER::setup(@_);
-
-  $self->_mock_http_auth();
-  $self->_mock_http_no_retries();
-
-  $self->_uri_responses(qw(
-    get_worksheet_properties_title_sheetid
-  ));
-
-  return;
-}
+init_logger;
 
 sub ws_format : Tests() {
   my $self = shift;
 
-  $self->_mock_http_response_by_uri();
-
-  my $ws0 = mock_worksheet();
+  my $ws0 = $self->mock_worksheet();
   my $ws = {
     updateSheetProperties => {
       properties => {

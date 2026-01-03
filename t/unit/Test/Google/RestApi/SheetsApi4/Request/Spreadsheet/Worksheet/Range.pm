@@ -7,6 +7,8 @@ use aliased 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range
 
 use parent 'Test::Unit::TestBase';
 
+init_logger;
+
 my $index = {
   sheetId          => 'Sheet1',
   startColumnIndex => 0,
@@ -15,25 +17,8 @@ my $index = {
   endRowIndex      => 1,
 };
 
-sub setup : Tests(setup) {
-  my $self = shift;
-  $self->SUPER::setup(@_);
-
-  $self->_mock_http_auth();
-  $self->_mock_http_no_retries();
-
-  $self->_uri_responses(qw(
-    get_worksheet_properties_title_sheetid
-    post_worksheet_batch_request
-  ));
-
-  return;
-}
-
 sub range_text_format : Tests(29) {
   my $self = shift;
-
-  $self->_mock_http_response_by_uri();
 
   my $cell = {
     repeatCell => {
@@ -47,7 +32,7 @@ sub range_text_format : Tests(29) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
 
   _range_text_format($cell, $range, 'bold');
@@ -55,7 +40,7 @@ sub range_text_format : Tests(29) {
   _range_text_format($cell, $range, 'strikethrough');
   _range_text_format($cell, $range, 'underline');
   _range_text_format($cell, $range, 'font_family', 'joe');
-  _range_text_format($cell, $range, 'font_size', 1.1);
+  _range_text_format($cell, $range, 'font_size', 2);
 
   _range_text_format_color($cell, $range, 'red');
   _range_text_format_color($cell, $range, 'blue', 0.2);
@@ -64,7 +49,7 @@ sub range_text_format : Tests(29) {
 
   isa_ok $range->
     bold()->italic()->strikethrough()->underline()->
-    red()->blue(0.2)->green(0)->font_family('joe')->font_size(1.1),
+    red()->blue(0.2)->green(0)->font_family('joe')->font_size(2),
     Range, "Build all for text format";
   my @requests = $range->batch_requests();
   is scalar @requests, 1, "Batch requests should have one entry.";
@@ -125,8 +110,6 @@ sub _range_text_format_color {
 sub range_background_color : Tests(13) {
   my $self = shift;
 
-  $self->_mock_http_response_by_uri();
-
   my $cell = {
     repeatCell => {
       range => '',
@@ -139,7 +122,7 @@ sub range_background_color : Tests(13) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
  
   _range_background_color($cell, $range, 'red', 1);
@@ -178,8 +161,6 @@ sub _range_background_color {
 sub range_misc : Tests(12) {
   my $self = shift;
 
-  $self->_mock_http_response_by_uri();
-
   my $cell = {
     repeatCell => {
       range => '',
@@ -194,7 +175,7 @@ sub range_misc : Tests(12) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
   my $user = $cell->{repeatCell}->{cell}->{userEnteredFormat};
 
@@ -242,15 +223,13 @@ sub range_misc : Tests(12) {
 sub range_borders : Tests(22) {
   my $self = shift;
 
-  $self->_mock_http_response_by_uri();
-
   my $cell = {
     updateBorders => {
       range => '',
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   my $borders = $cell->{updateBorders};
   $borders->{range} = $range->range_to_index();
 
@@ -300,8 +279,6 @@ sub _range_borders {
 sub range_border_style : Tests(14) {
   my $self = shift;
 
-  $self->_mock_http_response_by_uri();
-
   my $cell = {
     updateBorders => {
       range => '',
@@ -311,7 +288,7 @@ sub range_border_style : Tests(14) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{updateBorders}->{range} = $range->range_to_index();
 
   _range_border_style($cell, $range, $_)
@@ -338,8 +315,6 @@ sub _range_border_style {
 sub range_border_colors : Tests(13) {
   my $self = shift;
 
-  $self->_mock_http_response_by_uri();
-
   my $cell = {
     updateBorders => {
       range => '',
@@ -349,7 +324,7 @@ sub range_border_colors : Tests(13) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{updateBorders}->{range} = $range->range_to_index();
 
   _range_border_colors($cell, $range, 'red', 1);
@@ -386,8 +361,6 @@ sub _range_border_colors {
 sub range_border_cells : Tests(7) {
   my $self = shift;
 
-  $self->_mock_http_response_by_uri();
-
   my $cell = {
     repeatCell => {
       range => '',
@@ -400,7 +373,7 @@ sub range_border_cells : Tests(7) {
     },
   };
 
-  my $range = $self->_new_range("A1");
+  my $range = $self->mock_worksheet->range("A1");
   $cell->{repeatCell}->{range} = $range->range_to_index();
   my $borders = $cell->{repeatCell}->{cell}->{userEnteredFormat}->{borders};
   my $fields = $cell->{repeatCell}->{fields};
@@ -424,8 +397,6 @@ sub range_border_cells : Tests(7) {
 sub range_merge : Tests(6) {
   my $self = shift;
 
-  $self->_mock_http_response_by_uri();
-
   my $cell = {
     mergeCells => {
       range     => '',
@@ -433,8 +404,9 @@ sub range_merge : Tests(6) {
     },
   };
 
-  my $range = $self->_new_range("A1:B2");
+  my $range = $self->mock_worksheet->range("A1:B2");
   $cell->{mergeCells}->{range} = $range->range_to_index();
+
   my @requests;
 
   $range->red()->merge_cols();
@@ -456,11 +428,6 @@ sub range_merge : Tests(6) {
   is_deeply $requests[1], $cell, "Merge both should be staged";
 
   return;
-}
-
-sub _new_range {
-  my $self = shift;
-  return Google::RestApi::SheetsApi4::Range::factory(worksheet => mock_worksheet(), range => shift);
 }
 
 sub _add_field {
