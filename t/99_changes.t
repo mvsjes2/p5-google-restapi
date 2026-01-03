@@ -4,6 +4,7 @@ use strict;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::RealBin/lib";
 
 use File::Find;
 use Test::More tests => 2;
