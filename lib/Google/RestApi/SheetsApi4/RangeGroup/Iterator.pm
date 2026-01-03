@@ -113,6 +113,6 @@ Test User mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright (c) 2021, Test User. All rights reserved.
+Copyright (c) 2019, 2021, 2026 Test User. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.
