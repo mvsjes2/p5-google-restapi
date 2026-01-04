@@ -30,5 +30,3 @@ nytprof.out
 
 # Code::TidyAll Test::Code::TidyAll cache:
 /.tidyall.d/
-
-t/tutorial/sheets/999_unit.pl

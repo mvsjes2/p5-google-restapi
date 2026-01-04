@@ -299,7 +299,7 @@ that should be fine for most normal needs, but those behaviours can be overridde
 
 It is assumed that you are familiar with the Google Sheets API: https://developers.google.com/sheets/api
 
-C<t/tutorial/sheets/*> also has a step-by-step tutorial of creating and updating a spreadsheet, showing you the API calls and return values for each step.
+C<tutorial/sheets/*> also has a step-by-step tutorial of creating and updating a spreadsheet, showing you the API calls and return values for each step.
 
 =head1 NAVIGATION
 

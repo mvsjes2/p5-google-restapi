@@ -441,7 +441,7 @@ Returns the response hash from Google API.
 =back
 
 The last transaction details are passed to the callback. What you do with this information is up to you. For an example of how this is used, see the
-C<t/tutorial/sheets/*> scripts.
+C<tutorial/sheets/*> scripts.
 
 Returns the previous callback, if any.
 
