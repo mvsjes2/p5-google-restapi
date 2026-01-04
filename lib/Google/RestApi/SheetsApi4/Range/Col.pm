@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Range::Col;
 
-our $VERSION = '1.0.5';
+our $VERSION = '1.0.6';
 
 use Google::RestApi::Setup;
 
@@ -50,6 +50,7 @@ sub _col_i2a {
 
   return $col if ref($col);
   return $col if $col =~ qr/\D/;
+  $col > 0 or die "Column number should greater than zero, got $col";
 
   my $result = "";
   while ($col > 0) {

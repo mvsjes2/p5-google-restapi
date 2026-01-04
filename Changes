@@ -1,5 +1,8 @@
 Revision history for Perl extension Google::RestApi.
 
+1.0.6 2026-01-03
+        - Add missing PerlX::Maybe in Makefile.PL
+
 1.0.5 2026-01-02
         - Fixed bug in converting int columns to alpha for any columns > 52 (AZ).
         - Moved tutorial out of t dir as it never really belonged there.

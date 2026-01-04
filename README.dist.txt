@@ -1,4 +1,5 @@
 * check perlbrew is active on terminal
+* cpanm PPI::App::ppi_version
 * ppi_version change $old_version $new_version
 * git grep $old_version, update anything remaining
 * perl Makefile.PL

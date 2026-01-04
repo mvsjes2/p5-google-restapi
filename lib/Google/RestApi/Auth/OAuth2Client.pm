@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '1.0.5';
+our $VERSION = '1.0.6';
 
 use Google::RestApi::Setup;
 
