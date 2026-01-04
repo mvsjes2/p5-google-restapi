@@ -1,5 +1,8 @@
 Revision history for Perl extension Google::RestApi.
 
+1,1,0 2026-01-04
+        - Fill out missing API calls for sheets, should be comprehensive now.
+
 1.0.6 2026-01-03
         - Add missing PerlX::Maybe in Makefile.PL
 
