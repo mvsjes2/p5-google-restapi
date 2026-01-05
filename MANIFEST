@@ -80,6 +80,8 @@ t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Tie.pm
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Tie.pm.exchanges
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Tie/Iterator.pm
 t/unit/Test/Google/RestApi/SheetsApi4/RangeGroup/Tie/Iterator.pm.exchanges
+t/unit/Test/Google/RestApi/SheetsApi4/Request/Spreadsheet.pm
+t/unit/Test/Google/RestApi/SheetsApi4/Request/Spreadsheet.pm.exchanges
 t/unit/Test/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet.pm
 t/unit/Test/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet.pm.exchanges
 t/unit/Test/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet/Range.pm
