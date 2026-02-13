@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use 5.024001;
+use 5.024000;
 use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
