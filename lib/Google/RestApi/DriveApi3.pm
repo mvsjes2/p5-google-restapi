@@ -1,6 +1,6 @@
 package Google::RestApi::DriveApi3;
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 use Google::RestApi::Setup;
 

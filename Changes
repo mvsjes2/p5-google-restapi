@@ -1,6 +1,10 @@
 Revision history for Perl extension Google::RestApi.
 
-1,1,0 2026-01-04
+1.1.1 2026-02-13
+        - Separate Test::* from prod code. <= dkechang
+        - Add github workflow. <= dkechang
+
+1.1.0 2026-01-04
         - Fill out missing API calls for sheets, should be comprehensive now.
 
 1.0.6 2026-01-03
