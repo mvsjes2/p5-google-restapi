@@ -15,6 +15,7 @@ use Module::Load qw(load);
 use PerlX::Maybe;
 use Sub::Override;
 use Try::Tiny;
+use URI ();
 use YAML::Any qw(LoadFile);
 
 use parent 'Test::Class';
@@ -31,6 +32,7 @@ sub startup : Tests(startup) {
 
   if (my $appender = Log::Log4perl->appender_by_name('UnitTestCapture')) {
     $appender->file_switch($exchange_path);
+    $self->capture_exchanges;
   } elsif (-f $exchange_path) {
     # normalize the exchanges that we previously collected.
     for (LoadFile($exchange_path)) {
@@ -162,6 +164,47 @@ sub mock_http_response {
   # sets the right part of retry::backoff to only wait for .1 seconds between retries.
   # otherwise unit tests take ages to run.
   $self->_sub_override('Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
+
+  return;
+}
+
+sub capture_exchanges {
+  my $self = shift;
+  load('Google::RestApi');
+  my $orig = \&Google::RestApi::_api_callback;
+
+  $self->_sub_override('Google::RestApi', '_api_callback', sub {
+    my ($api) = @_;
+    $orig->($api);
+
+    my $transaction = $api->transaction();
+    my $response = $transaction->{response} or return;
+    my $request = $transaction->{request} || {};
+
+    my $request_uri = URI->new($request->{uri});
+    my %exchange = (
+      source  => find_test_caller(),
+      request => ($request->{method} || '') . ' ' . $request_uri->path,
+
+      provided $request->{params} && $request->{params}->%*,
+      query_params => $request->{params},
+
+      provided $request->{content},
+      request_content => $request->{content},
+
+      response => {
+        code    => $response->code,
+        message => $response->message,
+        headers => [ $response->headers->flatten ],
+
+        maybe
+        content => $response->{content},
+      }
+    );
+
+    get_logger('unit.test.capture')->info(Dump(\%exchange) . "\n");
+    return;
+  });
 
   return;
 }
