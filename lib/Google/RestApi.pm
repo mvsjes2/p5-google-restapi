@@ -8,7 +8,6 @@ use File::Basename qw( dirname );
 use Furl ();
 use JSON::MaybeXS qw( decode_json encode_json JSON );
 use List::Util ();
-use Log::Log4perl qw( get_logger );
 use Module::Load qw( load );
 use PerlX::Maybe qw( maybe provided );
 use Retry::Backoff qw( retry );
@@ -17,8 +16,6 @@ use Storable qw( dclone );
 use Try::Tiny qw( catch try );
 use URI ();
 use URI::QueryParam ();
-
-use Test::Utils qw( find_test_caller );
 
 sub new {
   my $class = shift;
@@ -98,37 +95,8 @@ sub api {
     DEBUG("Rest API response:\n", Dump( $decoded_response ));
   }
 
-  # calls the callback when an api call is madem, if any.
+  # calls the callback when an api call is made, if any.
   $self->_api_callback();
-
-  # this is for capturing request/responses for unit tests.
-  if ($response && Log::Log4perl::appenders->{'UnitTestCapture'}) {
-    # special log category for this. it should be tied to the UnitTestCapture appender.
-    # we want to dump this in the same format as what we need to store in
-    # t/etc/uri_responses.
-    my $test_method = find_test_caller();
-    my %exchange = (
-      source  => $test_method,
-      request => $request->{method} . ' ' . $uri->path,
-
-      provided $request->{params} && $request->{params}->%*,
-      query_params => $request->{params},
-
-      provided $request->{content},
-      request_content => $request->{content},
-
-      response => {
-        code    => $response->code,
-        message => $response->message,
-        headers => [ $response->headers->flatten ],
-
-        maybe
-        content => $response->{content},
-      }
-    );
-
-    get_logger('unit.test.capture')->info(Dump(\%exchange) . "\n");
-  }
 
   if (!$response || !$response->is_success()) {
     $self->_stat('error');
