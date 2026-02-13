@@ -95,7 +95,7 @@ sub api {
     DEBUG("Rest API response:\n", Dump( $decoded_response ));
   }
 
-  # calls the callback when an api call is madem, if any.
+  # calls the callback when an api call is made, if any.
   $self->_api_callback();
 
   if (!$response || !$response->is_success()) {
