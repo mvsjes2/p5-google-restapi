@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.42'
+          - '5.40'
+          - '5.38'
+          - '5.24'
+
+    container:
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
+
+    steps:
+      - uses: actions/checkout@main
+        with:
+            submodules: recursive
+      - run: perl -V
+      - run: cpanm --notest --installdeps --verbose .
+      - run: perl Makefile.PL
+      - run: make
+      - run: prove -wlvmb t
