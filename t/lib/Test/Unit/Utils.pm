@@ -12,7 +12,8 @@ our @EXPORT_OK = qw(
   mock_config_file mock_token_file
   mock_spreadsheet_name mock_spreadsheet_name2
   mock_worksheet_id mock_worksheet_name
-  mock_rest_api mock_sheets_api
+  mock_rest_api mock_sheets_api mock_drive_api
+  mock_file_id mock_file_name
   drive_endpoint sheets_endpoint
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
@@ -27,6 +28,9 @@ sub mock_worksheet_name { 'Sheet1'; }
 # require these ones so that errors in them don't prevent other tests from running.
 sub mock_rest_api { _load_and_new('Google::RestApi', config_file => mock_config_file(), @_); }
 sub mock_sheets_api { _load_and_new('Google::RestApi::SheetsApi4', api => mock_rest_api(), @_); }
+sub mock_drive_api { _load_and_new('Google::RestApi::DriveApi3', api => mock_rest_api(), @_); }
+sub mock_file_id { 'mock_file_id_12345'; }
+sub mock_file_name { 'mock_file_name'; }
 
 sub drive_endpoint { $Google::RestApi::DriveApi3::Drive_Endpoint; }
 sub sheets_endpoint { $Google::RestApi::SheetsApi4::Sheets_Endpoint; }

@@ -1,0 +1,557 @@
+---
+request: POST /v4/spreadsheets
+request_content:
+  properties:
+    title: mock_spreadsheet1
+response:
+  code: 200
+  content: |
+    {
+      "spreadsheetId": "13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4",
+      "properties": {
+        "title": "mock_spreadsheet1",
+        "locale": "en_GB",
+        "autoRecalc": "ON_CHANGE",
+        "timeZone": "Etc/GMT",
+        "defaultFormat": {
+          "backgroundColor": {
+            "red": 1,
+            "green": 1,
+            "blue": 1
+          },
+          "padding": {
+            "top": 2,
+            "right": 3,
+            "bottom": 2,
+            "left": 3
+          },
+          "verticalAlignment": "BOTTOM",
+          "wrapStrategy": "OVERFLOW_CELL",
+          "textFormat": {
+            "foregroundColor": {},
+            "fontFamily": "arial,sans,sans-serif",
+            "fontSize": 10,
+            "bold": false,
+            "italic": false,
+            "strikethrough": false,
+            "underline": false,
+            "foregroundColorStyle": {
+              "rgbColor": {}
+            }
+          },
+          "backgroundColorStyle": {
+            "rgbColor": {
+              "red": 1,
+              "green": 1,
+              "blue": 1
+            }
+          }
+        },
+        "spreadsheetTheme": {
+          "primaryFontFamily": "Arial",
+          "themeColors": [
+            {
+              "colorType": "TEXT",
+              "color": {
+                "rgbColor": {}
+              }
+            },
+            {
+              "colorType": "BACKGROUND",
+              "color": {
+                "rgbColor": {
+                  "red": 1,
+                  "green": 1,
+                  "blue": 1
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT1",
+              "color": {
+                "rgbColor": {
+                  "red": 0.25882354,
+                  "green": 0.52156866,
+                  "blue": 0.95686275
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT2",
+              "color": {
+                "rgbColor": {
+                  "red": 0.91764706,
+                  "green": 0.2627451,
+                  "blue": 0.20784314
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT3",
+              "color": {
+                "rgbColor": {
+                  "red": 0.9843137,
+                  "green": 0.7372549,
+                  "blue": 0.015686275
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT4",
+              "color": {
+                "rgbColor": {
+                  "red": 0.20392157,
+                  "green": 0.65882355,
+                  "blue": 0.3254902
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT5",
+              "color": {
+                "rgbColor": {
+                  "red": 1,
+                  "green": 0.42745098,
+                  "blue": 0.003921569
+                }
+              }
+            },
+            {
+              "colorType": "ACCENT6",
+              "color": {
+                "rgbColor": {
+                  "red": 0.27450982,
+                  "green": 0.7411765,
+                  "blue": 0.7764706
+                }
+              }
+            },
+            {
+              "colorType": "LINK",
+              "color": {
+                "rgbColor": {
+                  "red": 0.06666667,
+                  "green": 0.33333334,
+                  "blue": 0.8
+                }
+              }
+            }
+          ]
+        }
+      },
+      "sheets": [
+        {
+          "properties": {
+            "sheetId": 0,
+            "title": "Sheet1",
+            "index": 0,
+            "sheetType": "GRID",
+            "gridProperties": {
+              "rowCount": 1000,
+              "columnCount": 26
+            }
+          }
+        }
+      ],
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/edit"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-content-type-options
+    - nosniff
+    - accept-ranges
+    - none
+    - x-xss-protection
+    - 0
+    - x-l2-request-path
+    - l2-managed-6
+    - server
+    - ESF
+    - date
+    - 'Sat, 10 Jan 2026 16:32:57 GMT'
+    - transfer-encoding
+    - chunked
+  message: OK
+source: Test::Unit::TestBase::startup
+
+---
+query_params:
+  fields: 'id, content, author, createdTime'
+request: POST /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments
+request_content:
+  content: Test comment
+response:
+  code: 200
+  content: |
+    {
+      "author": {
+        "displayName": "Robin Murray",
+        "kind": "drive#user",
+        "me": true,
+        "photoLink": "//lh3.googleusercontent.com/a/ACg8ocIDNKjY4l2Rgl58YSBfL2p5ANmnLvor41ZFc0vBzMo2uzizK-8=s50-c-k-no"
+      },
+      "id": "AAABydfU3Po",
+      "createdTime": "2026-01-10T16:32:59.818Z",
+      "content": "Test comment"
+    }
+  headers:
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - accept-ranges
+    - none
+    - content-type
+    - application/json; charset=UTF-8
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - x-xss-protection
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
+    - pragma
+    - no-cache
+    - date
+    - 'Sat, 10 Jan 2026 16:33:01 GMT'
+    - transfer-encoding
+    - chunked
+  message: OK
+source: Test::Google::RestApi::DriveApi3::Reply::_constructor
+
+---
+request: DELETE /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments/AAABydfU3Po
+response:
+  code: 204
+  content: ''
+  headers:
+    - date
+    - 'Sat, 10 Jan 2026 16:33:02 GMT'
+    - server
+    - ESF
+    - pragma
+    - no-cache
+    - x-xss-protection
+    - 0
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - content-length
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - content-type
+    - text/html
+    - vary
+    - 'Origin, X-Origin'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+  message: No Content
+source: Test::Google::RestApi::DriveApi3::Reply::_constructor
+
+---
+query_params:
+  fields: 'id, content, author, createdTime'
+request: POST /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments
+request_content:
+  content: Test comment
+response:
+  code: 200
+  content: |
+    {
+      "author": {
+        "displayName": "Robin Murray",
+        "kind": "drive#user",
+        "me": true,
+        "photoLink": "//lh3.googleusercontent.com/a/ACg8ocIDNKjY4l2Rgl58YSBfL2p5ANmnLvor41ZFc0vBzMo2uzizK-8=s50-c-k-no"
+      },
+      "id": "AAABydfU3Ps",
+      "createdTime": "2026-01-10T16:33:05.099Z",
+      "content": "Test comment"
+    }
+  headers:
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - accept-ranges
+    - none
+    - content-type
+    - application/json; charset=UTF-8
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - x-xss-protection
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
+    - date
+    - 'Sat, 10 Jan 2026 16:33:05 GMT'
+    - pragma
+    - no-cache
+    - transfer-encoding
+    - chunked
+  message: OK
+source: Test::Google::RestApi::DriveApi3::Reply::accessors
+
+---
+request: DELETE /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments/AAABydfU3Ps
+response:
+  code: 204
+  content: ''
+  headers:
+    - vary
+    - 'Origin, X-Origin'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - content-type
+    - text/html
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - content-length
+    - 0
+    - date
+    - 'Sat, 10 Jan 2026 16:33:07 GMT'
+    - pragma
+    - no-cache
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - x-xss-protection
+    - 0
+  message: No Content
+source: Test::Google::RestApi::DriveApi3::Reply::accessors
+
+---
+query_params:
+  fields: 'id, content, author, createdTime'
+request: POST /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments
+request_content:
+  content: Test comment for reply
+response:
+  code: 200
+  content: |
+    {
+      "author": {
+        "displayName": "Robin Murray",
+        "kind": "drive#user",
+        "me": true,
+        "photoLink": "//lh3.googleusercontent.com/a/ACg8ocIDNKjY4l2Rgl58YSBfL2p5ANmnLvor41ZFc0vBzMo2uzizK-8=s50-c-k-no"
+      },
+      "id": "AAABydfU3Pw",
+      "createdTime": "2026-01-10T16:33:09.354Z",
+      "content": "Test comment for reply"
+    }
+  headers:
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - x-xss-protection
+    - 0
+    - transfer-encoding
+    - chunked
+    - pragma
+    - no-cache
+    - server
+    - ESF
+    - date
+    - 'Sat, 10 Jan 2026 16:33:09 GMT'
+    - accept-ranges
+    - none
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DriveApi3::Reply::create_and_delete
+
+---
+query_params:
+  fields: 'id, content, author, createdTime'
+request: POST /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments
+request_content:
+  content: Test comment
+response:
+  code: 200
+  content: |
+    {
+      "author": {
+        "displayName": "Robin Murray",
+        "kind": "drive#user",
+        "me": true,
+        "photoLink": "//lh3.googleusercontent.com/a/ACg8ocIDNKjY4l2Rgl58YSBfL2p5ANmnLvor41ZFc0vBzMo2uzizK-8=s50-c-k-no"
+      },
+      "id": "AAABydfU3P0",
+      "createdTime": "2026-01-10T16:33:12.021Z",
+      "content": "Test comment"
+    }
+  headers:
+    - transfer-encoding
+    - chunked
+    - date
+    - 'Sat, 10 Jan 2026 16:33:12 GMT'
+    - pragma
+    - no-cache
+    - server
+    - ESF
+    - x-xss-protection
+    - 0
+    - accept-ranges
+    - none
+    - x-content-type-options
+    - nosniff
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DriveApi3::Reply::requires_id
+
+---
+request: DELETE /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments/AAABydfU3P0
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-length
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - content-type
+    - text/html
+    - vary
+    - 'Origin, X-Origin'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - date
+    - 'Sat, 10 Jan 2026 16:33:14 GMT'
+    - server
+    - ESF
+    - pragma
+    - no-cache
+    - x-xss-protection
+    - 0
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+  message: No Content
+source: Test::Google::RestApi::DriveApi3::Reply::requires_id
+
+---
+request: DELETE /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - vary
+    - 'Origin, X-Origin'
+    - x-content-type-options
+    - nosniff
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - server
+    - ESF
+    - pragma
+    - no-cache
+    - date
+    - 'Sat, 10 Jan 2026 16:33:16 GMT'
+    - content-length
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - x-xss-protection
+    - 0
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+  message: No Content
+source: Test::Unit::TestBase::shutdown
+
+---
+query_params:
+  fields: 'nextPageToken, files(id, name)'
+  q: mimeType = 'application/vnd.google-apps.spreadsheet' and (name contains 'mock_spreadsheet')
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: "{\n  \"files\": []\n}\n"
+  headers:
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - x-xss-protection
+    - 0
+    - transfer-encoding
+    - chunked
+    - date
+    - 'Sat, 10 Jan 2026 16:33:18 GMT'
+    - pragma
+    - no-cache
+    - server
+    - ESF
+    - accept-ranges
+    - none
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Unit::TestBase::shutdown
+
