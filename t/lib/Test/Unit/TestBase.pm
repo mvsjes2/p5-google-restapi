@@ -178,8 +178,8 @@ sub capture_exchanges {
     $orig->($api);
 
     my $transaction = $api->transaction();
-    my $response = $transaction->{response} or return;
-    my $request = $transaction->{request} || {};
+    my $response    = $transaction->{response} or return;
+    my $request     = $transaction->{request} || {};
 
     my $request_uri = URI->new($request->{uri});
     my %exchange = (
@@ -195,7 +195,7 @@ sub capture_exchanges {
       response => {
         code    => $response->code,
         message => $response->message,
-        headers => [ $response->headers->flatten ],
+        headers => [$response->headers->flatten],
 
         maybe
         content => $response->{content},
