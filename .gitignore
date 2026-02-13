@@ -30,3 +30,5 @@ nytprof.out
 
 # Code::TidyAll Test::Code::TidyAll cache:
 /.tidyall.d/
+
+/.claude/
