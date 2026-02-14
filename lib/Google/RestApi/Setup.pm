@@ -3,7 +3,7 @@ package Google::RestApi::Setup;
 use strict;
 use warnings;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.2.0';
 
 use parent 'ToolSet';
 
