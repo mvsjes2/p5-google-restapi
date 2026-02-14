@@ -404,6 +404,172 @@ source: Test::Google::RestApi::DriveApi3::Reply::create_and_delete
 ---
 query_params:
   fields: 'id, content, author, createdTime'
+request: POST /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments/AAABydfU3Pw/replies
+request_content:
+  content: Test reply from unit tests
+response:
+  code: 200
+  content: |
+    {
+      "author": {
+        "displayName": "Test User",
+        "kind": "drive#user",
+        "me": true,
+        "photoLink": "://photo.example.com/placeholder"
+      },
+      "id": "AAABydfU3Pz",
+      "createdTime": "2026-01-10T16:33:10.123Z",
+      "content": "Test reply from unit tests"
+    }
+  headers:
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - accept-ranges
+    - none
+    - content-type
+    - application/json; charset=UTF-8
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - x-xss-protection
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
+    - pragma
+    - no-cache
+    - date
+    - 'Sat, 10 Jan 2026 16:33:10 GMT'
+    - transfer-encoding
+    - chunked
+  message: OK
+source: Test::Google::RestApi::DriveApi3::Reply::create_and_delete
+
+---
+query_params:
+  fields: 'id,content,author,createdTime,modifiedTime'
+  includeDeleted: false
+request: GET /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments/AAABydfU3Pw/replies/AAABydfU3Pz
+response:
+  code: 200
+  content: |
+    {
+      "author": {
+        "displayName": "Test User",
+        "kind": "drive#user",
+        "me": true,
+        "photoLink": "://photo.example.com/placeholder"
+      },
+      "id": "AAABydfU3Pz",
+      "createdTime": "2026-01-10T16:33:10.123Z",
+      "modifiedTime": "2026-01-10T16:33:10.123Z",
+      "content": "Test reply from unit tests"
+    }
+  headers:
+    - transfer-encoding
+    - chunked
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - x-content-type-options
+    - nosniff
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - content-type
+    - application/json; charset=UTF-8
+    - x-xss-protection
+    - 0
+    - date
+    - 'Sat, 10 Jan 2026 16:33:11 GMT'
+    - accept-ranges
+    - none
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - pragma
+    - no-cache
+    - server
+    - ESF
+  message: OK
+source: Test::Google::RestApi::DriveApi3::Reply::create_and_delete
+
+---
+request: DELETE /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments/AAABydfU3Pw/replies/AAABydfU3Pz
+response:
+  code: 204
+  content: ''
+  headers:
+    - vary
+    - 'Origin, X-Origin'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - content-type
+    - text/html
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - content-length
+    - 0
+    - date
+    - 'Sat, 10 Jan 2026 16:33:12 GMT'
+    - pragma
+    - no-cache
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - x-xss-protection
+    - 0
+  message: No Content
+source: Test::Google::RestApi::DriveApi3::Reply::create_and_delete
+
+---
+request: DELETE /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments/AAABydfU3Pw
+response:
+  code: 204
+  content: ''
+  headers:
+    - date
+    - 'Sat, 10 Jan 2026 16:33:13 GMT'
+    - server
+    - ESF
+    - pragma
+    - no-cache
+    - x-xss-protection
+    - 0
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - content-length
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - content-type
+    - text/html
+    - vary
+    - 'Origin, X-Origin'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+  message: No Content
+source: Test::Google::RestApi::DriveApi3::Reply::create_and_delete
+
+---
+query_params:
+  fields: 'id, content, author, createdTime'
 request: POST /drive/v3/files/13-wNrcF6idjUE5I9j8QExuLstMRTWU-5UX-bNwIo8A4/comments
 request_content:
   content: Test comment
