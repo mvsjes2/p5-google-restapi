@@ -92,4 +92,6 @@ my $row;
   end("$search\'s customer ID is $row->{id}.");
 }
 
+message('green', "\nRun ../99_delete_all.pl to clean up the tutorial spreadsheet.\n");
+
 message('blue', "We are done, here are some api stats:\n", Dump($ss->stats()));
