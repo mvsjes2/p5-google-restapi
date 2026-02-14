@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.2.0';
 
 use Google::RestApi::Setup;
 
@@ -195,8 +195,6 @@ didn't use Moose anywhere else in this framework.
 
 =head2 sub new
 
-=over 2
-
  config_file: Optional YAML configuration file that can specify any
    or all of the following args:
  client_id: The OAuth2 client id supplied by Google.
@@ -208,6 +206,8 @@ didn't use Moose anywhere else in this framework.
 
 You can specify any of the arguments in the optional YAML config file.
 Any passed in arguments will override what is in the config file.
+
+=over 2
 
 =item * client_id
 
