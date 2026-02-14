@@ -256,7 +256,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
+Google::RestApi - Connection to Google REST APIs (currently Drive, Sheets, and Calendar).
 
 =head1 SYNOPSIS
 
@@ -301,8 +301,8 @@ Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
 
 =head1 DESCRIPTION
 
-Google Rest API is the foundation class used by the included Drive (L<Google::RestApi::DriveApi3>) and Sheets (L<Google::RestApi::SheetsApi4>) APIs. It is used
-to send API requests to the Google API endpoint on behalf of the underlying API classes.
+Google Rest API is the foundation class used by the included Drive (L<Google::RestApi::DriveApi3>), Sheets (L<Google::RestApi::SheetsApi4>),
+and Calendar (L<Google::RestApi::CalendarApi3>) APIs. It is used to send API requests to the Google API endpoint on behalf of the underlying API classes.
 
 =head1 NAVIGATION
 
@@ -357,6 +357,20 @@ to send API requests to the Google API endpoint on behalf of the underlying API 
 =item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet>
 
 =item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range>
+
+=item * L<Google::RestApi::CalendarApi3>
+
+=item * L<Google::RestApi::CalendarApi3::Calendar>
+
+=item * L<Google::RestApi::CalendarApi3::Event>
+
+=item * L<Google::RestApi::CalendarApi3::Acl>
+
+=item * L<Google::RestApi::CalendarApi3::CalendarList>
+
+=item * L<Google::RestApi::CalendarApi3::Colors>
+
+=item * L<Google::RestApi::CalendarApi3::Settings>
 
 =back
 

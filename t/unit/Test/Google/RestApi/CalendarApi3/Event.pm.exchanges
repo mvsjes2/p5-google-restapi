@@ -1,0 +1,88 @@
+---
+request: POST /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/events
+request_content:
+  summary: Test Event
+  start:
+    dateTime: '2026-03-01T10:00:00Z'
+  end:
+    dateTime: '2026-03-01T11:00:00Z'
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#event",
+      "etag": "\"test_etag\"",
+      "id": "mock_event_id_12345",
+      "summary": "Test Event",
+      "start": { "dateTime": "2026-03-01T10:00:00Z" },
+      "end": { "dateTime": "2026-03-01T11:00:00Z" },
+      "status": "confirmed"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Event::create_and_delete
+
+---
+request: GET /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/events/mock_event_id_12345
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#event",
+      "etag": "\"test_etag\"",
+      "id": "mock_event_id_12345",
+      "summary": "Test Event",
+      "start": { "dateTime": "2026-03-01T10:00:00Z" },
+      "end": { "dateTime": "2026-03-01T11:00:00Z" },
+      "status": "confirmed"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Event::create_and_delete
+
+---
+request: DELETE /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/events/mock_event_id_12345
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::CalendarApi3::Event::create_and_delete
+
+---
+query_params:
+  text: Lunch tomorrow at noon
+request: POST /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/events/quickAdd
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#event",
+      "etag": "\"test_etag\"",
+      "id": "mock_quick_event_id",
+      "summary": "Lunch tomorrow at noon",
+      "status": "confirmed"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Event::quick_add
+
+---
+request: DELETE /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/events/mock_quick_event_id
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::CalendarApi3::Event::quick_add
+

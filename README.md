@@ -1,6 +1,6 @@
 # NAME
 
-Google::RestApi - API to Google Drive API V3 and Sheets API V4.
+Google::RestApi - API to Google Drive API V3, Sheets API V4, and Calendar API V3.
 
 # SYNOPSIS
 
@@ -119,7 +119,7 @@ Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 
 # DESCRIPTION
 
-Google::RestApi is a framework for interfacing with Google products, currently Drive and Sheets.
+Google::RestApi is a framework for interfacing with Google products, currently Drive, Sheets, and Calendar.
 
 The biggest hurdle to using this library is actually setting up the authorization to access your Drive and Sheets account via a script.
 The Google development web space is huge and complex. All that's required here is an OAuth2 token to authorize your script that uses this
@@ -138,6 +138,13 @@ The synopsis above is a quick reference. For more detailed information, most of 
     Google::RestApi::DriveApi3::Comment
     Google::RestApi::DriveApi3::Reply
     Google::RestApi::DriveApi3::Revision
+    Google::RestApi::CalendarApi3
+    Google::RestApi::CalendarApi3::Calendar
+    Google::RestApi::CalendarApi3::Event
+    Google::RestApi::CalendarApi3::Acl
+    Google::RestApi::CalendarApi3::CalendarList
+    Google::RestApi::CalendarApi3::Colors
+    Google::RestApi::CalendarApi3::Settings
     Google::RestApi::SheetsApi4
     Google::RestApi::SheetsApi4::Spreadsheet
     Google::RestApi::SheetsApi4::Worksheet

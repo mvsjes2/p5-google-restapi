@@ -1,0 +1,38 @@
+---
+request: GET /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#calendar",
+      "etag": "\"test_etag\"",
+      "id": "mock_calendar_id@group.calendar.google.com",
+      "summary": "Mock Calendar",
+      "timeZone": "Australia/Sydney"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Calendar::get
+
+---
+request: PUT /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com
+request_content:
+  summary: Updated Calendar
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#calendar",
+      "etag": "\"updated_etag\"",
+      "id": "mock_calendar_id@group.calendar.google.com",
+      "summary": "Updated Calendar",
+      "timeZone": "Australia/Sydney"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Calendar::update
+

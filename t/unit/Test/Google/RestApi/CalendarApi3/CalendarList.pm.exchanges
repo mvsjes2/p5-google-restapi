@@ -1,0 +1,50 @@
+---
+request: GET /calendar/v3/users/me/calendarList/primary
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#calendarListEntry",
+      "etag": "\"test_etag\"",
+      "id": "primary",
+      "summary": "user@gmail.com",
+      "timeZone": "Australia/Sydney",
+      "accessRole": "owner"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::CalendarList::get
+
+---
+request: POST /calendar/v3/users/me/calendarList
+request_content:
+  id: test_cal@group.calendar.google.com
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#calendarListEntry",
+      "etag": "\"test_etag\"",
+      "id": "test_cal@group.calendar.google.com",
+      "summary": "Test Calendar",
+      "accessRole": "owner"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::CalendarList::insert_and_delete
+
+---
+request: DELETE /calendar/v3/users/me/calendarList/test_cal@group.calendar.google.com
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::CalendarApi3::CalendarList::insert_and_delete
+

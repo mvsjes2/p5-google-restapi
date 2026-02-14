@@ -17,6 +17,7 @@ use Google::RestApi::Auth::OAuth2Client ();
 # set the scope for the project you are working one.
 # for this package, drive and spreadsheets are required.
 my @scope = (
+  'https://www.googleapis.com/auth/calendar',
   'https://www.googleapis.com/auth/drive',
   'https://www.googleapis.com/auth/spreadsheets',
 );
