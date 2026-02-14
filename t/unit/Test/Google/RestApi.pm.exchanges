@@ -1,7 +1,7 @@
 ---
 request: 'GET '
 response:
-  code: '200'
+  code: 200
   content: '{}'
   headers: []
   message: OK
@@ -10,7 +10,7 @@ source: Test::Google::RestApi::api
 ---
 request: 'GET '
 response:
-  code: '200'
+  code: 200
   content: '{}'
   headers: []
   message: OK
@@ -21,7 +21,7 @@ query_params:
   fred: joe
 request: 'GET '
 response:
-  code: '200'
+  code: 200
   content: '{}'
   headers: []
   message: OK
@@ -57,7 +57,7 @@ source: Test::Google::RestApi::api
 ---
 request: 'GET '
 response:
-  code: '200'
+  code: 200
   content: '{}'
   headers: []
   message: OK
@@ -84,7 +84,7 @@ source: Test::Google::RestApi::api_callback
 ---
 request: 'GET '
 response:
-  code: '200'
+  code: 200
   content: '{}'
   headers: []
   message: OK

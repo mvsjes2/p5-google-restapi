@@ -26,8 +26,29 @@ Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 >
 >     use Google::RestApi::DriveApi3;
 >     $drive = Google::RestApi::DriveApi3->new(api => $rest_api);
+>
+>     # file operations
 >     $file = $drive->file(id => 'xxxx');
->     $copy = $file->copy(title => 'my-copy-of-xxx');
+>     $copy = $file->copy(name => 'my-copy-of-xxx');
+>     $file->update(name => 'new-name', description => 'new desc');
+>     $file->export(mime_type => 'application/pdf');
+>
+>     # permissions
+>     $file->permission()->create(role => 'reader', type => 'anyone');
+>     @perms = $file->permissions();
+>
+>     # comments and replies
+>     $comment = $file->comment()->create(content => 'Looks good!');
+>     $reply = $comment->reply()->create(content => 'Thanks!');
+>     @comments = $file->comments();
+>
+>     # revisions
+>     @revs = $file->revisions();
+>
+>     # drive-level operations
+>     $about = $drive->about();
+>     $changes = $drive->changes();
+>     @shared = $drive->shared_drives();
 >
 >     use Google::RestApi::SheetsApi4;
 >     $sheets_api = Google::RestApi::SheetsApi4->new(api => $rest_api);
@@ -109,6 +130,14 @@ The synopsis above is a quick reference. For more detailed information, most of 
 
     Google::RestApi
     Google::RestApi::DriveApi3
+    Google::RestApi::DriveApi3::File
+    Google::RestApi::DriveApi3::About
+    Google::RestApi::DriveApi3::Changes
+    Google::RestApi::DriveApi3::Drive
+    Google::RestApi::DriveApi3::Permission
+    Google::RestApi::DriveApi3::Comment
+    Google::RestApi::DriveApi3::Reply
+    Google::RestApi::DriveApi3::Revision
     Google::RestApi::SheetsApi4
     Google::RestApi::SheetsApi4::Spreadsheet
     Google::RestApi::SheetsApi4::Worksheet
