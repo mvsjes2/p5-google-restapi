@@ -19,7 +19,7 @@ sub api {
   my $self = shift;
   my %p = @_;
   my $uri = "comments";
-  $uri .= "/$self->{id}" if $self->{id} && !$p{uri};
+  $uri .= "/$self->{id}" if $self->{id};
   $uri .= "/$p{uri}" if $p{uri};
   delete $p{uri};
   return $self->file()->api(%p, uri => $uri);

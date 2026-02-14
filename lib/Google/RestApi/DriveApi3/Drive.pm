@@ -17,7 +17,7 @@ sub api {
   my $self = shift;
   my %p = @_;
   my $uri = "drives";
-  $uri .= "/$self->{id}" if $self->{id} && !$p{uri};
+  $uri .= "/$self->{id}" if $self->{id};
   $uri .= "/$p{uri}" if $p{uri};
   delete $p{uri};
   return $self->drive_api()->api(%p, uri => $uri);
