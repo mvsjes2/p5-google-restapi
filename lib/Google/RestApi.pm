@@ -372,6 +372,18 @@ and Calendar (L<Google::RestApi::CalendarApi3>) APIs. It is used to send API req
 
 =item * L<Google::RestApi::CalendarApi3::Settings>
 
+=item * L<Google::RestApi::GmailApi1>
+
+=item * L<Google::RestApi::GmailApi1::Message>
+
+=item * L<Google::RestApi::GmailApi1::Attachment>
+
+=item * L<Google::RestApi::GmailApi1::Thread>
+
+=item * L<Google::RestApi::GmailApi1::Draft>
+
+=item * L<Google::RestApi::GmailApi1::Label>
+
 =back
 
 =head1 SUBROUTINES

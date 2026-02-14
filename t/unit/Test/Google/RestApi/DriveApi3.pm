@@ -82,6 +82,29 @@ sub list : Tests(2) {
   return;
 }
 
+sub list_max_pages : Tests(2) {
+  my $self = shift;
+
+  my $ss = $self->mock_spreadsheet();
+  my $drive = mock_drive_api();
+
+  my @files = $drive->list("name = '" . mock_spreadsheet_name() . "'", {}, 1);
+  ok scalar(@files) >= 1, 'List with max_pages should return results';
+  ok $files[0]->{id}, 'File has an ID';
+
+  return;
+}
+
+sub list_drives_max_pages : Tests(1) {
+  my $self = shift;
+
+  my $drive = mock_drive_api();
+  my @drives = $drive->list_drives(max_pages => 1);
+  ok defined(\@drives), 'list_drives with max_pages accepts param';
+
+  return;
+}
+
 sub shared_drive_factory : Tests(2) {
   my $self = shift;
 
