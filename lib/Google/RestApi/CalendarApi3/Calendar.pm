@@ -87,23 +87,27 @@ sub event {
 sub events {
   my $self = shift;
   state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+    fields    => Str, { optional => 1 },
+    max_pages => Int, { default => 0 },
+    params    => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
+  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'items(id, summary, start, end)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'events', params => $params);
     push(@list, $result->{items}->@*) if $result->{items};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -120,23 +124,27 @@ sub acl {
 sub acl_rules {
   my $self = shift;
   state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+    fields    => Str, { optional => 1 },
+    max_pages => Int, { default => 0 },
+    params    => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
+  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'items(id, role, scope)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'acl', params => $params);
     push(@list, $result->{items}->@*) if $result->{items};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -209,17 +217,19 @@ Clears all events from a calendar. Only works on the primary calendar.
 
 Returns an Event object. Without id, can be used to create new events.
 
-=head2 events()
+=head2 events(max_pages => $n)
 
-Lists all events on the calendar.
+Lists all events on the calendar. C<max_pages> limits the number of pages
+fetched (default 0 = unlimited).
 
 =head2 acl(id => $id)
 
 Returns an Acl object. Without id, can be used to create new ACL rules.
 
-=head2 acl_rules()
+=head2 acl_rules(max_pages => $n)
 
-Lists all ACL rules on the calendar.
+Lists all ACL rules on the calendar. C<max_pages> limits the number of pages
+fetched (default 0 = unlimited).
 
 =head2 calendar_id()
 

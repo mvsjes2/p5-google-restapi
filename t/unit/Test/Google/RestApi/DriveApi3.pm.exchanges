@@ -320,6 +320,44 @@ response:
 source: Test::Google::RestApi::DriveApi3::list
 
 ---
+query_params:
+  fields: 'nextPageToken, files(id, name)'
+  q: name = 'mock_spreadsheet1'
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: |
+    {
+      "files": [
+        {
+          "id": "1Rfp0znvD1FP8_tF82IzgRshEtEzQYrGtEr_Ohq0DOV4",
+          "name": "mock_spreadsheet1"
+        }
+      ],
+      "nextPageToken": "page2_token"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DriveApi3::list_max_pages
+
+---
+request: GET /drive/v3/drives
+response:
+  code: 200
+  content: |
+    {
+      "drives": [],
+      "nextPageToken": "page2_token"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DriveApi3::list_drives_max_pages
+
+---
 request: DELETE /drive/v3/files/1Rfp0znvD1FP8_tF82IzgRshEtEzQYrGtEr_Ohq0DOV4
 response:
   code: 204

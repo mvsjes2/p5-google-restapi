@@ -98,4 +98,16 @@ sub list_calendars : Tests(2) {
   return;
 }
 
+sub list_calendars_max_pages : Tests(2) {
+  my $self = shift;
+
+  my $cal_api = mock_calendar_api();
+
+  my @calendars = $cal_api->list_calendars(max_pages => 1);
+  ok scalar(@calendars) >= 1, 'List with max_pages should return results';
+  ok $calendars[0]->{id}, 'Calendar has an ID';
+
+  return;
+}
+
 1;

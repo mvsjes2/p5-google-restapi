@@ -89,22 +89,26 @@ sub create_calendar {
 sub list_calendars {
   my $self = shift;
   state $check = compile_named(
-    params => HashRef, { default => {} },
+    max_pages => Int, { default => 0 },
+    params    => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
+  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'items(id, summary)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'users/me/calendarList', params => $params);
     push(@list, $result->{items}->@*) if $result->{items};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -386,9 +390,12 @@ Returns a Calendar object for the created calendar.
 
 =head2 list_calendars(%args)
 
-Lists all calendars visible to the user. Handles pagination automatically.
+Lists all calendars visible to the user.
 
  my @calendars = $cal_api->list_calendars();
+ my @calendars = $cal_api->list_calendars(max_pages => 2);
+
+C<max_pages> limits the number of pages fetched (default 0 = unlimited).
 
 Returns a list of calendar hashrefs with id and summary.
 
@@ -423,6 +430,8 @@ Queries free/busy information for a set of calendars.
 =item * L<Google::RestApi::DriveApi3> - Google Drive API (related module)
 
 =item * L<Google::RestApi::SheetsApi4> - Google Sheets API (related module)
+
+=item * L<Google::RestApi::GmailApi1> - Google Gmail API (related module)
 
 =item * L<https://developers.google.com/calendar/api/v3/reference> - Google Calendar API Reference
 

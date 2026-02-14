@@ -63,6 +63,31 @@ sub event_factory : Tests(2) {
   return;
 }
 
+sub events_max_pages : Tests(2) {
+  my $self = shift;
+
+  my $cal_api = mock_calendar_api();
+  my $cal = $cal_api->calendar(id => mock_calendar_id());
+
+  my @events = $cal->events(max_pages => 1);
+  ok scalar(@events) >= 1, 'Events with max_pages returns results';
+  ok $events[0]->{id}, 'Event has an ID';
+
+  return;
+}
+
+sub acl_rules_max_pages : Tests(1) {
+  my $self = shift;
+
+  my $cal_api = mock_calendar_api();
+  my $cal = $cal_api->calendar(id => mock_calendar_id());
+
+  my @rules = $cal->acl_rules(max_pages => 1);
+  ok defined(\@rules), 'acl_rules with max_pages accepts param';
+
+  return;
+}
+
 sub acl_factory : Tests(2) {
   my $self = shift;
 

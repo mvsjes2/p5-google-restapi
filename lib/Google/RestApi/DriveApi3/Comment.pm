@@ -116,12 +116,14 @@ sub replies {
   state $check = compile_named(
     fields          => Str, { optional => 1 },
     include_deleted => Bool, { default => 0 },
+    max_pages       => Int, { default => 0 },
     params          => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
   LOGDIE "Comment ID required for replies()" unless $self->{id};
 
+  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'replies(id, content, author, createdTime)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
@@ -129,12 +131,14 @@ sub replies {
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'replies', params => $params);
     push(@list, $result->{replies}->@*) if $result->{replies};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -205,9 +209,10 @@ Deletes the comment. Requires comment ID.
 
 Returns a Reply object. Without id, can create new replies.
 
-=head2 replies(include_deleted => $bool)
+=head2 replies(include_deleted => $bool, max_pages => $n)
 
-Lists all replies to the comment.
+Lists all replies to the comment. C<max_pages> limits the number of pages
+fetched (default 0 = unlimited).
 
 =head2 comment_id()
 

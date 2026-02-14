@@ -36,3 +36,44 @@ response:
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Calendar::update
 
+---
+request: GET /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/events
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#events",
+      "etag": "\"test_etag\"",
+      "nextPageToken": "page2_token",
+      "items": [
+        {
+          "id": "mock_event_id_1",
+          "summary": "Test Event",
+          "start": { "dateTime": "2026-03-01T10:00:00Z" },
+          "end": { "dateTime": "2026-03-01T11:00:00Z" }
+        }
+      ]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Calendar::events_max_pages
+
+---
+request: GET /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/acl
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#acl",
+      "etag": "\"test_etag\"",
+      "nextPageToken": "page2_token",
+      "items": []
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Calendar::acl_rules_max_pages
+
