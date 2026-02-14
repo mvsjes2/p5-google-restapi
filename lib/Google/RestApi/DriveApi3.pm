@@ -147,6 +147,8 @@ sub empty_trash {
   );
 }
 
+sub rest_api { shift->{api}; }
+
 1;
 
 __END__
