@@ -14,10 +14,11 @@ use YAML::Any qw(Dump LoadFile);
 
 use aliased "Google::RestApi";
 use aliased "Google::RestApi::SheetsApi4";
+use aliased "Google::RestApi::DriveApi3";
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
-  rest_api sheets_api
+  rest_api sheets_api drive_api
   spreadsheet_name
   message start end end_go start_note
   show_api
@@ -25,7 +26,8 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
 sub rest_api { RestApi->new(@_, config_file => config_file()); }
-sub sheets_api { SheetsApi4->new(@_, api => rest_api()); }
+sub sheets_api { SheetsApi4->new(api => rest_api(), @_); }
+sub drive_api { DriveApi3->new(api => rest_api(), @_); }
 
 # point GOOGLE_RESTAPI_CONFIG to a file that contains the OAuth2 access config
 # for integration and tutorials to run. unit tests are mocked so is not needed

@@ -1,4 +1,3 @@
-* check perlbrew is active on terminal
 * cpanm PPI::App::ppi_version
 * ppi_version change $old_version $new_version
 * git grep $old_version, update anything remaining
@@ -9,13 +8,10 @@
 * git push
 * git tag $new_version
 * git push origin $new_version
+* ensure git workflow passes on configured perl releases
 * make
 * make test
 * make dist
-* perlbrew off
-* perlbrew uninstall $perl_version
-* perlbrew install $perl_version
-* perlbrew swtich $perl_version
 * cpanm Google-RestApi-$new_version.tar.gz
 * make test again to check that everything installed correctly
 * cpan-upload Google-RestApi-${new_version}.tar.gz --user $user

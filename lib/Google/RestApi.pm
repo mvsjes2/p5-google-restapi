@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.2.0';
 
 use Google::RestApi::Setup;
 
@@ -286,7 +286,14 @@ Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
   use Google::RestApi::DriveApi3;
   $drive = Google::RestApi::DriveApi3->new(api => $rest_api);
   $file = $drive->file(id => 'xxxx');
-  $copy = $file->copy(title => 'my-copy-of-xxx');
+  $copy = $file->copy(name => 'my-copy-of-xxx');
+  $file->update(description => 'Updated via API');
+
+  # permissions, comments, replies, revisions
+  $file->permission()->create(role => 'reader', type => 'anyone');
+  $comment = $file->comment()->create(content => 'Looks good!');
+  $comment->reply()->create(content => 'Thanks!');
+  @revisions = $file->revisions();
 
   print YAML::Any::Dump($rest_api->stats());
 
@@ -304,6 +311,20 @@ to send API requests to the Google API endpoint on behalf of the underlying API 
 =item * L<Google::RestApi::DriveApi3>
 
 =item * L<Google::RestApi::DriveApi3::File>
+
+=item * L<Google::RestApi::DriveApi3::About>
+
+=item * L<Google::RestApi::DriveApi3::Changes>
+
+=item * L<Google::RestApi::DriveApi3::Drive>
+
+=item * L<Google::RestApi::DriveApi3::Permission>
+
+=item * L<Google::RestApi::DriveApi3::Comment>
+
+=item * L<Google::RestApi::DriveApi3::Reply>
+
+=item * L<Google::RestApi::DriveApi3::Revision>
 
 =item * L<Google::RestApi::SheetsApi4>
 
@@ -409,7 +430,7 @@ Returns the response hash from Google API.
 =back
 
 The last transaction details are passed to the callback. What you do with this information is up to you. For an example of how this is used, see the
-C<tutorial/sheets/*> scripts.
+C<tutorial/sheets/*> and C<tutorial/drive/*> scripts.
 
 Returns the previous callback, if any.
 
