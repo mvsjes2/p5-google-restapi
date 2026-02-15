@@ -127,31 +127,25 @@ sub quick_add {
 sub instances {
   my $self = shift;
   state $check = compile_named(
-    fields    => Str, { optional => 1 },
-    max_pages => Int, { default => 0 },
-    params    => HashRef, { default => {} },
+    fields        => Str, { optional => 1 },
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
   LOGDIE "Event ID required for instances()" unless $self->{id};
 
-  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'items(id, summary, start, end)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->api(uri => 'instances', params => $params);
-    push(@list, $result->{items}->@*) if $result->{items};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'instances', params => $params); },
+    result_key     => 'items',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub move {
