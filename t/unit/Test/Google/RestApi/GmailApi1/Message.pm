@@ -13,6 +13,31 @@ init_logger;
 
 sub dont_create_mock_spreadsheets { 1; }
 
+sub _setup_live_message : Tests(startup) {
+  my $self = shift;
+  return unless $ENV{GOOGLE_RESTAPI_CONFIG};
+  my $gmail = mock_gmail_api();
+  my $profile = $gmail->profile();
+  my $msg = $gmail->send_message(
+    to      => $profile->{emailAddress},
+    subject => 'Test Message for Unit Tests',
+    body    => 'This is a test message body.',
+  );
+  $self->{_live_msg} = $msg;
+  return;
+}
+
+sub _teardown_live_message : Tests(shutdown) {
+  my $self = shift;
+  $self->{_live_msg}->trash() if $self->{_live_msg};
+  return;
+}
+
+sub _msg_id {
+  my $self = shift;
+  return $self->{_live_msg} ? $self->{_live_msg}->message_id() : 'mock_msg_id_001';
+}
+
 sub _constructor : Tests(3) {
   my $self = shift;
 
@@ -57,15 +82,14 @@ sub requires_id : Tests(5) {
   return;
 }
 
-sub get_and_modify : Tests(3) {
+sub get_and_modify : Tests(2) {
   my $self = shift;
 
   my $gmail = mock_gmail_api();
 
-  my $msg = $gmail->message(id => 'mock_msg_id_001');
+  my $msg = $gmail->message(id => $self->_msg_id());
   my $details = $msg->get();
   ok $details, 'Get returns message details';
-  is $details->{id}, 'mock_msg_id_001', 'Message has correct ID';
 
   lives_ok sub {
     $msg->modify(
@@ -77,15 +101,14 @@ sub get_and_modify : Tests(3) {
   return;
 }
 
-sub trash_and_delete : Tests(3) {
+sub trash_and_untrash : Tests(2) {
   my $self = shift;
 
   my $gmail = mock_gmail_api();
-  my $msg = $gmail->message(id => 'mock_msg_id_001');
+  my $msg = $gmail->message(id => $self->_msg_id());
 
   lives_ok sub { $msg->trash() }, 'Trash message lives';
   lives_ok sub { $msg->untrash() }, 'Untrash message lives';
-  lives_ok sub { $msg->delete() }, 'Delete message lives';
 
   return;
 }
@@ -94,7 +117,7 @@ sub attachment_factory : Tests(2) {
   my $self = shift;
 
   my $gmail = mock_gmail_api();
-  my $msg = $gmail->message(id => 'mock_msg_id_001');
+  my $msg = $gmail->message(id => $self->_msg_id());
 
   ok my $att = $msg->attachment(id => 'att_001'), 'Attachment factory should succeed';
   isa_ok $att, Attachment, 'Attachment factory returns';

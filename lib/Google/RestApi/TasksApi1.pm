@@ -295,6 +295,8 @@ Returns the underlying L<Google::RestApi> object.
 
 =item * L<Google::RestApi::GmailApi1> - Google Gmail API (related module)
 
+=item * L<Google::RestApi::DocsApi1> - Google Docs API (related module)
+
 =item * L<https://developers.google.com/tasks/reference/rest> - Google Tasks API Reference
 
 =back

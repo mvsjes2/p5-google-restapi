@@ -1090,6 +1090,8 @@ releases may break this release. Not all api calls have been implemented.
 
 =item * L<Google::RestApi::TasksApi1> - Google Tasks API (related module)
 
+=item * L<Google::RestApi::DocsApi1> - Google Docs API (related module)
+
 =item * L<https://developers.google.com/sheets/api/reference/rest> - Google Sheets API Reference
 
 =back

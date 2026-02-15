@@ -12,11 +12,31 @@ init_logger;
 
 sub dont_create_mock_spreadsheets { 1; }
 
+sub _setup_live_calendar : Tests(startup) {
+  my $self = shift;
+  return unless $ENV{GOOGLE_RESTAPI_CONFIG};
+  my $cal_api = mock_calendar_api();
+  my $cal = $cal_api->create_calendar(summary => 'Test Calendar ACL');
+  $self->{_live_cal} = $cal;
+  return;
+}
+
+sub _teardown_live_calendar : Tests(shutdown) {
+  my $self = shift;
+  $self->{_live_cal}->delete() if $self->{_live_cal};
+  return;
+}
+
+sub _cal_id {
+  my $self = shift;
+  return $self->{_live_cal} ? $self->{_live_cal}->calendar_id() : mock_calendar_id();
+}
+
 sub _constructor : Tests(3) {
   my $self = shift;
 
   my $cal_api = mock_calendar_api();
-  my $cal = $cal_api->calendar(id => mock_calendar_id());
+  my $cal = $cal_api->calendar(id => $self->_cal_id());
 
   ok my $acl = Acl->new(calendar => $cal),
     'Constructor without id should succeed';
@@ -32,7 +52,7 @@ sub requires_id : Tests(3) {
   my $self = shift;
 
   my $cal_api = mock_calendar_api();
-  my $cal = $cal_api->calendar(id => mock_calendar_id());
+  my $cal = $cal_api->calendar(id => $self->_cal_id());
   my $acl = Acl->new(calendar => $cal);
 
   throws_ok sub { $acl->get() },
@@ -54,7 +74,7 @@ sub create_and_delete : Tests(4) {
   my $self = shift;
 
   my $cal_api = mock_calendar_api();
-  my $cal = $cal_api->calendar(id => mock_calendar_id());
+  my $cal = $cal_api->calendar(id => $self->_cal_id());
 
   my $acl = $cal->acl()->create(
     role        => 'reader',

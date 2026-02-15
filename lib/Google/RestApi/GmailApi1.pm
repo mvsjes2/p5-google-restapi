@@ -568,6 +568,8 @@ Returns the underlying L<Google::RestApi> instance.
 
 =item * L<Google::RestApi::TasksApi1> - Google Tasks API (related module)
 
+=item * L<Google::RestApi::DocsApi1> - Google Docs API (related module)
+
 =item * L<https://developers.google.com/gmail/api/reference/rest> - Google Gmail API Reference
 
 =back
