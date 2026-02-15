@@ -39,25 +39,25 @@ sub api {
 
 sub list {
   my $self = shift;
-  state $check = compile(Str, HashRef, { default => {} }, Int, { default => 0 });
-  my ($filter, $params, $max_pages) = $check->(@_);
+  state $check = compile_named(
+    filter        => Str,
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
+  );
+  my $p = $check->(@_);
 
-  $params->{q} = $filter;
+  my $params = $p->{params};
+  $params->{q} = $p->{filter};
   $params->{fields} = 'files(id, name)' unless $params->{fields};
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->api(uri => 'files', params => $params);
-    push(@list, $result->{files}->@*) if $result->{files};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'files', params => $params); },
+    result_key     => 'files',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 # backward compatibility.
 *filter_files = *list{CODE};
@@ -87,28 +87,22 @@ sub shared_drive {
 sub list_drives {
   my $self = shift;
   state $check = compile_named(
-    max_pages => Int, { default => 0 },
-    params    => HashRef, { default => {} },
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
-  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'drives(id, name)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->api(uri => 'drives', params => $params);
-    push(@list, $result->{drives}->@*) if $result->{drives};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'drives', params => $params); },
+    result_key     => 'drives',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub create_drive {
@@ -181,14 +175,14 @@ Google::RestApi::DriveApi3 - API to Google Drive API V3.
 =head2 Listing and Searching Files
 
  # List files matching a query (uses Google Drive query syntax)
- my @files = $drive->list("name contains 'report'");
- my @files = $drive->list("mimeType = 'application/vnd.google-apps.spreadsheet'");
- my @files = $drive->list("'folder_id' in parents and trashed = false");
+ my @files = $drive->list(filter => "name contains 'report'");
+ my @files = $drive->list(filter => "mimeType = 'application/vnd.google-apps.spreadsheet'");
+ my @files = $drive->list(filter => "'folder_id' in parents and trashed = false");
 
  # With custom fields
  my @files = $drive->list(
-   "name contains 'doc'",
-   { fields => 'files(id, name, mimeType, createdTime)' }
+   filter => "name contains 'doc'",
+   params => { fields => 'files(id, name, mimeType, createdTime)' },
  );
 
 =head2 Working with Files
@@ -471,28 +465,41 @@ unless making a Google API call not currently supported by this framework.
 
 Returns the response hash from the Google API.
 
-=head2 list($filter, \%params, $max_pages)
+=head2 list(%args)
 
 Lists files matching the given query filter.
 
- my @files = $drive->list("name contains 'report'");
+ my @files = $drive->list(filter => "name contains 'report'");
 
  # With custom parameters
  my @files = $drive->list(
-   "mimeType = 'application/pdf'",
-   { fields => 'files(id, name, size)', orderBy => 'modifiedTime desc' }
+   filter => "mimeType = 'application/pdf'",
+   params => { fields => 'files(id, name, size)', orderBy => 'modifiedTime desc' },
  );
 
  # Limit to 2 pages of results
- my @files = $drive->list("name contains 'report'", {}, 2);
+ my @files = $drive->list(filter => "name contains 'report'", max_pages => 2);
 
-C<$max_pages> limits the number of pages fetched (default 0 = unlimited).
+%args consists of:
+
+=over
+
+=item * C<filter> <string>: Required. Google Drive query filter string.
+
+=item * C<max_pages> <int>: Optional. Limits the number of pages fetched (default 0 = unlimited).
+
+=item * C<page_callback> <coderef>: Optional. Called after each page with the API result hashref.
+Return true to continue fetching, false to stop.
+
+=item * C<params> <hashref>: Optional. Additional query parameters.
+
+=back
 
 See L<https://developers.google.com/drive/api/v3/search-files> for query syntax.
 
 Returns a list of file hashrefs with id and name (or custom fields).
 
-=head2 filter_files($filter, \%params, $max_pages)
+=head2 filter_files(%args)
 
 Alias for list(). Provided for backward compatibility.
 

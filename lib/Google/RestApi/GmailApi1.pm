@@ -83,55 +83,43 @@ sub profile {
 sub messages {
   my $self = shift;
   state $check = compile_named(
-    max_pages => Int, { default => 1 },
-    params    => HashRef, { default => {} },
+    max_pages     => Int, { default => 1 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
-  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'messages(id, threadId)';
   $params->{fields} = 'nextPageToken, resultSizeEstimate, ' . $params->{fields};
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->api(uri => 'messages', params => $params);
-    push(@list, $result->{messages}->@*) if $result->{messages};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'messages', params => $params); },
+    result_key     => 'messages',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub threads {
   my $self = shift;
   state $check = compile_named(
-    max_pages => Int, { default => 1 },
-    params    => HashRef, { default => {} },
+    max_pages     => Int, { default => 1 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
-  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'threads(id, snippet)';
   $params->{fields} = 'nextPageToken, resultSizeEstimate, ' . $params->{fields};
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->api(uri => 'threads', params => $params);
-    push(@list, $result->{threads}->@*) if $result->{threads};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'threads', params => $params); },
+    result_key     => 'threads',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub labels {
