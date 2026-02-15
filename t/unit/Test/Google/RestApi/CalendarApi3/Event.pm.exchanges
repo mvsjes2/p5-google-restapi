@@ -19,7 +19,7 @@ response:
      "updated": "2026-02-15T20:49:15.770Z",
      "summary": "Test Event",
      "creator": {
-      "email": "nibor.yarrum@gmail.com"
+      "email": "test.user@gmail.com"
      },
      "organizer": {
       "email": "a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com",
@@ -92,7 +92,7 @@ response:
      "updated": "2026-02-15T20:49:15.770Z",
      "summary": "Test Event",
      "creator": {
-      "email": "nibor.yarrum@gmail.com"
+      "email": "test.user@gmail.com"
      },
      "organizer": {
       "email": "a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com",
@@ -204,7 +204,7 @@ response:
      "updated": "2026-02-15T20:49:20.922Z",
      "summary": "Lunch",
      "creator": {
-      "email": "nibor.yarrum@gmail.com"
+      "email": "test.user@gmail.com"
      },
      "organizer": {
       "email": "a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com",

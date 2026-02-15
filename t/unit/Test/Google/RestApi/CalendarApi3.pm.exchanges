@@ -11,7 +11,7 @@ response:
      "id": "2d7cd43ed784bd4ddf18965f9ef6f7b89bdbb26630df4b1fb1afb8f76e47cecb@group.calendar.google.com",
      "summary": "Test Calendar",
      "timeZone": "UTC",
-     "dataOwner": "nibor.yarrum@gmail.com",
+     "dataOwner": "test.user@gmail.com",
      "conferenceProperties": {
       "allowedConferenceSolutionTypes": [
        "hangoutsMeet"
@@ -123,12 +123,12 @@ response:
        "summary": "Holidays in Canada"
       },
       {
-       "id": "nibor.yarrum@gmail.com",
-       "summary": "nibor.yarrum@gmail.com"
+       "id": "test.user@gmail.com",
+       "summary": "test.user@gmail.com"
       },
       {
-       "id": "mariette.howey@gmail.com",
-       "summary": "mariette.howey@gmail.com"
+       "id": "friend.user@gmail.com",
+       "summary": "friend.user@gmail.com"
       },
       {
        "id": "0ed31f577c2ee528f5b30f0e2c8b212c61d9cb8c597036f5e5613ffcfc8f7b2f@group.calendar.google.com",
@@ -200,12 +200,12 @@ response:
        "summary": "Holidays in Canada"
       },
       {
-       "id": "nibor.yarrum@gmail.com",
-       "summary": "nibor.yarrum@gmail.com"
+       "id": "test.user@gmail.com",
+       "summary": "test.user@gmail.com"
       },
       {
-       "id": "mariette.howey@gmail.com",
-       "summary": "mariette.howey@gmail.com"
+       "id": "friend.user@gmail.com",
+       "summary": "friend.user@gmail.com"
       },
       {
        "id": "0ed31f577c2ee528f5b30f0e2c8b212c61d9cb8c597036f5e5613ffcfc8f7b2f@group.calendar.google.com",

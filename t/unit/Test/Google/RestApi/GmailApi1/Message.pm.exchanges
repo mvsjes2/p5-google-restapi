@@ -11,7 +11,7 @@ response:
         "SENT",
         "INBOX"
       ],
-      "snippet": "This is a test message body.",
+      "snippet": "Test email snippet",
       "payload": {
         "partId": "",
         "mimeType": "text/plain",
@@ -55,7 +55,7 @@ response:
           },
           {
             "name": "To",
-            "value": "nibor.yarrum@gmail.com"
+            "value": "test.user@gmail.com"
           },
           {
             "name": "Subject",
@@ -67,7 +67,7 @@ response:
           },
           {
             "name": "From",
-            "value": "nibor.yarrum@gmail.com"
+            "value": "test.user@gmail.com"
           }
         ],
         "body": {

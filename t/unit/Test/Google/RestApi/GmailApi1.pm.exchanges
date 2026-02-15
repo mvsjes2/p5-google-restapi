@@ -1075,7 +1075,7 @@ response:
   code: 200
   content: |
     {
-      "emailAddress": "nibor.yarrum@gmail.com",
+      "emailAddress": "test.user@gmail.com",
       "messagesTotal": 41030,
       "threadsTotal": 20565,
       "historyId": "21211568"
@@ -1119,403 +1119,403 @@ response:
       "threads": [
         {
           "id": "19c62e9a1b0a34b4",
-          "snippet": "Your receipt from Anthropic, PBC #2998-0914-4184 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c6257f7cb4b8a5",
-          "snippet": "Your receipt from Anthropic, PBC #2192-8466-9459 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c625789e2ff055",
-          "snippet": "Hey there, 24 hours later â still waiting for you. Continue Where You Left Off Best regards, Daniel Product Manager, Use AI Facebook Instagram Â© 2026 Use AI, All rights reserved. 1034 E Brandon Blvd,"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c61d4f7b47648b",
-          "snippet": "Hi Robin, Your billboard cut through Ottawa&#39;s government entitlement culture. Thanks to taxfighters like you, we put a sidewalk billboard right in front of Parliament Hill and right outside of the"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c61d4d2ee6c0bd",
-          "snippet": "Your receipt from Anthropic, PBC #2085-2592-7064 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c6195e257cde4b",
-          "snippet": "Hello, Your access to the Claude API has been disabled because your organization &#39;Robin&#39;s Individual Org&#39; is out of usage credits. Go to the Billing page to add credits and manage your"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c60f63bfee93e6",
-          "snippet": "Hate being interrupted while you&#39;re cooking? Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c609122164b1e9",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Sun Feb 15, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c60175722053d7",
-          "snippet": "Hi Leslie, Did you get my text? I want you to attend. The CO has something important she wants you to know. Pls let me know by sending your email! -Jakob"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19ac221eec7703d2",
-          "snippet": "If you have an account in Wolfville I should be able to just email it to you. Is your email hooked up to the account? -- Robin Murray Seabright, Nova Scotia, Canada On Sun, Feb 15, 2026, 1:39 am Jancis"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5f86dd2f3afc4",
-          "snippet": "The following report has been written by the PAUSE namespace indexer. Please contact modules@perl.org if there are any open questions. User: MVSJES (Robin Murray) Distribution file: Google-RestApi-2.0."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5f857c982d285",
-          "snippet": "The uploaded file Google-RestApi-2.0.0.tar.gz has entered CPAN as file: $CPAN/authors/id/M/MV/MVSJES/Google-RestApi-2.0.0.tar.gz size: 187548 bytes sha256:"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5f7b129a2ea3a",
-          "snippet": "https://www.facebook.com/share/v/1EA7PzViMW/ Simone Todoroff - Owner 416 578-1221"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5f746bae33c34",
-          "snippet": "[mvsjes2/p5-google-restapi] CI workflow run CI: All jobs have failed View workflow run Status Job Annotations CI / linux (5.38) Failed in 1 minute and 40 seconds annotations for CI / linux (5.38) 1 CI"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5f724aa61ff65",
-          "snippet": "[mvsjes2/p5-google-restapi] CI workflow run CI: All jobs have failed View workflow run Status Job Annotations CI / linux (5.38) Failed in 1 minute and 39 seconds annotations for CI / linux (5.38) 1 CI"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5f10bc03223f0",
-          "snippet": "Prime Video Amazon Prime Video | Your account Order confirmation Order #D01-5421172-3632247 Hello Robin Murray, Find all of your previous Amazon Prime Video purchases and unexpired rentals in Purchases"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5eaa7b7194daf",
-          "snippet": "Prime Video Amazon Prime Video | Your account Order confirmation Order #D01-3261522-9315413 Hello Robin Murray, Find all of your previous Amazon Prime Video purchases and unexpired rentals in Purchases"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5e8aebc6ad8fa",
-          "snippet": "Your receipt from Anthropic, PBC #2677-2896-6546 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5e4a42d42047c",
-          "snippet": "This is a test message sent by the Google::RestApi Gmail tutorial. You can safely delete this."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5e43c79a95acc",
-          "snippet": "Hey there, Just a quick note â your Use AI session is still active. Your conversation history, your settings, everything is saved exactly where you left it. Continue Where You Left Off If you meant to"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5e1280e59d6c9",
-          "snippet": "Your receipt from Anthropic, PBC #2254-4245-2770 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5e119f7aa4cda",
-          "snippet": "Hello, Your access to the Claude API has been disabled because your organization &#39;Robin&#39;s Individual Org&#39; is out of usage credits. Go to the Billing page to add credits and manage your"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5dc80dcd4f720",
-          "snippet": "Posted on 2/4/2026 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5dc351e857640",
-          "snippet": "Hi Robin, An MP actually wants to turn down a pay hike and you can stand with him. Mike Dawson was a drywaller in New Brunswick before he was elected as an MP in Ottawa. MPs are already paid more than"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5d8a663b650f7",
-          "snippet": "The following report has been written by the PAUSE namespace indexer. Please contact modules@perl.org if there are any open questions. User: MVSJES (Robin Murray) Distribution file: Google-RestApi-1.2."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5d890bb1f95da",
-          "snippet": "The uploaded file Google-RestApi-1.2.0.tar.gz has entered CPAN as file: $CPAN/authors/id/M/MV/MVSJES/Google-RestApi-1.2.0.tar.gz size: 137479 bytes sha256:"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5d6809eb3badd",
-          "snippet": "Hey there, An hour ago, you were in the middle of something. Your session is still open. Your conversation history is still there. Whatever you were working on â a draft, a question, a task â it&#39;s"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5d2a02910bb51",
-          "snippet": "Your receipt from Anthropic, PBC #2669-6299-8243 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5d293caf707cc",
-          "snippet": "Let&#39;s get you signed in Sign in with the secure link below Sign in to Claude Console If you didn&#39;t request this email, you can safely ignore it. If you&#39;re experiencing issues, please"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5ce2c999adfc7",
-          "snippet": "Most Popular Classifieds This Week Email not displaying correctly? View it in your browser. Welcome to the Canuck Audio Mart weekly newsletter. As usual we&#39;ve had hundreds of new listings this week"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5cd84b3f011e3",
-          "snippet": "Dear All, We have been having some issues with our email programs. Can you let me know if you have received this email? Happy Valentine&#39;s Day! ARC, Jackie âAdmiration is a particle which unites and"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5cb628f2f0d7f",
-          "snippet": "Please complete by 03/04\u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5c65cec3c6f42",
-          "snippet": "Robin Murray, your transfer to SHORELINE PROPERTY MANAGEMENT LTD. was successfully deposited. \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c INTERAC e-Transfer View in browser | FR ? Hi Robin Murray, Your"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5b6c25e90d09d",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Sat Feb 14, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c59e65104a250a",
-          "snippet": "Hello, Your access to the Claude API has been disabled because your organization &#39;Robin&#39;s Individual Org&#39; is out of usage credits. Go to the Billing page to add credits and manage your"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c597485f8a7c5d",
-          "snippet": "You know Carney is wasting too much money when he&#39;s spending even more than Trudeau. The Canadian Taxpayers Federation caught Prime Minister Mark Carney billing you $300000 for his airplane food"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c58fc65751ae39",
-          "snippet": "Dear Customer, This is a courtesy message from VoIP.ms Your account 128614 has received a deposit of $25.00 USD Do not reply to this email, we will not receive your message. Email our support directly"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c58b8995e6edfb",
-          "snippet": "Hi Robin, Politicians are ready to hike taxes you pay for beer, wine and spirits. Again. Taxes already account for about half the price you pay for alcoholic beverages and on April 1, Ottawa is going"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c58b33c50b2314",
-          "snippet": "The following report has been written by the PAUSE namespace indexer. Please contact modules@perl.org if there are any open questions. User: MVSJES (Robin Murray) Distribution file: Google-RestApi-1.1."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c58b1e1d9bfcfc",
-          "snippet": "The uploaded file Google-RestApi-1.1.1.tar.gz has entered CPAN as file: $CPAN/authors/id/M/MV/MVSJES/Google-RestApi-1.1.1.tar.gz size: 116271 bytes sha256:"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19755742083f85b2",
-          "snippet": "Balanced portfolio 100%. Matthew Bishop, Financial Advisor H&amp;M Bishop Wealth Management 301-90 Lovett Lake Court Halifax, NS B3S 0H6 (902) 422-0014 (office) (902) 209-5866 (mobile) matt@bishopwm."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5741f9c5b0375",
-          "snippet": "I added a Github CI workflow, runs tests against 3 latest Perl version, plus the oldest supported. Hope this helps. You can view, comment on, or merge this pull request online at: https://github.com/"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c5734c9b1af25b",
-          "snippet": "@dkechag pushed 1 commit. f433be4 align â View it on GitHub or unsubscribe. You are receiving this because you are subscribed to this thread. Message ID: &lt;mvsjes2/p5-google-restapi/pull/17/before/"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c568eaa5e1adde",
-          "snippet": "@victor-savinoff approved this pull request. â Reply to this email directly, view it on GitHub, or unsubscribe. You are receiving this because you authored the thread. Message ID: &lt;UK2-Limited/"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c55bb23847191e",
-          "snippet": "English version *** La version franÃ§aise suit *** Dear ROBIN MURRAY: The Canada Revenue Agency (CRA) sent you new mail online called: Instalment reminder This mail may require your attention. If you"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4ec16a053d2b8",
-          "snippet": "https://static1.squarespace.com/static/672682e1d7c9744897385bce/t/69651d1b69037e3a624ff37e/1768234267205/Menu_FR%3AEN.pdf Located in the nearby 1000 de la GauchetiÃ¨re building, this Italian osteria is"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c51c417d5810ce",
-          "snippet": "See what he posted. David Verneuille posted in Scientologist Bus, Jobs, &amp; Classifieds! Post, Browse, &amp; Share it! February 11 at 7:09 PM Well its about time I shared my secret sauce! I hav..."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c51470bbe7943c",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Thu Feb 12, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4d6d6386948d6",
-          "snippet": "@victor-savinoff requested your review on: UK2-Limited/Chimera#5431 Test commit. â Reply to this email directly, view it on GitHub, or unsubscribe. You are receiving this because your review was"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4d838b7627953",
-          "snippet": "@victor-savinoff requested your review on: UK2-Limited/Chimera#5434 Test commit. â Reply to this email directly, view it on GitHub, or unsubscribe. You are receiving this because your review was"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4d45e23f377db",
-          "snippet": "Closed #5429. â Reply to this email directly, view it on GitHub, or unsubscribe. You are receiving this because your review was requested. Message ID: &lt;UK2-Limited/Chimera/pull/5429/issue_event/"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4d37339e468da",
-          "snippet": "@victor-savinoff requested your review on: UK2-Limited/Chimera#5428 Block autorenewal of services that have not yet processed actions. â Reply to this email directly, view it on GitHub, or unsubscribe."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4ccc9f710b5bf",
-          "snippet": "You&#39;ve been added to the &quot;CHI BE&quot; team for the organization: &quot;UK2 Limited&quot; &quot;CHI BE&quot; has 4 members and gives access to 4 &quot;UK2-Limited&quot; repositories. View"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4cc6938381f22",
-          "snippet": "@Danie-THG has invited you to join the @UK2-Limited organization @Danie-THG has invited you to join the UK2-Limited organization Hi Robin Murray! @Danie-THG has invited you to join the @UK2-Limited"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4c0d80a45df2f",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Wed Feb 11, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4b5c9ec4c725d",
-          "snippet": "Hello! Please provide the following for this week: 1. Weekly Report Submission Kindly submit your report using the following form: ð Submit Weekly Report 2. I HELP Activity Shots Please shoot and"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4a230609cfcb3",
-          "snippet": "Unlock insights with Google Analytics.\u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4a17989eaebfb",
-          "snippet": "5 Personal Care Ingredients To Avoid + Best Showerheads + Most &amp; Least Expensive Supermarkets + Top Cooktop Cleaners \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c49b80af676bc9",
-          "snippet": "Your power bill summary This summary shows what you need to pay and when it&#39;s due. If you&#39;d like to know more, please view your bill online. Account #: 0224107-3 Due on: 03/11/2026 Amount due:"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c495c2477d8dd3",
-          "snippet": "Thursday February 12, 2026 5:00pm AST Osteopathic Treatment - 60 minutes with Sophie Arsenault Location: Sullivan Street If you are no longer able to make this appointment, please visit your My Account"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c3e701796fdf72",
-          "snippet": "Wow... beautiful! On a darker side... I wonder how may ppl fall off those cliffs? On 08/02/2026 2:07 pm, Andy &amp; Susan Murray wrote: Don Clerk sent this to me. It&#39;s a full 30 mins, but .... ----"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c48fcb45d3f6a5",
-          "snippet": "ok thanks. -- Robin Murray Seabright, Nova Scotia, Canada On Tue, 10 Feb 2026 at 15:17, Heather Blackburn &lt;hmurphy@bridgepub.com&gt; wrote: Dear Robin, Here is the label to print and tape to the box"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c48f2c0fd95de3",
-          "snippet": "FedEx Attached are your shipping label(s) and/or document(s) in PDF format. Please print your documents and drop off your labeled package at a FedEx location OR request a FedEx pickup if you do not"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c48d5329dce721",
-          "snippet": "INVOICE 1636 DETAILS SHORELINE PROPERTY MANAGEMENT LTD. DUE 12/03/2026 $136.80 Print or save Powered by QuickBooks Dear ROBIN MURRAY, We appreciate your business. Please find your invoice details here."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c46db2789ba406",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Tue Feb 10, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c4620110847b47",
-          "snippet": "Tracking number is 444398307170 -- Robin Murray Seabright, Nova Scotia, Canada ---------- Forwarded message --------- From: FedEx Email/Online Label NoReply &lt;emaillabel@fedex.com&gt; Date: Tue, 10"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c44ae2b12323b3",
-          "snippet": "I will look at that and see what I can do , will let you know Get Outlook for iOS From: Robin Murray &lt;nibor.yarrum@gmail.com&gt; Sent: Monday, February 9, 2026 7:14:01 PM To: Kevin Aucoin &lt;"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c43c391b84e839",
-          "snippet": "A quick reminder that our joint webinar with Alcatel-Lucent is coming up soon VoIP.ms February 2026 Robin A quick reminder that our joint webinar with Alcatel-Lucent is coming up soon. We&#39;ll walk"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c41cf7fb01165b",
-          "snippet": "Google Calendar Robin Murray, here is your schedule for: Mon Feb 9, 2026 All day Mon Feb 9 Pay Costco mastercard Robin Murray Google Calendar You are receiving this email at the account nibor.yarrum@"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c3f7b225356067",
-          "snippet": "Mariette Howey shared a spreadsheet Mariette Howey (mariette.howey@gmail.com) has invited you to edit the following spreadsheet: Taxes 2025 Open Does this item look suspicious? Block sender Google LLC,"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c3d7286027378c",
-          "snippet": "Check out what he posted. ð Nial Murray posted on Lia Chin-Yet&#39;s profile. February 3 at 9:14 AM View This message was sent to nibor.yarrum@gmail.com. If you don&#39;t want to receive these emails"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c353aaba328641",
-          "snippet": "75 people viewed Sears-Halifax Toastmasters last month. \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d \u200d"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c3342255ce8ed6",
-          "snippet": "Have you heard about our new gift card program? CAA Hello, Robin #*** *** *****38 002 My Account MORE BRANDS. MORE REWARDS. DISCOVER THE CAA GIFT CARD PROGRAM! Hi Robin, Great news! Your favourite way"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c2ff52d0032526",
-          "snippet": "Hi Robin, You made Ottawa retreat on its gas and diesel vehicle ban and now it&#39;s time to turn up the heat on the next fight. Prime Minister Mark Carney didn&#39;t retreat because he wanted to."
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c2d18391d43dd8",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Thu Feb 5, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c2ad75eaa8250c",
-          "snippet": "Hi Robin, You are paying for the Governor General&#39;s salary hike, but no one ever asked your opinion. The Governor General&#39;s salary has climbed to nearly $400000 through automatic raises. That"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c284b7b374110f",
-          "snippet": "@PreDeToRLinux has invited you to join the @UK2-Limited organization @PreDeToRLinux has invited you to join the UK2-Limited organization Hi Robin Murray! @PreDeToRLinux has invited you to join the @UK2"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c27e6a5a9d2ef8",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Wed Feb 4, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c268d3697a8e6d",
-          "snippet": ""
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c25f69eedf4c04",
-          "snippet": "Hi Robin, You can take taxpayer news to the next level. The Canadian Taxpayers Federation YouTube channel is so close to our goal of 100000 subscribers. While I am writing this message, we&#39;re less"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c25d9d86496a89",
-          "snippet": "10 Top Cars, SUVs &amp; Trucks + BRAND NEW: CR Safety Verdict + Our Favorite Deals Right Now + Super Bowl TV Deals \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c258180bd8788c",
-          "snippet": "Exciting new seasons and series this month on CBC Gem. View in browser Milano Cortina 2026 Olympic Winter Games Milano Cortina 2026 Every day from February 6-22, CBC Gem offers 22 hours of Olympic"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c24ebeaf521710",
-          "snippet": "Check your staking rewards. Your January 2026 Staking Report Hi Robin, here is your Staking breakdown for last month: In January, you earned $13.07 1 Your staked assets are valued at $5859.75 2 Since"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c24a92519c5296",
-          "snippet": "Hacks for Home Users, our Resource of the Month and more! VoIP.ms Newsletter | Edition No. 78 | February 2026 Good news for anyone running FS PBX: it now plays cleanly with VoIP.ms. We wrapped up"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c23f895b66cf4f",
-          "snippet": ""
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c23edf40ac603d",
-          "snippet": "https://www.facebook.com/share/v/1L685Ymxat/ Simone Todoroff - Owner 416 578-1221"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c20f837fb2b1fe",
-          "snippet": "Wow that was amazing. Once in a while a cover comes along that works. I like the softer sound of this, less frantic than Billy Paul. -- Robin Murray Seabright, Nova Scotia, Canada On Mon, Feb 2, 2026,"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c20981bc40cac5",
-          "snippet": "Hi Robin , You can make YouTube show more Canadians what&#39;s happening with their taxes. Here&#39;s the big goal: Get the Canadian Taxpayers Federation YouTube channel to 100000 subscribers. That"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c2088c97f83baa",
-          "snippet": "https://www.facebook.com/share/r/1BFRd9vy1g/ Simone Todoroff - Owner 416 578-1221"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c204d0fcd1ebf6",
-          "snippet": "-- Robin Murray Seabright, Nova Scotia, Canada ---------- Forwarded message --------- From: &lt;noreply@westhost.com&gt; Date: Mon, Feb 2, 2026, 5:40 pm Subject: How to climb search rankings &amp;"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c204d0d1347164",
-          "snippet": "-- Robin Murray Seabright, Nova Scotia, Canada ---------- Forwarded message --------- From: &lt;noreply@westhost.com&gt; Date: Mon, Feb 2, 2026, 5:40 pm Subject: WordPress Creates Professional Blogs,"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c204d0c487d9fa",
-          "snippet": "-- Robin Murray Seabright, Nova Scotia, Canada ---------- Forwarded message --------- From: &lt;noreply@westhost.com&gt; Date: Mon, Feb 2, 2026, 5:40 pm Subject: SiteLock monitors your website 24x7 for"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c204d0b35a73d2",
-          "snippet": "-- Robin Murray Seabright, Nova Scotia, Canada ---------- Forwarded message --------- From: &lt;noreply@westhost.com&gt; Date: Mon, Feb 2, 2026, 5:40 pm Subject: Time to get your idea online &amp; save"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c204ad0d2d394b",
-          "snippet": "-- Robin Murray Seabright, Nova Scotia, Canada ---------- Forwarded message --------- From: &lt;noreply@westhost.com&gt; Date: Mon, Feb 2, 2026, 5:40 pm Subject: Create a Personalised Professional"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c204d08d5abfdc",
-          "snippet": "-- Robin Murray Seabright, Nova Scotia, Canada ---------- Forwarded message --------- From: &lt;noreply@westhost.com&gt; Date: Mon, Feb 2, 2026, 5:40 pm Subject: Protect your site today with 50% OFF"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c1f8c4289f8941",
-          "snippet": "Tuesday March 3, 2026 1:00pm AST 60 mins Massage with MaryLou Bourgeois Subscribe to your calendar Online Form Please take a moment to fill out the required form(s) before your visit. Intake Form-SMB"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c1f8847cdb7842",
-          "snippet": "Robin, thanks for your payment of $115.00. Items February 2, 2026 - 1:00pm, 60 mins massage (60 minutes) MaryLou Bourgeois RMT, License #209b Invoice #3077-P01 $100.88 Subtotal $100.88 HST $14.12 Payer"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c1b0318afc75aa",
-          "snippet": "Tuesday February 3, 2026 5:00pm AST Osteopathic Treatment - 60 minutes with Sophie Arsenault Location: Sullivan Street If you are no longer able to make this appointment, please visit your My Account"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c1a9841fd6e0b2",
-          "snippet": "Google Play Thank you Your subscription from Google LLC on Google Play continues and you&#39;ve been charged. Manage your subscriptions Order number: SOP.3369-2019-5929-22202..86 Order date: 1 Feb 2026"
+          "snippet": "Test email snippet"
         },
         {
           "id": "19c18de0b87ab4ca",
-          "snippet": "Hate being interrupted while you&#39;re cooking? Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í"
+          "snippet": "Test email snippet"
         }
       ],
       "nextPageToken": "15855394057523639658",

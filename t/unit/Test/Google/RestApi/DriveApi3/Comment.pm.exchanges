@@ -196,10 +196,10 @@ response:
   content: |
     {
       "author": {
-        "displayName": "Robin Murray",
+        "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "//lh3.googleusercontent.com/a/ACg8ocIDNKjY4l2Rgl58YSBfL2p5ANmnLvor41ZFc0vBzMo2uzizK-8=s50-c-k-no"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0ZcEe1Y",
       "createdTime": "2026-02-15T20:55:33.724Z",
@@ -245,10 +245,10 @@ response:
   content: |
     {
       "author": {
-        "displayName": "Robin Murray",
+        "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "//lh3.googleusercontent.com/a/ACg8ocIDNKjY4l2Rgl58YSBfL2p5ANmnLvor41ZFc0vBzMo2uzizK-8=s50-c-k-no"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0ZcEe1Y",
       "createdTime": "2026-02-15T20:55:33.724Z",
@@ -329,10 +329,10 @@ response:
   content: |
     {
       "author": {
-        "displayName": "Robin Murray",
+        "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "//lh3.googleusercontent.com/a/ACg8ocIDNKjY4l2Rgl58YSBfL2p5ANmnLvor41ZFc0vBzMo2uzizK-8=s50-c-k-no"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0ZcEe1c",
       "createdTime": "2026-02-15T20:55:39.746Z",

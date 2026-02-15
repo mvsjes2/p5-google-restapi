@@ -57,7 +57,7 @@ response:
         "labelIds": [
           "DRAFT"
         ],
-        "snippet": "Draft body text",
+        "snippet": "Test email snippet",
         "payload": {
           "partId": "",
           "mimeType": "text/plain",
@@ -109,7 +109,7 @@ response:
             },
             {
               "name": "From",
-              "value": "nibor.yarrum@gmail.com"
+              "value": "test.user@gmail.com"
             }
           ],
           "body": {

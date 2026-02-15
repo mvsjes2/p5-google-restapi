@@ -16,10 +16,10 @@ response:
        "role": "owner"
       },
       {
-       "id": "user:nibor.yarrum@gmail.com",
+       "id": "user:test.user@gmail.com",
        "scope": {
         "type": "user",
-        "value": "nibor.yarrum@gmail.com"
+        "value": "test.user@gmail.com"
        },
        "role": "owner"
       }
@@ -111,7 +111,7 @@ response:
      "id": "c995958c4cb96c2eb80dba3a59f67367c03997ac33a72143b45ec5cc18465c69@group.calendar.google.com",
      "summary": "Test Calendar",
      "timeZone": "UTC",
-     "dataOwner": "nibor.yarrum@gmail.com",
+     "dataOwner": "test.user@gmail.com",
      "conferenceProperties": {
       "allowedConferenceSolutionTypes": [
        "hangoutsMeet"
@@ -165,7 +165,7 @@ response:
      "id": "c995958c4cb96c2eb80dba3a59f67367c03997ac33a72143b45ec5cc18465c69@group.calendar.google.com",
      "summary": "Updated Calendar",
      "timeZone": "UTC",
-     "dataOwner": "nibor.yarrum@gmail.com",
+     "dataOwner": "test.user@gmail.com",
      "conferenceProperties": {
       "allowedConferenceSolutionTypes": [
        "hangoutsMeet"

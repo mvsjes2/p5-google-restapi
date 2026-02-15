@@ -288,11 +288,11 @@ response:
       "kind": "drive#about",
       "user": {
         "kind": "drive#user",
-        "displayName": "Robin Murray",
-        "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocKJPoArSZhIPF6ByvQlRS-B1sTf5YI7vbYHoV8ipGlbTF1SG8U=s64",
+        "displayName": "Test User",
+        "photoLink": "https://photo.example.com/placeholder",
         "me": true,
-        "permissionId": "05493041388541905921",
-        "emailAddress": "nibor.yarrum@gmail.com"
+        "permissionId": "00000000000000000000",
+        "emailAddress": "test.user@gmail.com"
       },
       "storageQuota": {
         "limit": "107374182400",
@@ -941,11 +941,11 @@ response:
     {
       "user": {
         "kind": "drive#user",
-        "displayName": "Robin Murray",
-        "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocKJPoArSZhIPF6ByvQlRS-B1sTf5YI7vbYHoV8ipGlbTF1SG8U=s64",
+        "displayName": "Test User",
+        "photoLink": "https://photo.example.com/placeholder",
         "me": true,
-        "permissionId": "05493041388541905921",
-        "emailAddress": "nibor.yarrum@gmail.com"
+        "permissionId": "00000000000000000000",
+        "emailAddress": "test.user@gmail.com"
       }
     }
   headers:

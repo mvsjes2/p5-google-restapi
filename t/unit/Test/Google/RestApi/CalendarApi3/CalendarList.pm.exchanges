@@ -6,8 +6,8 @@ response:
     {
      "kind": "calendar#calendarListEntry",
      "etag": "\"1749496229953071\"",
-     "id": "nibor.yarrum@gmail.com",
-     "summary": "nibor.yarrum@gmail.com",
+     "id": "test.user@gmail.com",
+     "summary": "test.user@gmail.com",
      "timeZone": "America/Halifax",
      "colorId": "17",
      "backgroundColor": "#9a9cff",
