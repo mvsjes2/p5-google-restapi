@@ -110,14 +110,14 @@ sub messages {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'messages(id, threadId)';
-  $params->{fields} = 'nextPageToken, resultSizeEstimate, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'messages', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'messages',
     result_key     => 'messages',
+    default_fields => 'messages(id, threadId)',
+    fields_prefix  => 'nextPageToken, resultSizeEstimate',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -134,14 +134,14 @@ sub threads {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'threads(id, snippet)';
-  $params->{fields} = 'nextPageToken, resultSizeEstimate, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'threads', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'threads',
     result_key     => 'threads',
+    default_fields => 'threads(id, snippet)',
+    fields_prefix  => 'nextPageToken, resultSizeEstimate',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }

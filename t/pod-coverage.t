@@ -11,7 +11,7 @@ plan skip_all => "Test::Pod::Coverage 1.08 required for testing POD coverage" if
 # Methods common across many modules that are inherited, self-evident,
 # or documented in a parent class.
 my @common_private = qw(
-  new api rest_api
+  new api rest_api require_id
   transaction stats reset_stats
 );
 

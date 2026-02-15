@@ -4,6 +4,8 @@ our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
   state $check = signature(
@@ -16,15 +18,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "users/me/calendarList";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->calendar_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'users/me/calendarList' }
+sub _parent_accessor { 'calendar_api' }
 
 sub get {
   my $self = shift;
@@ -36,7 +31,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "CalendarList ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -82,7 +77,7 @@ sub update {
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "CalendarList ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content;
   $content{summaryOverride} = delete $p->{summary_override} if defined $p->{summary_override};
@@ -100,7 +95,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "CalendarList ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting calendar list entry '%s'", $self->{id}));
   return $self->api(method => 'delete');

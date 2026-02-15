@@ -4,6 +4,8 @@ our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
   state $check = signature(
@@ -16,15 +18,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "replies";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->comment()->api(%p, uri => $uri);
-}
+sub _uri_base { 'replies' }
+sub _parent_accessor { 'comment' }
 
 sub create {
   my $self = shift;
@@ -64,7 +59,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Reply ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params = (
     fields => $p->{fields},
@@ -85,7 +80,7 @@ sub update {
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Reply ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content = (
     content => delete $p->{content},
@@ -101,7 +96,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Reply ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting reply '%s'", $self->{id}));
   return $self->api(method => 'delete');

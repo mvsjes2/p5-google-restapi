@@ -4,6 +4,8 @@ our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 use aliased 'Google::RestApi::CalendarApi3::Event';
 use aliased 'Google::RestApi::CalendarApi3::Acl';
 
@@ -19,14 +21,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "calendars/$self->{id}";
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->calendar_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'calendars' }
+sub _parent_accessor { 'calendar_api' }
 
 sub get {
   my $self = shift;
@@ -109,14 +105,13 @@ sub events {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'items(id, summary, start, end)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'events', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'events',
     result_key     => 'items',
+    default_fields => 'items(id, summary, start, end)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -146,14 +141,13 @@ sub acl_rules {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'items(id, role, scope)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'acl', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'acl',
     result_key     => 'items',
+    default_fields => 'items(id, role, scope)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }

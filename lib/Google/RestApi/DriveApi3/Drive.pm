@@ -4,6 +4,8 @@ our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
   state $check = signature(
@@ -16,15 +18,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "drives";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->drive_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'drives' }
+sub _parent_accessor { 'drive_api' }
 
 sub get {
   my $self = shift;
@@ -37,7 +32,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Drive ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -62,7 +57,7 @@ sub update {
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Drive ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %params;
   $params{useDomainAdminAccess} = 'true' if delete $p->{use_domain_admin_access};
@@ -94,7 +89,7 @@ sub delete {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Drive ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   my %params;
   $params{useDomainAdminAccess} = 'true' if $p->{use_domain_admin_access};
@@ -107,7 +102,7 @@ sub delete {
 sub hide {
   my $self = shift;
 
-  LOGDIE "Drive ID required for hide()" unless $self->{id};
+  $self->require_id('hide');
 
   DEBUG(sprintf("Hiding shared drive '%s'", $self->{id}));
   return $self->api(uri => 'hide', method => 'post');
@@ -116,7 +111,7 @@ sub hide {
 sub unhide {
   my $self = shift;
 
-  LOGDIE "Drive ID required for unhide()" unless $self->{id};
+  $self->require_id('unhide');
 
   DEBUG(sprintf("Unhiding shared drive '%s'", $self->{id}));
   return $self->api(uri => 'unhide', method => 'post');

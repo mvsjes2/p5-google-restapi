@@ -116,14 +116,13 @@ sub list_calendars {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'items(id, summary)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'users/me/calendarList', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'users/me/calendarList',
     result_key     => 'items',
+    default_fields => 'items(id, summary)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }

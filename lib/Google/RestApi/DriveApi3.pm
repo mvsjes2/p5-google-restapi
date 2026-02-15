@@ -56,15 +56,15 @@ sub list {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{q} = $p->{filter};
-  $params->{fields} = 'files(id, name)' unless $params->{fields};
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
+  $p->{params}->{q} = $p->{filter};
 
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'files', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'files',
     result_key     => 'files',
+    default_fields => 'files(id, name)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -108,14 +108,13 @@ sub list_drives {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'drives(id, name)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'drives', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'drives',
     result_key     => 'drives',
+    default_fields => 'drives(id, name)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }

@@ -14,7 +14,7 @@ use Hash::Merge ();
 use Log::Log4perl qw( :easy );
 use Scalar::Util qw( blessed );
 use Type::Params qw( signature );
-use Types::Standard qw( Str StrMatch Int CodeRef HashRef Any slurpy );
+use Types::Standard qw( Str StrMatch Int CodeRef HashRef HasMethods Any slurpy );
 use YAML::Any qw( Dump LoadFile );
 
 use Google::RestApi::Types qw( ReadableFile );
@@ -31,6 +31,7 @@ our @EXPORT_OK = qw(
   cl_black cl_white
   strip
   paginate_api
+  paginated_list
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
@@ -200,6 +201,34 @@ sub paginate_api {
   } until !$keep_going || !$next_page_token || ($p->{max_pages} > 0 && $page >= $p->{max_pages});
 
   return @list;
+}
+
+sub paginated_list {
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api            => HasMethods['api'],
+      uri            => Str,
+      result_key     => Str,
+      default_fields => Str,
+      fields_prefix  => Str, { default => 'nextPageToken' },
+      max_pages      => Int, { default => 0 },
+      page_callback  => CodeRef, { optional => 1 },
+      params         => HashRef, { default => {} },
+    ],
+  );
+  my $p = $check->(@_);
+  my $params = $p->{params};
+  $params->{fields} //= $p->{default_fields};
+  $params->{fields} = "$p->{fields_prefix}, $params->{fields}";
+  my $api = $p->{api};
+  my $uri = $p->{uri};
+  return paginate_api(
+    api_call   => sub { $params->{pageToken} = $_[0] if $_[0]; $api->api(uri => $uri, params => $params); },
+    result_key => $p->{result_key},
+    max_pages  => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 1;

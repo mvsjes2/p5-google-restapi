@@ -4,6 +4,8 @@ our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 use aliased 'Google::RestApi::DriveApi3';
 use aliased 'Google::RestApi::DriveApi3::Permission';
 use aliased 'Google::RestApi::DriveApi3::Revision';
@@ -22,14 +24,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "files/$self->{id}";
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->drive()->api(%p, uri => $uri);
-}
+sub _uri_base { 'files' }
+sub _parent_accessor { 'drive' }
 
 sub copy {
   my $self = shift;
@@ -184,14 +180,13 @@ sub permissions {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'permissions(id, role, type, emailAddress)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'permissions', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'permissions',
     result_key     => 'permissions',
+    default_fields => 'permissions(id, role, type, emailAddress)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -221,14 +216,13 @@ sub revisions {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'revisions(id, modifiedTime, keepForever)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'revisions', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'revisions',
     result_key     => 'revisions',
+    default_fields => 'revisions(id, modifiedTime, keepForever)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -259,15 +253,15 @@ sub comments {
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'comments(id, content, author, createdTime)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-  $params->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
+  $p->{params}->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
 
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'comments', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'comments',
     result_key     => 'comments',
+    default_fields => 'comments(id, content, author, createdTime)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }

@@ -4,6 +4,8 @@ our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 use aliased 'Google::RestApi::GmailApi1::Attachment';
 
 sub new {
@@ -18,15 +20,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "messages";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->gmail_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'messages' }
+sub _parent_accessor { 'gmail_api' }
 
 sub get {
   my $self = shift;
@@ -39,7 +34,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Message ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{format} = $p->{format} if defined $p->{format};
@@ -59,7 +54,7 @@ sub modify {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Message ID required for modify()" unless $self->{id};
+  $self->require_id('modify');
 
   my %content;
   $content{addLabelIds} = $p->{add_label_ids} if $p->{add_label_ids}->@*;
@@ -76,7 +71,7 @@ sub modify {
 sub trash {
   my $self = shift;
 
-  LOGDIE "Message ID required for trash()" unless $self->{id};
+  $self->require_id('trash');
 
   DEBUG(sprintf("Trashing message '%s'", $self->{id}));
   return $self->api(uri => 'trash', method => 'post');
@@ -85,7 +80,7 @@ sub trash {
 sub untrash {
   my $self = shift;
 
-  LOGDIE "Message ID required for untrash()" unless $self->{id};
+  $self->require_id('untrash');
 
   DEBUG(sprintf("Untrashing message '%s'", $self->{id}));
   return $self->api(uri => 'untrash', method => 'post');
@@ -94,7 +89,7 @@ sub untrash {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Message ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting message '%s'", $self->{id}));
   return $self->api(method => 'delete');
@@ -110,7 +105,7 @@ sub attachment {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Message ID required for attachment()" unless $self->{id};
+  $self->require_id('attachment');
 
   return Attachment->new(message => $self, %$p);
 }
