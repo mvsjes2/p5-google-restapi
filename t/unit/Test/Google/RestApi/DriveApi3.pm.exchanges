@@ -196,7 +196,7 @@ response:
       "user": {
         "kind": "drive#user",
         "displayName": "Test User",
-        "photoLink": "://photo.example.com/placeholder",
+        "photoLink": "https://photo.example.com/placeholder",
         "me": true,
         "permissionId": "00000000000000000000",
         "emailAddress": "test.user@gmail.com"

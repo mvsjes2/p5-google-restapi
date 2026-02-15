@@ -199,7 +199,7 @@ response:
         "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "://photo.example.com/placeholder"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0ZcEe1Y",
       "createdTime": "2026-02-15T20:55:33.724Z",
@@ -248,7 +248,7 @@ response:
         "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "://photo.example.com/placeholder"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0ZcEe1Y",
       "createdTime": "2026-02-15T20:55:33.724Z",
@@ -332,7 +332,7 @@ response:
         "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "://photo.example.com/placeholder"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0ZcEe1c",
       "createdTime": "2026-02-15T20:55:39.746Z",
