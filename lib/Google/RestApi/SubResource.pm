@@ -1,6 +1,6 @@
 package Google::RestApi::SubResource;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 

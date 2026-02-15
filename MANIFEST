@@ -1,4 +1,5 @@
 bin/google_restapi_oauth_token_creator
+bin/pod2readme
 Changes
 cpanfile
 lib/Google/RestApi.pm
@@ -31,7 +32,6 @@ lib/Google/RestApi/GmailApi1/Message.pm
 lib/Google/RestApi/GmailApi1/Thread.pm
 lib/Google/RestApi/Request.pm
 lib/Google/RestApi/Setup.pm
-lib/Google/RestApi/SubResource.pm
 lib/Google/RestApi/SheetsApi4.pm
 lib/Google/RestApi/SheetsApi4/Range.pm
 lib/Google/RestApi/SheetsApi4/Range/All.pm
@@ -50,6 +50,7 @@ lib/Google/RestApi/SheetsApi4/Request/Spreadsheet/Worksheet/Range.pm
 lib/Google/RestApi/SheetsApi4/Spreadsheet.pm
 lib/Google/RestApi/SheetsApi4/Types.pm
 lib/Google/RestApi/SheetsApi4/Worksheet.pm
+lib/Google/RestApi/SubResource.pm
 lib/Google/RestApi/TasksApi1.pm
 lib/Google/RestApi/TasksApi1/Task.pm
 lib/Google/RestApi/TasksApi1/TaskList.pm
@@ -64,7 +65,7 @@ README.md
 t/99_changes.t
 t/bin/fix_drive_exchanges.pl
 t/bin/regenerate_exchanges.sh
-t/bin/sanitize_exchanges.pl
+t/compile.t
 t/etc/log4perl.conf
 t/etc/log4perl_debug.conf
 t/etc/perlcriticrc
@@ -75,6 +76,7 @@ t/lib/Test/Unit/TestBase.pm
 t/lib/Test/Unit/Utils.pm
 t/lib/Test/Utils.pm
 t/perlcritic.t
+t/pod-coverage.t
 t/pod.t
 t/run_unit_tests.t
 t/unit/Test/Google/RestApi.pm
