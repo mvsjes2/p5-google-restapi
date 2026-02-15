@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    comment => HasApi,
-    id      => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      comment => HasApi,
+      id      => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -25,10 +28,13 @@ sub api {
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    content => Str,
-    action  => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      content => Str,
+      action  => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -49,9 +55,12 @@ sub create {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields          => Str, { default => 'id,content,author,createdTime,modifiedTime' },
-    include_deleted => Bool, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields          => Str, { default => 'id,content,author,createdTime,modifiedTime' },
+      include_deleted => Bool, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -67,9 +76,12 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    content => Str,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      content => Str,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 

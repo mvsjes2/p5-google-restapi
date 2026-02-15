@@ -17,18 +17,24 @@ Readonly our $Calendar_Id       => '[a-zA-Z0-9._@-]+';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    api      => HasApi,
-    endpoint => Str, { default => $Calendar_Endpoint },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api      => HasApi,
+      endpoint => Str, { default => $Calendar_Endpoint },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   my $uri = "$self->{endpoint}/";
@@ -38,8 +44,11 @@ sub api {
 
 sub calendar {
   my $self = shift;
-  state $check = compile_named(
-    id => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str,
+    ],
   );
   my $p = $check->(@_);
   return Calendar->new(calendar_api => $self, %$p);
@@ -47,8 +56,11 @@ sub calendar {
 
 sub calendar_list {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return CalendarList->new(calendar_api => $self, %$p);
@@ -58,8 +70,11 @@ sub colors { Colors->new(calendar_api => shift); }
 
 sub settings {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Settings->new(calendar_api => $self, %$p);
@@ -67,9 +82,12 @@ sub settings {
 
 sub create_calendar {
   my $self = shift;
-  state $check = compile_named(
-    summary => Str,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      summary => Str,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -88,10 +106,13 @@ sub create_calendar {
 
 sub list_calendars {
   my $self = shift;
-  state $check = compile_named(
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -109,11 +130,14 @@ sub list_calendars {
 
 sub freebusy {
   my $self = shift;
-  state $check = compile_named(
-    time_min => Str,
-    time_max => Str,
-    items    => ArrayRef[HashRef],
-    _extra_  => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      time_min => Str,
+      time_max => Str,
+      items    => ArrayRef[HashRef],
+      _extra_  => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 

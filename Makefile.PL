@@ -39,7 +39,7 @@ WriteMakefile(
       'Tie::Hash'                       => 0,
       'Try::Tiny'                       => 0,
       'ToolSet'                         => 0,
-      'Type::Params'                    => 1.004004,
+      'Type::Params'                    => 2.000000,
       'Types::Standard'                 => 0,
       'URI'                             => 0,
       'URI::QueryParam'                 => 0,

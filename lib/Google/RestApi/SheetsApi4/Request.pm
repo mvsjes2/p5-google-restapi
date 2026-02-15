@@ -13,7 +13,7 @@ use parent "Google::RestApi::Request";
 sub merge_request {
   my $self = shift;
 
-  state $check = compile(HashRef);
+  state $check = signature(positional => [HashRef]);
   my ($request) = $check->(@_);
 
   my $requests = $self->{requests} or return;

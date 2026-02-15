@@ -23,7 +23,7 @@ requires 'Term::Prompt';
 requires 'Tie::Hash';
 requires 'ToolSet';
 requires 'Try::Tiny';
-requires 'Type::Params', '== 1.004004';
+requires 'Type::Params', '>= 2.000000';
 requires 'Types::Standard';
 requires 'URI';
 requires 'URI::QueryParam';

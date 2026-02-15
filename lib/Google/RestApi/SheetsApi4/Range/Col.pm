@@ -28,7 +28,7 @@ sub new {
   # if factory has already been used, then this should resolve here.
   my $err;
   try {
-    state $check = compile(RangeCol);
+    state $check = signature(positional => [RangeCol]);
     ($self{range}) = $check->($self{range});
   } catch {
     $err = $_;
@@ -66,9 +66,12 @@ sub _col_i2a {
 
 sub values {
   my $self = shift;
-  state $check = compile_named(
-    values => ArrayRef[Str], { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values => ArrayRef[Str], { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   $p->{values} = [ $p->{values} ] if defined $p->{values};
@@ -78,8 +81,11 @@ sub values {
 
 sub batch_values {
   my $self = shift;
-  state $check = compile_named(
-    values => ArrayRef[Str], { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values => ArrayRef[Str], { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   $p->{values} = [ $p->{values} ] if $p->{values};
@@ -89,7 +95,7 @@ sub batch_values {
 sub cell_at_offset {
   my $self = shift;
 
-  state $check = compile(Int, DimColRow, { optional => 1 });
+  state $check = signature(positional => [Int, DimColRow, { optional => 1 }]);
   my ($offset) = $check->(@_);   # we're a column, no dim required.
 
   my $col_range = $self->range_to_array($Google::RestApi::SheetsApi4::Range::RANGE_EXPANDED);  # can't use aliased.
@@ -105,7 +111,7 @@ sub cell_at_offset {
 sub is_other_inside {
   my $self = shift;
 
-  state $check = compile(HasRange);
+  state $check = signature(positional => [HasRange]);
   my ($inside_range) = $check->(@_);
 
   my $range = $self->range_to_hash($Google::RestApi::SheetsApi4::Range::RANGE_EXPANDED);

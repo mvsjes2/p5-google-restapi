@@ -13,7 +13,7 @@ use File::Basename qw( dirname );
 use Hash::Merge ();
 use Log::Log4perl qw( :easy );
 use Scalar::Util qw( blessed );
-use Type::Params qw( compile compile_named );
+use Type::Params qw( signature );
 use Types::Standard qw( Str StrMatch Int CodeRef HashRef Any slurpy );
 use YAML::Any qw( Dump LoadFile );
 
@@ -39,11 +39,16 @@ our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 # extra key/value pairs we aren't interested in in the checked
 # argument hash.
 sub named_extra {
-  state $check = compile_named(
-    _extra_   => HashRef,
-    validated => slurpy HashRef,
+  # v2 signature returns blessed hashref; dereference if needed.
+  my @args = @_ == 1 && ref $_[0] ? %{$_[0]} : @_;
+  state $check = signature(
+    bless => !!0,
+    named => [
+      _extra_   => HashRef,
+      validated => slurpy HashRef,
+    ],
   );
-  my $p = $check->(@_);
+  my $p = $check->(@args);
   my $extra = delete $p->{_extra_};
 
   my %p;
@@ -53,9 +58,12 @@ sub named_extra {
 }
 
 sub merge_config_file {
-  state $check = compile_named(
-    config_file => ReadableFile, { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      config_file => ReadableFile, { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $passed_config = named_extra($check->(@_));
 
@@ -77,7 +85,7 @@ sub merge_config_file {
 # to a full path. can be used in Auth configs, possibly others.
 # see sub RestApi::auth for more.
 sub resolve_config_file_path {
-  state $check = compile(HashRef, Str);
+  state $check = signature(positional => [HashRef, Str]);
   my ($config, $file_key) = $check->(@_);
 
   my $config_file = $config->{$file_key} or return;
@@ -142,7 +150,7 @@ sub bool {
 }
 
 sub dims_any {
-  state $check = compile(StrMatch[qr/^(col|row)/i]);
+  state $check = signature(positional => [StrMatch[qr/^(col|row)/i]]);
   my ($dims) = $check->(@_);
   return $dims =~ /^col/i ? "COLUMNS" : "ROWS";
 }
@@ -150,7 +158,7 @@ sub dims_any {
 sub dims_all {
   my $dims = eval { dims_any(@_); };
   return $dims if $dims;
-  state $check = compile(StrMatch[qr/^all/i]);
+  state $check = signature(positional => [StrMatch[qr/^all/i]]);
   ($dims) = $check->(@_);
   return "ALL";
 }
@@ -165,11 +173,14 @@ sub strip {
 }
 
 sub paginate_api {
-  state $check = compile_named(
-    api_call       => CodeRef,
-    result_key     => Str,
-    max_pages      => Int, { default => 0 },
-    page_callback  => CodeRef, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api_call       => CodeRef,
+      result_key     => Str,
+      max_pages      => Int, { default => 0 },
+      page_callback  => CodeRef, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 

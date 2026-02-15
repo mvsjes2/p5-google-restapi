@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    message => HasApi,
-    id      => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      message => HasApi,
+      id      => Str,
+    ],
   );
   return bless $check->(@_), $class;
 }

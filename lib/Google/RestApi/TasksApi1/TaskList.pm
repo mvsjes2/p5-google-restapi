@@ -8,9 +8,12 @@ use aliased 'Google::RestApi::TasksApi1::Task';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    tasks_api => HasApi,
-    id        => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      tasks_api => HasApi,
+      id        => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -27,9 +30,12 @@ sub api {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+      params => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -43,9 +49,12 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    title   => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -72,8 +81,11 @@ sub delete {
 
 sub task {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Task->new(task_list => $self, %$p);
@@ -81,10 +93,13 @@ sub task {
 
 sub tasks {
   my $self = shift;
-  state $check = compile_named(
-    max_pages     => Int, { default => 1 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      max_pages     => Int, { default => 1 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -104,11 +119,14 @@ sub tasks {
 
 sub create_task {
   my $self = shift;
-  state $check = compile_named(
-    title   => Str,
-    notes   => Str, { optional => 1 },
-    due     => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str,
+      notes   => Str, { optional => 1 },
+      due     => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 

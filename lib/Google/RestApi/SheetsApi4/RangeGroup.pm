@@ -18,9 +18,12 @@ use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Iterator';
 sub new {
   my $class = shift;
 
-  state $check = compile_named(
-    spreadsheet => HasApi,
-    ranges      => ArrayRef[HasRange], { default => [] },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      spreadsheet => HasApi,
+      ranges      => ArrayRef[HasRange], { default => [] },
+    ],
   );
 
   return bless $check->(@_), $class;
@@ -28,7 +31,7 @@ sub new {
 
 sub push_ranges {
   my $self = shift;
-  state $check = compile(slurpy ArrayRef[HasRange]);
+  state $check = signature(positional => [slurpy ArrayRef[HasRange]]);
   my ($ranges) = $check->(@_);
   push(@{ $self->{ranges} }, @$ranges);
   return;
@@ -63,9 +66,12 @@ sub refresh_values {
 sub values {
   my $self = shift;
 
-  state $check = compile_named(
-    params  => HashRef, { default => {} },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      params  => HashRef, { default => {} },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -115,8 +121,11 @@ sub _batch_get {
 sub batch_values {
   my $self = shift;
 
-  state $check = compile_named(
-    values  => ArrayRef, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values  => ArrayRef, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -137,7 +146,7 @@ sub batch_values {
 
 sub values_response_from_api {
   my $self = shift;
-  state $check = compile(ArrayRef);
+  state $check = signature(positional => [ArrayRef]);
   my ($updates) = $check->(@_);
   my @updates = map {
     $_->has_values() ? ($_->values_response_from_api($updates)) : ();
@@ -167,7 +176,7 @@ sub submit_requests {
 
 sub requests_response_from_api {
   my $self = shift;
-  state $check = compile(ArrayRef);
+  state $check = signature(positional => [ArrayRef]);
   my ($requests) = $check->(@_);
   my @requests = map {
     $_->requests_response_from_api($requests);

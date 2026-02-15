@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar_api => HasApi,
-    id           => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar_api => HasApi,
+      id           => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -25,8 +28,11 @@ sub api {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -40,9 +46,12 @@ sub get {
 
 sub insert {
   my $self = shift;
-  state $check = compile_named(
-    id      => Str,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id      => Str,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -61,12 +70,15 @@ sub insert {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    summary_override => Str, { optional => 1 },
-    color_id         => Str, { optional => 1 },
-    hidden           => Bool, { optional => 1 },
-    selected         => Bool, { optional => 1 },
-    _extra_          => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      summary_override => Str, { optional => 1 },
+      color_id         => Str, { optional => 1 },
+      hidden           => Bool, { optional => 1 },
+      selected         => Bool, { optional => 1 },
+      _extra_          => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 

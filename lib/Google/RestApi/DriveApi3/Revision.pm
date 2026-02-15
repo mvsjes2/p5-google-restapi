@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    file => HasApi,
-    id   => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      file => HasApi,
+      id   => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -25,9 +28,12 @@ sub api {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields            => Str, { optional => 1 },
-    acknowledge_abuse => Bool, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields            => Str, { optional => 1 },
+      acknowledge_abuse => Bool, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -42,12 +48,15 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    keep_forever              => Bool, { optional => 1 },
-    publish_auto              => Bool, { optional => 1 },
-    published                 => Bool, { optional => 1 },
-    published_outside_domain  => Bool, { optional => 1 },
-    _extra_                   => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      keep_forever              => Bool, { optional => 1 },
+      publish_auto              => Bool, { optional => 1 },
+      published                 => Bool, { optional => 1 },
+      published_outside_domain  => Bool, { optional => 1 },
+      _extra_                   => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 

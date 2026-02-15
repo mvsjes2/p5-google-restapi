@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    gmail_api => HasApi,
-    id        => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      gmail_api => HasApi,
+      id        => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -25,14 +28,17 @@ sub api {
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    to           => Str,
-    subject      => Str,
-    body         => Str,
-    from         => Str, { optional => 1 },
-    cc           => Str, { optional => 1 },
-    bcc          => Str, { optional => 1 },
-    content_type => Str, { default => 'text/plain' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      to           => Str,
+      subject      => Str,
+      body         => Str,
+      from         => Str, { optional => 1 },
+      cc           => Str, { optional => 1 },
+      bcc          => Str, { optional => 1 },
+      content_type => Str, { default => 'text/plain' },
+    ],
   );
   my $p = $check->(@_);
 
@@ -49,8 +55,11 @@ sub create {
 
 sub create_raw {
   my $self = shift;
-  state $check = compile_named(
-    raw => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      raw => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -65,9 +74,12 @@ sub create_raw {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    format => Str, { optional => 1 },
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      format => Str, { optional => 1 },
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -82,14 +94,17 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    to           => Str,
-    subject      => Str,
-    body         => Str,
-    from         => Str, { optional => 1 },
-    cc           => Str, { optional => 1 },
-    bcc          => Str, { optional => 1 },
-    content_type => Str, { default => 'text/plain' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      to           => Str,
+      subject      => Str,
+      body         => Str,
+      from         => Str, { optional => 1 },
+      cc           => Str, { optional => 1 },
+      bcc          => Str, { optional => 1 },
+      content_type => Str, { default => 'text/plain' },
+    ],
   );
   my $p = $check->(@_);
 

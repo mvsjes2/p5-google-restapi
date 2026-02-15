@@ -6,12 +6,15 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    range => HasMethods[qw(range worksheet)],
-    dim   => StrMatch[qr/^(col|row)$/], { default => 'row' },
-    by    => PositiveInt, { default => 1 },
-    from  => PositiveOrZeroInt, { optional => 1 },
-    to    => PositiveOrZeroInt, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range => HasMethods[qw(range worksheet)],
+      dim   => StrMatch[qr/^(col|row)$/], { default => 'row' },
+      by    => PositiveInt, { default => 1 },
+      from  => PositiveOrZeroInt, { optional => 1 },
+      to    => PositiveOrZeroInt, { optional => 1 },
+    ],
   );
   my $self = $check->(@_);
   $self->{current} = delete $self->{from} || 0;
