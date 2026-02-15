@@ -4,6 +4,8 @@ our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
   state $check = signature(
@@ -16,15 +18,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "permissions";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->file()->api(%p, uri => $uri);
-}
+sub _uri_base { 'permissions' }
+sub _parent_accessor { 'file' }
 
 sub create {
   my $self = shift;
@@ -75,7 +70,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Permission ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -95,7 +90,7 @@ sub update {
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Permission ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %params;
   $params{transferOwnership} = delete $p->{transfer_ownership} ? 'true' : 'false';
@@ -115,7 +110,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Permission ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting permission '%s' from file '%s'", $self->{id}, $self->file()->file_id()));
   return $self->api(method => 'delete');

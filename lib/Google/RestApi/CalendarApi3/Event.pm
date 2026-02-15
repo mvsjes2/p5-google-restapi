@@ -4,6 +4,8 @@ our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
   state $check = signature(
@@ -16,15 +18,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "events";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->calendar()->api(%p, uri => $uri);
-}
+sub _uri_base { 'events' }
+sub _parent_accessor { 'calendar' }
 
 sub create {
   my $self = shift;
@@ -70,7 +65,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Event ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -94,7 +89,7 @@ sub update {
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Event ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content;
   $content{summary} = delete $p->{summary} if defined $p->{summary};
@@ -114,7 +109,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Event ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting event '%s'", $self->{id}));
   return $self->api(method => 'delete');
@@ -152,16 +147,15 @@ sub instances {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Event ID required for instances()" unless $self->{id};
+  $self->require_id('instances');
 
-  my $params = $p->{params};
-  $params->{fields} //= 'items(id, summary, start, end)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'instances', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'instances',
     result_key     => 'items',
+    default_fields => 'items(id, summary, start, end)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -176,7 +170,7 @@ sub move {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Event ID required for move()" unless $self->{id};
+  $self->require_id('move');
 
   DEBUG(sprintf("Moving event '%s' to calendar '%s'", $self->{id}, $p->{destination}));
   my $result = $self->api(

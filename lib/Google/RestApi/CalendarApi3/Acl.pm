@@ -4,6 +4,8 @@ our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
   state $check = signature(
@@ -16,15 +18,9 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "acl";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->calendar()->api(%p, uri => $uri);
-}
+sub _uri_base { 'acl' }
+sub _parent_accessor { 'calendar' }
+sub _resource_name { 'ACL' }
 
 sub create {
   my $self = shift;
@@ -66,7 +62,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "ACL ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -85,7 +81,7 @@ sub update {
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "ACL ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content = (
     role => delete $p->{role},
@@ -101,7 +97,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "ACL ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting ACL rule '%s' from calendar '%s'", $self->{id}, $self->calendar()->calendar_id()));
   return $self->api(method => 'delete');

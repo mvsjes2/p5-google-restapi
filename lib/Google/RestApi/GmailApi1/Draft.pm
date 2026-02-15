@@ -4,6 +4,8 @@ our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
   state $check = signature(
@@ -16,15 +18,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "drafts";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->gmail_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'drafts' }
+sub _parent_accessor { 'gmail_api' }
 
 sub create {
   my $self = shift;
@@ -83,7 +78,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Draft ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{format} = $p->{format} if defined $p->{format};
@@ -108,7 +103,7 @@ sub update {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Draft ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my $raw = $self->gmail_api()->_build_mime(%$p);
 
@@ -122,7 +117,7 @@ sub update {
 sub send {
   my $self = shift;
 
-  LOGDIE "Draft ID required for send()" unless $self->{id};
+  $self->require_id('send');
 
   DEBUG(sprintf("Sending draft '%s'", $self->{id}));
   return $self->gmail_api()->api(
@@ -135,7 +130,7 @@ sub send {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Draft ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting draft '%s'", $self->{id}));
   return $self->api(method => 'delete');
