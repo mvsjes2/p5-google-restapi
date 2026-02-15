@@ -501,6 +501,20 @@ response:
 source: Test::Google::RestApi::DocsApi1::Document::submit_requests
 
 ---
+request: GET /v1/documents/16ezV6nq6c4nLrf8IQ3KhGUX5Dn38fNdJSOoqqyoRHOQ?fields=title
+response:
+  code: 200
+  content: |
+    {
+      "title": "Mock Document"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DocsApi1::Document::get_with_fields
+
+---
 request: DELETE /drive/v3/files/16ezV6nq6c4nLrf8IQ3KhGUX5Dn38fNdJSOoqqyoRHOQ
 response:
   code: 204
