@@ -19,14 +19,17 @@ sub new {
   my $qr_id = $Google::RestApi::SheetsApi4::Spreadsheet_Id;
   my $qr_uri = $Google::RestApi::SheetsApi4::Spreadsheet_Uri;
   # pass one of id/name/title/uri and this will work out the others.
-  state $check = compile_named(
-    sheets_api => HasApi,
-    # https://developers.google.com/sheets/api/guides/concepts
-    id         => StrMatch[qr/^$qr_id$/], { optional => 1 },
-    name       => Str, { optional => 1 },
-    title      => Str, { optional => 1 },
-    uri        => StrMatch[qr|^$qr_uri/$qr_id/?|], { optional => 1 },
-    cache_seconds => PositiveOrZeroNum, { default => 5 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      sheets_api => HasApi,
+      # https://developers.google.com/sheets/api/guides/concepts
+      id         => StrMatch[qr/^$qr_id$/], { optional => 1 },
+      name       => Str, { optional => 1 },
+      title      => Str, { optional => 1 },
+      uri        => StrMatch[qr|^$qr_uri/$qr_id/?|], { optional => 1 },
+      cache_seconds => PositiveOrZeroNum, { default => 5 },
+    ],
   );
   my $self = $check->(@_);
 
@@ -43,9 +46,12 @@ sub new {
 # then pass it up to G::R::SheetsApi4 which will tack on the endpoint.
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { default => '' },
-    _extra_ => slurpy Any,             # we'll just pass the params/content etc up for processing.
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { default => '' },
+      _extra_ => slurpy HashRef,             # we'll just pass the params/content etc up for processing.
+    ],
   );
   my $p = named_extra($check->(@_));
   $p->{uri} = $self->spreadsheet_id() . $p->{uri};
@@ -107,7 +113,7 @@ sub attrs {
 # return one of the property attributes of the spreadsheet.
 sub properties {
   my $self = shift;
-  state $check = compile(Str);
+  state $check = signature(positional => [Str]);
   my ($what) = $check->(@_);
   my $fields = _fields('properties', $what);
   return $self->attrs($fields)->{properties};
@@ -117,7 +123,7 @@ sub properties {
 # returns properties for each worksheet in the spreadsheet.
 sub worksheet_properties {
   my $self = shift;
-  state $check = compile(Str);
+  state $check = signature(positional => [Str]);
   my ($what) = $check->(@_);
   my $fields = _fields('sheets.properties', $what);
   my $properties = $self->attrs($fields)->{sheets};
@@ -140,7 +146,7 @@ sub _fields {
 sub _cache {
   my $self = shift;
 
-  state $check = compile(Str, CodeRef);
+  state $check = signature(positional => [Str, CodeRef]);
   my ($key, $code) = $check->(@_);
   return $code->() if !$self->{cache_seconds};
 
@@ -164,7 +170,7 @@ sub _cache_delete {
 sub cache_seconds {
   my $self = shift;
 
-  state $check = compile(PositiveOrZeroNum);
+  state $check = signature(positional => [PositiveOrZeroNum]);
   my ($cache_seconds) = $check->(@_);
 
   $self->{_cache}->delete_all() if $self->{_cache};
@@ -193,7 +199,7 @@ sub delete_spreadsheet {
 
 sub range_group {
   my $self = shift;
-  state $check = compile(slurpy ArrayRef[HasRange]);
+  state $check = signature(positional => [slurpy ArrayRef[HasRange]]);
   my ($ranges) = $check->(@_);
   return RangeGroup->new(
     spreadsheet => $self,
@@ -216,7 +222,7 @@ sub tie {
 # TODO: if worksheet is renamed, registration should be updated too.
 sub _register_worksheet {
   my $self = shift;
-  state $check = compile(HasApi);
+  state $check = signature(positional => [HasApi]);
   my ($worksheet) = $check->(@_);
   my $name = $worksheet->worksheet_name();
   return $self->{registered_worksheet}->{$name} if $self->{registered_worksheet}->{$name};
@@ -228,9 +234,12 @@ sub _register_worksheet {
 sub submit_values {
   my $self = shift;
 
-  state $check = compile_named(
-    ranges  => ArrayRef[HasMethods[qw(has_values batch_values values_response_from_api)]],
-    content => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      ranges  => ArrayRef[HasMethods[qw(has_values batch_values values_response_from_api)]],
+      content => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -259,9 +268,12 @@ sub submit_values {
 sub submit_requests {
   my $self = shift;
 
-  state $check = compile_named(
-    ranges  => ArrayRef[HasMethods[qw(batch_requests requests_response_from_api)]], { default => [] }, # might just be self.
-    content => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      ranges  => ArrayRef[HasMethods[qw(batch_requests requests_response_from_api)]], { default => [] }, # might just be self.
+      content => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -304,7 +316,7 @@ sub submit_requests {
 sub named_ranges {
   my $self = shift;
 
-  state $check = compile(RangeNamed, { optional => 1 });
+  state $check = signature(positional => [RangeNamed, { optional => 1 }]);
   my ($named_range_name) = $check->(@_);
 
   my $named_ranges = $self->attrs('namedRanges')->{namedRanges};
@@ -318,7 +330,7 @@ sub named_ranges {
 sub normalize_named {
   my $self = shift;
 
-  state $check = compile(RangeNamed);
+  state $check = signature(positional => [RangeNamed]);
   my ($named_range_name) = $check->(@_);
 
   my $named_range = $self->named_ranges($named_range_name) or return;

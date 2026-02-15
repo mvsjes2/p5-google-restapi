@@ -34,7 +34,7 @@ sub _freeze {
   my $self = shift;
 
   my $dim = shift;
-  state $check = compile(PositiveOrZeroInt, { default => 0 });
+  state $check = signature(positional => [PositiveOrZeroInt, { default => 0 }]);
   my ($count) = $check->(@_);
 
   # "frozenColumnCount" or "frozenRowCount".
@@ -49,9 +49,12 @@ sub _freeze {
 sub update_worksheet_properties {
   my $self = shift;
 
-  state $check = compile_named(
-    properties => HashRef,
-    fields     => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      properties => HashRef,
+      fields     => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -101,10 +104,13 @@ sub delete_worksheet {
 sub duplicate_worksheet {
   my $self = shift;
 
-  state $check = compile_named(
-    new_name       => Optional[Str],
-    insert_index   => Optional[Int],
-    new_sheet_id   => Optional[Int],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      new_name       => Optional[Str],
+      insert_index   => Optional[Int],
+      new_sheet_id   => Optional[Int],
+    ],
   );
   my $p = $check->(@_);
 
@@ -121,12 +127,15 @@ sub duplicate_worksheet {
 sub update_dimension_properties {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension  => Str,
-    start      => Int,
-    end        => Optional[Int],
-    properties => HashRef,
-    fields     => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension  => Str,
+      start      => Int,
+      end        => Optional[Int],
+      properties => HashRef,
+      fields     => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -219,9 +228,12 @@ sub show_cols {
 sub append_dimension {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension => Str,
-    length    => Int,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension => Str,
+      length    => Int,
+    ],
   );
   my $p = $check->(@_);
 
@@ -244,10 +256,13 @@ sub append_cols { shift->append_dimension(dimension => 'col', length => shift); 
 sub auto_resize_dimensions {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension => Str,
-    start     => Int,
-    end       => Optional[Int],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension => Str,
+      start     => Int,
+      end       => Optional[Int],
+    ],
   );
   my $p = $check->(@_);
 
@@ -283,10 +298,13 @@ sub auto_resize_cols {
 sub set_basic_filter {
   my $self = shift;
 
-  state $check = compile_named(
-    range   => Optional[HashRef],
-    criteria => Optional[HashRef],
-    sort_specs => Optional[ArrayRef],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range   => Optional[HashRef],
+      criteria => Optional[HashRef],
+      sort_specs => Optional[ArrayRef],
+    ],
   );
   my $p = $check->(@_);
 
@@ -319,10 +337,13 @@ sub clear_basic_filter {
 sub add_conditional_format_rule {
   my $self = shift;
 
-  state $check = compile_named(
-    ranges    => ArrayRef,
-    rule      => HashRef,
-    index     => Int, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      ranges    => ArrayRef,
+      rule      => HashRef,
+      index     => Int, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -342,10 +363,13 @@ sub add_conditional_format_rule {
 sub update_conditional_format_rule {
   my $self = shift;
 
-  state $check = compile_named(
-    index     => Int,
-    rule      => Optional[HashRef],
-    new_index => Optional[Int],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      index     => Int,
+      rule      => Optional[HashRef],
+      new_index => Optional[Int],
+    ],
   );
   my $p = $check->(@_);
 
@@ -361,7 +385,7 @@ sub update_conditional_format_rule {
 sub delete_conditional_format_rule {
   my $self = shift;
 
-  state $check = compile(Int);
+  state $check = signature(positional => [Int]);
   my ($index) = $check->(@_);
 
   $self->batch_requests(
@@ -377,10 +401,13 @@ sub delete_conditional_format_rule {
 sub add_banding {
   my $self = shift;
 
-  state $check = compile_named(
-    range                 => HashRef,
-    row_properties        => Optional[HashRef],
-    column_properties     => Optional[HashRef],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range                 => HashRef,
+      row_properties        => Optional[HashRef],
+      column_properties     => Optional[HashRef],
+    ],
   );
   my $p = $check->(@_);
 
@@ -400,12 +427,15 @@ sub add_banding {
 sub update_banding {
   my $self = shift;
 
-  state $check = compile_named(
-    id                    => Str,
-    range                 => Optional[HashRef],
-    row_properties        => Optional[HashRef],
-    column_properties     => Optional[HashRef],
-    fields                => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id                    => Str,
+      range                 => Optional[HashRef],
+      row_properties        => Optional[HashRef],
+      column_properties     => Optional[HashRef],
+      fields                => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -433,7 +463,7 @@ sub update_banding {
 sub delete_banding {
   my $self = shift;
 
-  state $check = compile(Str);
+  state $check = signature(positional => [Str]);
   my ($id) = $check->(@_);
 
   $self->batch_requests(
@@ -448,10 +478,13 @@ sub delete_banding {
 sub add_dimension_group {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension => Str,
-    start     => Int,
-    end       => Int,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension => Str,
+      start     => Int,
+      end       => Int,
+    ],
   );
   my $p = $check->(@_);
 
@@ -474,10 +507,13 @@ sub add_dimension_group {
 sub delete_dimension_group {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension => Str,
-    start     => Int,
-    end       => Int,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension => Str,
+      start     => Int,
+      end       => Int,
+    ],
   );
   my $p = $check->(@_);
 
@@ -500,12 +536,15 @@ sub delete_dimension_group {
 sub update_dimension_group {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension      => Str,
-    start          => Int,
-    end            => Int,
-    depth          => Int,
-    collapsed      => Bool,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension      => Str,
+      start          => Int,
+      end            => Int,
+      depth          => Int,
+      collapsed      => Bool,
+    ],
   );
   my $p = $check->(@_);
 

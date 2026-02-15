@@ -17,11 +17,14 @@ sub new {
   resolve_config_file_path(\%p, 'account_file');
   
   my $self = merge_config_file(%p);
-  state $check = compile_named(
-    config_dir   => ReadableDir, { optional => 1 },
-    config_file  => ReadableFile, { optional => 1 },
-    account_file => ReadableFile,
-    scope        => ArrayRef[Str],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      config_dir   => ReadableDir, { optional => 1 },
+      config_file  => ReadableFile, { optional => 1 },
+      account_file => ReadableFile,
+      scope        => ArrayRef[Str],
+    ],
   );
   $self = $check->(%$self);
   $self = bless $self, $class;

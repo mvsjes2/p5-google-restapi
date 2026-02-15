@@ -9,9 +9,12 @@ use aliased 'Google::RestApi::CalendarApi3::Acl';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar_api => HasApi,
-    id           => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar_api => HasApi,
+      id           => Str,
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -27,9 +30,12 @@ sub api {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+      params => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -41,12 +47,15 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    summary     => Str, { optional => 1 },
-    description => Str, { optional => 1 },
-    location    => Str, { optional => 1 },
-    time_zone   => Str, { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      summary     => Str, { optional => 1 },
+      description => Str, { optional => 1 },
+      location    => Str, { optional => 1 },
+      time_zone   => Str, { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -77,8 +86,11 @@ sub clear {
 
 sub event {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Event->new(calendar => $self, %$p);
@@ -86,11 +98,14 @@ sub event {
 
 sub events {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -108,8 +123,11 @@ sub events {
 
 sub acl {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Acl->new(calendar => $self, %$p);
@@ -117,11 +135,14 @@ sub acl {
 
 sub acl_rules {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 

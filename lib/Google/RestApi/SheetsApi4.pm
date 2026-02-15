@@ -22,10 +22,13 @@ Readonly our $Spreadsheet_Filter => "mimeType = 'application/vnd.google-apps.spr
 sub new {
   my $class = shift;
 
-  state $check = compile_named(
-    api           => HasApi,                                           # the G::RestApi object that will be used to send http calls.
-    drive         => HasMethods[qw(list)], { optional => 1 },  # a drive instnace, could be your own, defaults to G::R::DriveApi3.
-    endpoint      => Str, { default => $Sheets_Endpoint },              # this gets tacked on to the api uri to reach the sheets endpoint.
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api           => HasApi,                                           # the G::RestApi object that will be used to send http calls.
+      drive         => HasMethods[qw(list)], { optional => 1 },  # a drive instnace, could be your own, defaults to G::R::DriveApi3.
+      endpoint      => Str, { default => $Sheets_Endpoint },              # this gets tacked on to the api uri to reach the sheets endpoint.
+    ],
   );
   my $self = $check->(@_);
 
@@ -37,9 +40,12 @@ sub new {
 # sheets endpoint and pass it up the line to G::RestApi to make the actual call.
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { default => '' },
-    _extra_ => slurpy Any,              # just pass through any extra params to G::RestApi::api call.
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { default => '' },
+      _extra_ => slurpy HashRef,              # just pass through any extra params to G::RestApi::api call.
+    ],
   );
   my $p = named_extra($check->(@_));
   my $uri = $self->{endpoint};          # tack on the uri endpoint and pass the buck.
@@ -50,10 +56,13 @@ sub api {
 sub create_spreadsheet {
   my $self = shift;
 
-  state $check = compile_named(
-    title   => Str, { optional => 1 },
-    name    => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str, { optional => 1 },
+      name    => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   # we allow name and title to be synonymous for convenience. it's actuall title in the google api.
@@ -78,9 +87,12 @@ sub create_spreadsheet {
 sub copy_spreadsheet {
   my $self = shift;
   my $id = $Spreadsheet_Id;
-  state $check = compile_named(
-    spreadsheet_id => StrMatch[qr/$id/],
-    _extra_        => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      spreadsheet_id => StrMatch[qr/$id/],
+      _extra_        => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   my $file_id = delete $p->{spreadsheet_id};
@@ -92,7 +104,7 @@ sub copy_spreadsheet {
 sub delete_spreadsheet {
   my $self = shift;
   my $id = $Spreadsheet_Id;
-  state $check = compile(StrMatch[qr/$id/]);
+  state $check = signature(positional => [StrMatch[qr/$id/]]);
   my ($spreadsheet_id) = $check->(@_);
   return $self->drive()->file(id => $spreadsheet_id)->delete();
 }
@@ -100,7 +112,7 @@ sub delete_spreadsheet {
 sub delete_all_spreadsheets_by_filters {
   my $self = shift;
 
-  state $check = compile(ArrayRef->plus_coercions(Str, sub { [$_]; }));
+  state $check = signature(positional => [ArrayRef->plus_coercions(Str, sub { [$_]; })]);
   my ($filter) = $check->(@_);
 
   my $count = 0;
@@ -123,11 +135,14 @@ sub delete_all_spreadsheets {
 sub spreadsheets_by_filter {
   my $self = shift;
 
-  state $check = compile_named(
-    filter        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      filter        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -145,11 +160,14 @@ sub spreadsheets_by_filter {
 sub spreadsheets {
   my $self = shift;
 
-  state $check = compile_named(
-    name          => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name          => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 

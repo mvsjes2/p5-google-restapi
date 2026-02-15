@@ -108,39 +108,42 @@ sub factory {
   my %original_range_args = @_;
   my $original_range = $original_range_args{range};
 
-  state $check = multisig(
-    compile_named(
-      worksheet => HasApi,
-      range     => RangeCol,
-      dim       => DimColRow, { optional => 1 },  # is switched to 'col'.
-    ),
-    compile_named(
-      worksheet => HasApi,
-      range     => RangeRow,
-      dim       => DimColRow, { optional => 1 },  # is switched to 'row'
-    ),
-    compile_named(
-      worksheet => HasApi,
-      range     => RangeCell,
-      dim       => DimColRow, { optional => 1 },  # doesn't matter for cells.
-    ),
-    compile_named(
-      worksheet => HasApi,
-      range     => RangeAny,
-      dim       => DimColRow, { default => 'row' },
-    ),
-    compile_named(
-      worksheet => HasApi,
-      range     => RangeNamed,
-      dim       => DimColRow, { default => 'row' },
-    ),
+  state $check = signature(
+    bless => !!0,
+    multiple => [
+      { named => [
+          worksheet => HasApi,
+          range     => RangeCol,
+          dim       => DimColRow, { optional => 1 },  # is switched to 'col'.
+      ] },
+      { named => [
+          worksheet => HasApi,
+          range     => RangeRow,
+          dim       => DimColRow, { optional => 1 },  # is switched to 'row'
+      ] },
+      { named => [
+          worksheet => HasApi,
+          range     => RangeCell,
+          dim       => DimColRow, { optional => 1 },  # doesn't matter for cells.
+      ] },
+      { named => [
+          worksheet => HasApi,
+          range     => RangeAny,
+          dim       => DimColRow, { default => 'row' },
+      ] },
+      { named => [
+          worksheet => HasApi,
+          range     => RangeNamed,
+          dim       => DimColRow, { default => 'row' },
+      ] },
+    ],
   );
   my @range_args = $check->(@_);
   my $range_args = $range_args[0];  # no idea why it returns an arrayref pointer to a hashref.
   my $range = $range_args->{range};
-  
+
   # be careful here, recursive.
-  my $result = ${^_TYPE_PARAMS_MULTISIG} || ${^TYPE_PARAMS_MULTISIG};
+  my $result = ${^_TYPE_PARAMS_MULTISIG};
   if    ($result == 0) { return Col->new(%$range_args); }
   elsif ($result == 1) { return Row->new(%$range_args); }
   elsif ($result == 2) { return Cell->new(%$range_args); }
@@ -197,10 +200,13 @@ sub new {
 
   # TODO: sort start range and end range before storing.
 
-  state $check = compile_named(
-    worksheet => HasMethods[qw(api worksheet_name)],
-    range     => RangeAny,
-    dim       => DimColRow, { default => 'row' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      worksheet => HasMethods[qw(api worksheet_name)],
+      range     => RangeAny,
+      dim       => DimColRow, { default => 'row' },
+    ],
   );
   my $self = $check->(@_);
   $self->{dim} = dims_any($self->{dim});   # convert internally to COLUMN | ROW
@@ -243,11 +249,14 @@ sub values {
 sub _send_values {
   my $self = shift;
 
-  state $check = compile_named(
-    values  => ArrayRef[ArrayRef[Str]], { optional => 1 },
-    params  => HashRef, { default => {} },
-    content => HashRef, { default => {} },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values  => ArrayRef[ArrayRef[Str]], { optional => 1 },
+      params  => HashRef, { default => {} },
+      content => HashRef, { default => {} },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   
@@ -291,7 +300,7 @@ sub _send_values {
 sub values_response_from_api {
   my $self = shift;
 
-  state $check = compile(ArrayRef, { optional => 1 });
+  state $check = signature(positional => [ArrayRef, { optional => 1 }]);
   my ($updates) = $check->(@_);
   return if !$updates;
 
@@ -336,10 +345,13 @@ sub _cache_range_values {
   # original values using the valueRenderOption to replace, say, formulas with their
   # calculated value.
   if ($p{range}) {
-    state $check = compile_named(
-      majorDimension => DimColRow,
-      range          => StrMatch[qr/.+!/],
-      values         => ArrayRef, { optional => 1 }  # will not exist if values aren't set in the ss.
+    state $check = signature(
+      bless => !!0,
+      named => [
+        majorDimension => DimColRow,
+        range          => StrMatch[qr/.+!/],
+        values         => ArrayRef, { optional => 1 }  # will not exist if values aren't set in the ss.
+      ],
     );
     my $p = $check->(@_);
 
@@ -417,7 +429,7 @@ sub has_values {
 sub offsets {
   my $self = shift;
 
-  state $check = compile(HasRange);
+  state $check = signature(positional => [HasRange]);
   my ($other_range) = $check->(@_);
 
   my $range = $self->range_to_hash($RANGE_EXPANDED);
@@ -434,7 +446,7 @@ sub offsets {
 sub share_values {
   my $self = shift;
 
-  state $check = compile(HasRange);
+  state $check = signature(positional => [HasRange]);
   my ($shared_range) = $check->(@_);
   return if !$shared_range->is_other_inside($self);
 
@@ -446,7 +458,7 @@ sub share_values {
 sub is_other_inside {
   my $self = shift;
 
-  state $check = compile(HasRange);
+  state $check = signature(positional => [HasRange]);
   my ($inside_range) = $check->(@_);
 
   my $range = $self->range_to_hash($RANGE_EXPANDED);
@@ -465,8 +477,11 @@ sub is_other_inside {
 sub batch_values {
   my $self = shift;
 
-  state $check = compile_named(
-    values => ArrayRef, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values => ArrayRef, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -506,11 +521,14 @@ sub submit_requests {
 sub append {
   my $self = shift;
 
-  state $check = compile_named(
-    values  => ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
-    params  => HashRef, { default => {} },
-    content => HashRef, { default => {} },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values  => ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
+      params  => HashRef, { default => {} },
+      content => HashRef, { default => {} },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -557,7 +575,7 @@ sub _caller_external {
 
 # taken from https://metacpan.org/source/DOUGW/Spreadsheet-ParseExcel-0.65/lib/Spreadsheet/ParseExcel/Utility.pm
 sub _col_a2i {
-  state $check = compile(StrMatch[qr/^[A-Z]+$/]);
+  state $check = signature(positional => [StrMatch[qr/^[A-Z]+$/]]);
   my ($a) = $check->(@_);
 
   my $result = 0;
@@ -593,7 +611,7 @@ sub cell_to_array {
 sub range_to_array {
   my $self = shift;
 
-  state $check = compile(Bool, { optional => 1 });
+  state $check = signature(positional => [Bool, { optional => 1 }]);
   my ($expand_range) = $check->(@_);
 
   my $range = $self->range();
@@ -647,7 +665,7 @@ sub range_to_index {
 sub range_to_dimension {
   my $self = shift;
 
-  state $check = compile(DimColRow);
+  state $check = signature(positional => [DimColRow]);
   my ($dims) = $check->(@_);
   $dims = dims_any($dims);
 
@@ -669,7 +687,7 @@ sub range_to_dimension {
 sub cell_at_offset {
   my $self = shift;
 
-  state $check = compile(Int, DimColRow);
+  state $check = signature(positional => [Int, DimColRow]);
   my ($offset, $dim) = $check->(@_);
 
   # it's an a1:b2 range. col/row/cell handle this in the subclass.
@@ -695,13 +713,16 @@ sub cell_at_offset {
 sub range_at_offset {
   my $self = shift;
 
-  state $check = compile_named(
-    col    => Int, { default => 0 },
-    row    => Int, { default => 0 },
-    top    => Int, { default => 0 },
-    left   => Int, { default => 0 },
-    bottom => Int, { default => 0 },
-    right  => Int, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      col    => Int, { default => 0 },
+      row    => Int, { default => 0 },
+      top    => Int, { default => 0 },
+      left   => Int, { default => 0 },
+      bottom => Int, { default => 0 },
+      right  => Int, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 

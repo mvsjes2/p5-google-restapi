@@ -16,10 +16,13 @@ Readonly our $Document_Filter  => "mimeType = 'application/vnd.google-apps.docum
 sub new {
   my $class = shift;
 
-  state $check = compile_named(
-    api      => HasApi,
-    drive    => HasMethods[qw(list)], { optional => 1 },
-    endpoint => Str, { default => $Docs_Endpoint },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api      => HasApi,
+      drive    => HasMethods[qw(list)], { optional => 1 },
+      endpoint => Str, { default => $Docs_Endpoint },
+    ],
   );
   my $self = $check->(@_);
 
@@ -28,9 +31,12 @@ sub new {
 
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { default => '' },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { default => '' },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   my $uri = $self->{endpoint};
@@ -41,10 +47,13 @@ sub api {
 sub create_document {
   my $self = shift;
 
-  state $check = compile_named(
-    title   => Str, { optional => 1 },
-    name    => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str, { optional => 1 },
+      name    => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   $p->{title} || $p->{name} or LOGDIE "Either 'title' or 'name' should be supplied";
@@ -65,7 +74,7 @@ sub open_document { Document->new(docs_api => shift, @_); }
 sub delete_document {
   my $self = shift;
   my $id = $Document_Id;
-  state $check = compile(StrMatch[qr/$id/]);
+  state $check = signature(positional => [StrMatch[qr/$id/]]);
   my ($document_id) = $check->(@_);
   return $self->drive()->file(id => $document_id)->delete();
 }
@@ -73,7 +82,7 @@ sub delete_document {
 sub delete_all_documents_by_filters {
   my $self = shift;
 
-  state $check = compile(ArrayRef->plus_coercions(Str, sub { [$_]; }));
+  state $check = signature(positional => [ArrayRef->plus_coercions(Str, sub { [$_]; })]);
   my ($filter) = $check->(@_);
 
   my $count = 0;
@@ -96,11 +105,14 @@ sub delete_all_documents {
 sub documents_by_filter {
   my $self = shift;
 
-  state $check = compile_named(
-    filter        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      filter        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -118,11 +130,14 @@ sub documents_by_filter {
 sub documents {
   my $self = shift;
 
-  state $check = compile_named(
-    name          => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name          => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 

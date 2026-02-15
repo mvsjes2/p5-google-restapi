@@ -21,12 +21,15 @@ sub new {
   my $class = shift;
 
   my $self = merge_config_file(@_);
-  state $check = compile_named(
-    config_file  => ReadableFile, { optional => 1 },          # specify any of the below in a yaml file instead.
-    auth         => HashRef | HasMethods[qw(headers params)], # a string that will be used to construct an auth obj, or the obj itself.
-    throttle     => PositiveOrZeroInt, { default => 0 },      # mostly used for integration testing, to ensure we don't blow our rate limit.
-    timeout      => Int, { default => 120 },
-    max_attempts => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      config_file  => ReadableFile, { optional => 1 },          # specify any of the below in a yaml file instead.
+      auth         => HashRef | HasMethods[qw(headers params)], # a string that will be used to construct an auth obj, or the obj itself.
+      throttle     => PositiveOrZeroInt, { default => 0 },      # mostly used for integration testing, to ensure we don't blow our rate limit.
+      timeout      => Int, { default => 120 },
+      max_attempts => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
+    ],
   );
   $self = $check->(%$self);
 
@@ -40,12 +43,15 @@ sub new {
 sub api {
   my $self = shift;
 
-  state $check = compile_named(
-    uri     => StrMatch[qr(^https://)],
-    method  => StrMatch[qr/^(get|head|put|patch|post|delete)$/i], { default => 'get' },
-    params  => HashRef[Str|ArrayRef[Str]], { default => {} },   # uri param string.
-    headers => ArrayRef[Str], { default => [] },                # http headers.
-    content => 0,                                               # rest payload.
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => StrMatch[qr(^https://)],
+      method  => StrMatch[qr/^(get|head|put|patch|post|delete)$/i], { default => 'get' },
+      params  => HashRef[Str|ArrayRef[Str]], { default => {} },   # uri param string.
+      headers => ArrayRef[Str], { default => [] },                # http headers.
+      content => 0,                                               # rest payload.
+    ],
   );
   my $request = $check->(@_);
 
@@ -172,7 +178,7 @@ sub _api_callback {
 # sets the api callback code.
 sub api_callback {
   my $self = shift;
-  state $check = compile(CodeRef, { optional => 1 });
+  state $check = signature(positional => [CodeRef, { optional => 1 }]);
   my ($api_callback) = $check->(@_);
   my $prev_api_callback = delete $self->{api_callback};
   $self->{api_callback} = $api_callback if $api_callback;
@@ -243,7 +249,7 @@ sub _caller_external {
 # 0 sets and returns default value.
 sub max_attempts {
   my $self = shift;
-  state $check = compile(PositiveOrZeroInt->where(sub { $_ < 10; }), { optional => 1 });
+  state $check = signature(positional => [PositiveOrZeroInt->where(sub { $_ < 10; }), { optional => 1 }]);
   my ($max_attempts) = $check->(@_);
   $self->{max_attempts} = $max_attempts if $max_attempts;
   $self->{max_attempts} = 4 if defined $max_attempts && $max_attempts == 0;

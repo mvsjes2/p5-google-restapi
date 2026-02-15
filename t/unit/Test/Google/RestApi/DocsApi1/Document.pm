@@ -46,7 +46,7 @@ sub _constructor : Tests(4) {
   my $self = shift;
 
   throws_ok sub { Document->new() },
-    qr/docs_api/i,
+    qr/docs_api|Wrong number of parameters/i,
     'Constructor without docs_api should throw';
 
   my $docs = mock_docs_api();

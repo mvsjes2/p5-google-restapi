@@ -13,18 +13,24 @@ Readonly our $Tasks_Endpoint => 'https://tasks.googleapis.com/tasks/v1';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    api      => HasApi,
-    endpoint => Str, { default => $Tasks_Endpoint },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api      => HasApi,
+      endpoint => Str, { default => $Tasks_Endpoint },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   my $uri = "$self->{endpoint}/";
@@ -34,8 +40,11 @@ sub api {
 
 sub task_list {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return TaskList->new(tasks_api => $self, %$p);
@@ -43,9 +52,12 @@ sub task_list {
 
 sub create_task_list {
   my $self = shift;
-  state $check = compile_named(
-    title   => Str,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -64,10 +76,13 @@ sub create_task_list {
 
 sub list_task_lists {
   my $self = shift;
-  state $check = compile_named(
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 

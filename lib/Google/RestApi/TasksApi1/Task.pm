@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    task_list => HasApi,
-    id        => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      task_list => HasApi,
+      id        => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -25,8 +28,11 @@ sub api {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -40,12 +46,15 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    title   => Str, { optional => 1 },
-    notes   => Str, { optional => 1 },
-    due     => Str, { optional => 1 },
-    status  => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str, { optional => 1 },
+      notes   => Str, { optional => 1 },
+      due     => Str, { optional => 1 },
+      status  => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -75,10 +84,13 @@ sub delete {
 
 sub move {
   my $self = shift;
-  state $check = compile_named(
-    parent                => Str, { optional => 1 },
-    previous              => Str, { optional => 1 },
-    destination_tasklist   => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      parent                => Str, { optional => 1 },
+      previous              => Str, { optional => 1 },
+      destination_tasklist   => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 

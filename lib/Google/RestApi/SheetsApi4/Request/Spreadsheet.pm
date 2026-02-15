@@ -11,7 +11,7 @@ sub spreadsheet_id { LOGDIE "Pure virtual function 'spreadsheet_id' must be over
 sub delete_protected_range {
   my $self = shift;
 
-  state $check = compile(Str);
+  state $check = signature(positional => [Str]);
   my ($id) = $check->(@_);
 
   $self->batch_requests(
@@ -26,11 +26,14 @@ sub delete_protected_range {
 sub add_worksheet {
   my $self = shift;
 
-  state $check = compile_named(
-    name            => Optional[Str],
-    title           => Optional[Str],
-    grid_properties => Optional[Dict[ rows => Optional[Int], cols => Optional[Int] ]],
-    tab_color       => Optional[Dict[ red => Optional[Num], blue => Optional[Num], green => Optional[Num] ]],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name            => Optional[Str],
+      title           => Optional[Str],
+      grid_properties => Optional[Dict[ rows => Optional[Int], cols => Optional[Int] ]],
+      tab_color       => Optional[Dict[ red => Optional[Num], blue => Optional[Num], green => Optional[Num] ]],
+    ],
   );
   my $p = $check->(@_);
 
@@ -51,9 +54,12 @@ sub add_worksheet {
 sub update_spreadsheet_properties {
   my $self = shift;
 
-  state $check = compile_named(
-    properties => HashRef,
-    fields     => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      properties => HashRef,
+      fields     => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -99,12 +105,15 @@ sub ss_default_format {
 sub add_protected_range {
   my $self = shift;
 
-  state $check = compile_named(
-    range            => HashRef,
-    description      => Optional[Str],
-    warning_only     => Optional[Bool],
-    requesting_user  => Optional[Bool],
-    editors          => Optional[HashRef],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range            => HashRef,
+      description      => Optional[Str],
+      warning_only     => Optional[Bool],
+      requesting_user  => Optional[Bool],
+      editors          => Optional[HashRef],
+    ],
   );
   my $p = $check->(@_);
 
@@ -126,14 +135,17 @@ sub add_protected_range {
 sub update_protected_range {
   my $self = shift;
 
-  state $check = compile_named(
-    id               => Str,
-    range            => Optional[HashRef],
-    description      => Optional[Str],
-    warning_only     => Optional[Bool],
-    requesting_user  => Optional[Bool],
-    editors          => Optional[HashRef],
-    fields           => Optional[Str],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id               => Str,
+      range            => Optional[HashRef],
+      description      => Optional[Str],
+      warning_only     => Optional[Bool],
+      requesting_user  => Optional[Bool],
+      editors          => Optional[HashRef],
+      fields           => Optional[Str],
+    ],
   );
   my $p = $check->(@_);
 

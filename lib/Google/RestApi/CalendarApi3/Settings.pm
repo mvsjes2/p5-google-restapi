@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar_api => HasApi,
-    id           => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar_api => HasApi,
+      id           => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }

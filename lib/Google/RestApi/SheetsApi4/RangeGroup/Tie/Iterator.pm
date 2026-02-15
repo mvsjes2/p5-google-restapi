@@ -8,9 +8,12 @@ use parent qw(Google::RestApi::SheetsApi4::RangeGroup::Iterator);
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    tied    => HashRef,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      tied    => HashRef,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 

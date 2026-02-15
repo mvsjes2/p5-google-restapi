@@ -33,7 +33,7 @@ sub batch_values {
 sub add_ranges {
   my $self = shift;
   my %ranges = @_;
-  state $check = compile(slurpy ArrayRef[HasRange]);
+  state $check = signature(positional => [slurpy ArrayRef[HasRange]]);
   $check->(CORE::values %ranges);
   @{ $self->{ranges} }{ keys %ranges } = CORE::values %ranges;
   return \%ranges;
@@ -41,7 +41,7 @@ sub add_ranges {
 
 sub add_tied {
   my $self = shift;
-  state $check = compile(HashRef);
+  state $check = signature(positional => [HashRef]);
   my ($tied) = $check->(@_);
 
   my $fetch_range = tied(%$tied)->fetch_range();
@@ -76,8 +76,10 @@ sub range_group {
 
 sub default_worksheet {
   my $self = shift;
-  state $check = compile(
-    HasMethods[qw(tie_ranges tie_cells)], { optional => 1 },
+  state $check = signature(
+    positional => [
+      HasMethods[qw(tie_ranges tie_cells)], { optional => 1 },
+    ],
   );
   my ($worksheet) = $check->(@_);
   $self->{worksheet} = $worksheet if $worksheet;
@@ -86,8 +88,10 @@ sub default_worksheet {
 
 sub TIEHASH  {
   my $class = shift;
-  state $check = compile(
-    HasMethods[qw(range_group)],
+  state $check = signature(
+    positional => [
+      HasMethods[qw(range_group)],
+    ],
   );
   my ($spreadsheet) = $check->(@_);
   my $self = bless {}, $class;

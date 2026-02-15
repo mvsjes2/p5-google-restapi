@@ -17,7 +17,7 @@ sub _constructor : Tests(4) {
   my $self = shift;
 
   throws_ok sub { File->new(drive => mock_drive_api()) },
-    qr/id/i,
+    qr/\bid\b|Wrong number of parameters/i,
     'Constructor without id should throw';
 
   my $ss = $self->mock_spreadsheet();

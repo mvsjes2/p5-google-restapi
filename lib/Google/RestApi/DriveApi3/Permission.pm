@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    file => HasApi,
-    id   => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      file => HasApi,
+      id   => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -25,15 +28,18 @@ sub api {
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    role              => Str,
-    type              => Str,
-    email_address     => Str, { optional => 1 },
-    domain            => Str, { optional => 1 },
-    send_notification => Bool, { default => 0 },
-    email_message     => Str, { optional => 1 },
-    transfer_ownership => Bool, { default => 0 },
-    _extra_           => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      role              => Str,
+      type              => Str,
+      email_address     => Str, { optional => 1 },
+      domain            => Str, { optional => 1 },
+      send_notification => Bool, { default => 0 },
+      email_message     => Str, { optional => 1 },
+      transfer_ownership => Bool, { default => 0 },
+      _extra_           => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -61,8 +67,11 @@ sub create {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -76,10 +85,13 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    role               => Str,
-    transfer_ownership => Bool, { default => 0 },
-    _extra_            => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      role               => Str,
+      transfer_ownership => Bool, { default => 0 },
+      _extra_            => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 

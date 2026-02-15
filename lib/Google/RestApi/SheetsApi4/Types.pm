@@ -15,7 +15,7 @@ our $VERSION = '2.0.0';
 
 use feature qw( state );
 
-use Type::Params qw( compile );
+use Type::Params qw( signature );
 use Types::Standard qw( Undef Defined Value Str StrMatch Int ArrayRef HashRef Tuple Dict HasMethods );
 use Types::Common::Numeric qw( PositiveInt PositiveOrZeroInt );
 
@@ -133,7 +133,7 @@ my $range_any = $meta->add_type(
 $range_any->coercion->add_type_coercions(
   Tuple[Defined, Defined],
     sub {
-      state $check = compile(Tuple[$col | $row | $cell, $col | $row | $cell]);
+      state $check = signature(positional => [Tuple[$col | $row | $cell, $col | $row | $cell]]);
       my ($range) = $check->($_);
 
       # these look odd but if 'A' is passed as one of the tuples, it will be
@@ -152,13 +152,13 @@ $range_any->coercion->add_type_coercions(
     },
   Tuple[Defined],
     sub {
-      state $check = compile(Tuple[$col | $row | $cell]);
+      state $check = signature(positional => [Tuple[$col | $row | $cell]]);
       my ($range) = $check->($_);
       return $range;
     },
   Value,
     sub {
-      state $check = compile($col | $row | $cell);
+      state $check = signature(positional => [$col | $row | $cell]);
       my ($range) = $check->($_);
       return $range;
     },
