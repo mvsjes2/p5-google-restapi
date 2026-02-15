@@ -167,7 +167,7 @@ Google::RestApi::DocsApi1 - API to Google Docs API V1.
  # Style the text
  $doc->update_text_style(
    range  => { startIndex => 1, endIndex => 14 },
-   style  => { bold => JSON::MaybeXS::true },
+   style  => { bold => JSON::MaybeXS::true() },
    fields => 'bold',
  );
  $doc->submit_requests();
