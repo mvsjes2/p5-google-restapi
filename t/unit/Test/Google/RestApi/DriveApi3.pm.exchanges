@@ -343,6 +343,75 @@ response:
 source: Test::Google::RestApi::DriveApi3::list_max_pages
 
 ---
+query_params:
+  fields: 'nextPageToken, files(id, name)'
+  q: name = 'mock_spreadsheet1'
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: |
+    {
+      "files": [
+        {
+          "id": "file_page1",
+          "name": "mock_spreadsheet1"
+        }
+      ],
+      "nextPageToken": "page2_token"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DriveApi3::list_page_callback_stop
+
+---
+query_params:
+  fields: 'nextPageToken, files(id, name)'
+  q: name = 'mock_spreadsheet1'
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: |
+    {
+      "files": [
+        {
+          "id": "file_page1",
+          "name": "mock_spreadsheet1"
+        }
+      ],
+      "nextPageToken": "page2_token"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DriveApi3::list_page_callback_continue
+
+---
+query_params:
+  fields: 'nextPageToken, files(id, name)'
+  pageToken: page2_token
+  q: name = 'mock_spreadsheet1'
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: |
+    {
+      "files": [
+        {
+          "id": "file_page2",
+          "name": "mock_spreadsheet1"
+        }
+      ]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DriveApi3::list_page_callback_continue
+
+---
 request: GET /drive/v3/drives
 response:
   code: 200

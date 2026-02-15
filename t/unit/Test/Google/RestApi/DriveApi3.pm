@@ -75,7 +75,7 @@ sub list : Tests(2) {
   my $ss = $self->mock_spreadsheet();
   my $drive = mock_drive_api();
 
-  my @files = $drive->list("name = '" . mock_spreadsheet_name() . "'");
+  my @files = $drive->list(filter => "name = '" . mock_spreadsheet_name() . "'");
   ok scalar(@files) >= 1, 'List should return at least one file';
   ok $files[0]->{id}, 'File has an ID';
 
@@ -88,9 +88,43 @@ sub list_max_pages : Tests(2) {
   my $ss = $self->mock_spreadsheet();
   my $drive = mock_drive_api();
 
-  my @files = $drive->list("name = '" . mock_spreadsheet_name() . "'", {}, 1);
+  my @files = $drive->list(filter => "name = '" . mock_spreadsheet_name() . "'", max_pages => 1);
   ok scalar(@files) >= 1, 'List with max_pages should return results';
   ok $files[0]->{id}, 'File has an ID';
+
+  return;
+}
+
+sub list_page_callback_stop : Tests(2) {
+  my $self = shift;
+
+  my $ss = $self->mock_spreadsheet();
+  my $drive = mock_drive_api();
+
+  my $callback_called = 0;
+  my @files = $drive->list(
+    filter        => "name = '" . mock_spreadsheet_name() . "'",
+    page_callback => sub { $callback_called++; return 0; },
+  );
+  ok $callback_called == 1, 'Callback was called once';
+  ok scalar(@files) >= 1, 'Should return first page results despite stopping';
+
+  return;
+}
+
+sub list_page_callback_continue : Tests(2) {
+  my $self = shift;
+
+  my $ss = $self->mock_spreadsheet();
+  my $drive = mock_drive_api();
+
+  my $callback_called = 0;
+  my @files = $drive->list(
+    filter        => "name = '" . mock_spreadsheet_name() . "'",
+    page_callback => sub { $callback_called++; return 1; },
+  );
+  ok $callback_called == 2, 'Callback was called for both pages';
+  ok scalar(@files) >= 2, 'Should return results from both pages';
 
   return;
 }

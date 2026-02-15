@@ -49,11 +49,13 @@ sub list {
     page_size                     => PositiveInt, { default => 100 },
     drive_id                      => Str, { optional => 1 },
     max_pages                     => Int, { default => 0 },
+    page_callback                 => CodeRef, { optional => 1 },
     _extra_                       => slurpy Any,
   );
   my $p = named_extra($check->(@_));
 
   my $max_pages = delete $p->{max_pages};
+  my $page_callback = delete $p->{page_callback};
   my %params = (
     pageToken   => delete $p->{page_token},
     spaces      => delete $p->{spaces},
@@ -69,6 +71,7 @@ sub list {
   my $next_page_token;
   my $new_start_page_token;
   my $page = 0;
+  my $keep_going = 1;
 
   do {
     $params{pageToken} = $next_page_token if $next_page_token;
@@ -77,7 +80,10 @@ sub list {
     $next_page_token = $result->{nextPageToken};
     $new_start_page_token = $result->{newStartPageToken};
     $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
+    if ($page_callback && $result->{changes}) {
+      $keep_going = $page_callback->($result);
+    }
+  } until !$keep_going || !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return wantarray ? @changes : { changes => \@changes, newStartPageToken => $new_start_page_token };
 }

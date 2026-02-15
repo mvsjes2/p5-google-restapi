@@ -14,7 +14,7 @@ use Hash::Merge ();
 use Log::Log4perl qw( :easy );
 use Scalar::Util qw( blessed );
 use Type::Params qw( compile compile_named );
-use Types::Standard qw( Str StrMatch HashRef Any slurpy );
+use Types::Standard qw( Str StrMatch Int CodeRef HashRef Any slurpy );
 use YAML::Any qw( Dump LoadFile );
 
 use Google::RestApi::Types qw( ReadableFile );
@@ -30,6 +30,7 @@ our @EXPORT_OK = qw(
   dim_any dims_any dims_all
   cl_black cl_white
   strip
+  paginate_api
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
@@ -161,6 +162,33 @@ sub strip {
   my $p = shift // '';
   $p =~ s/^\s+|\s+$//g;
   return $p;
+}
+
+sub paginate_api {
+  state $check = compile_named(
+    api_call       => CodeRef,
+    result_key     => Str,
+    max_pages      => Int, { default => 0 },
+    page_callback  => CodeRef, { optional => 1 },
+  );
+  my $p = $check->(@_);
+
+  my @list;
+  my $next_page_token;
+  my $page = 0;
+  my $keep_going = 1;
+  do {
+    my $result = $p->{api_call}->($next_page_token);
+    my $items = $result->{ $p->{result_key} };
+    push(@list, $items->@*) if $items;
+    $next_page_token = $result->{nextPageToken};
+    $page++;
+    if ($p->{page_callback} && $items) {
+      $keep_going = $p->{page_callback}->($result);
+    }
+  } until !$keep_going || !$next_page_token || ($p->{max_pages} > 0 && $page >= $p->{max_pages});
+
+  return @list;
 }
 
 1;
