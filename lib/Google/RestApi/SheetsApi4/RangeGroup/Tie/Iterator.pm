@@ -95,7 +95,6 @@ Robin Murray mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-<<<<<<< Updated upstream
 Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

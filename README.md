@@ -163,7 +163,8 @@ The synopsis above is a quick reference. For more detailed information, most of 
 
 Once you have successfully created your OAuth2 token, you can run the tutorials to ensure everything is working correctly.
 Set the environment variable GOOGLE_RESTAPI_CONFIG to the path to your auth config file.
-See the tutorial/ directory for step-by-step tutorials covering Sheets, Drive, Calendar, Gmail, and Tasks. These will help you understand how the API interacts with Google.
+See the tutorial/ directory for step-by-step tutorials covering Sheets, Drive, Calendar, Documents, Gmail, and Tasks.
+These will help you understand how the API interacts with Google.
 
 # STATUS
 
