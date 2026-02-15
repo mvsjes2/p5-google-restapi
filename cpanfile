@@ -7,6 +7,8 @@ requires 'Hash::Merge';
 requires 'JSON::MaybeXS';
 requires 'LWP::Protocol::https';
 requires 'List::MoreUtils';
+requires 'MIME::Base64';
+requires 'MIME::Lite';
 requires 'List::Util';
 requires 'Log::Log4perl';
 requires 'Module::Load';

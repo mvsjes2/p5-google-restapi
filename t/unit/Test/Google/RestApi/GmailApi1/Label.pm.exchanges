@@ -1,0 +1,53 @@
+---
+request: POST /gmail/v1/users/me/labels
+request_content:
+  name: Test Label
+response:
+  code: 200
+  content: |
+    {
+      "id": "Label_42",
+      "name": "Test Label",
+      "type": "user",
+      "labelListVisibility": "labelShow",
+      "messageListVisibility": "show"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
+
+---
+request: GET /gmail/v1/users/me/labels/Label_42
+response:
+  code: 200
+  content: |
+    {
+      "id": "Label_42",
+      "name": "Test Label",
+      "type": "user",
+      "labelListVisibility": "labelShow",
+      "messageListVisibility": "show",
+      "messagesTotal": 0,
+      "messagesUnread": 0,
+      "threadsTotal": 0,
+      "threadsUnread": 0
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
+
+---
+request: DELETE /gmail/v1/users/me/labels/Label_42
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
+

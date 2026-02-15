@@ -39,8 +39,8 @@ sub api {
 
 sub list {
   my $self = shift;
-  state $check = compile(Str, HashRef, { default => {} });
-  my ($filter, $params) = $check->(@_);
+  state $check = compile(Str, HashRef, { default => {} }, Int, { default => 0 });
+  my ($filter, $params, $max_pages) = $check->(@_);
 
   $params->{q} = $filter;
   $params->{fields} = 'files(id, name)' unless $params->{fields};
@@ -48,12 +48,14 @@ sub list {
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'files', params => $params);
     push(@list, $result->{files}->@*) if $result->{files};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -85,22 +87,26 @@ sub shared_drive {
 sub list_drives {
   my $self = shift;
   state $check = compile_named(
-    params => HashRef, { default => {} },
+    max_pages => Int, { default => 0 },
+    params    => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
+  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'drives(id, name)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'drives', params => $params);
     push(@list, $result->{drives}->@*) if $result->{drives};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -146,6 +152,8 @@ sub empty_trash {
     method => 'delete',
   );
 }
+
+sub rest_api { shift->{api}; }
 
 1;
 
@@ -463,9 +471,9 @@ unless making a Google API call not currently supported by this framework.
 
 Returns the response hash from the Google API.
 
-=head2 list($filter, \%params)
+=head2 list($filter, \%params, $max_pages)
 
-Lists files matching the given query filter. Handles pagination automatically.
+Lists files matching the given query filter.
 
  my @files = $drive->list("name contains 'report'");
 
@@ -475,11 +483,16 @@ Lists files matching the given query filter. Handles pagination automatically.
    { fields => 'files(id, name, size)', orderBy => 'modifiedTime desc' }
  );
 
+ # Limit to 2 pages of results
+ my @files = $drive->list("name contains 'report'", {}, 2);
+
+C<$max_pages> limits the number of pages fetched (default 0 = unlimited).
+
 See L<https://developers.google.com/drive/api/v3/search-files> for query syntax.
 
 Returns a list of file hashrefs with id and name (or custom fields).
 
-=head2 filter_files($filter, \%params)
+=head2 filter_files($filter, \%params, $max_pages)
 
 Alias for list(). Provided for backward compatibility.
 
@@ -531,14 +544,17 @@ Returns a Drive object for working with shared drives.
 
 =head2 list_drives(%args)
 
-Lists all shared drives accessible to the user. Handles pagination automatically.
+Lists all shared drives accessible to the user.
 
  my @drives = $drive->list_drives();
 
- # With custom parameters
+ # With custom parameters and page limit
  my @drives = $drive->list_drives(
-   params => { fields => 'drives(id, name, createdTime)' }
+   max_pages => 2,
+   params    => { fields => 'drives(id, name, createdTime)' },
  );
+
+C<max_pages> limits the number of pages fetched (default 0 = unlimited).
 
 Returns a list of drive hashrefs.
 
@@ -633,6 +649,12 @@ See L<https://developers.google.com/drive/api/v3/search-files> for full document
 =item * L<Google::RestApi> - The underlying REST API client
 
 =item * L<Google::RestApi::SheetsApi4> - Google Sheets API (related module)
+
+=item * L<Google::RestApi::CalendarApi3> - Google Calendar API (related module)
+
+=item * L<Google::RestApi::GmailApi1> - Google Gmail API (related module)
+
+=item * L<Google::RestApi::TasksApi1> - Google Tasks API (related module)
 
 =item * L<https://developers.google.com/drive/api/v3/reference> - Google Drive API Reference
 

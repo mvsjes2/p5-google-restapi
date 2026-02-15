@@ -1,0 +1,71 @@
+---
+request: GET /tasks/v1/users/@me/lists/mock_task_list_id_12345
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#taskList",
+      "id": "mock_task_list_id_12345",
+      "title": "Mock Task List",
+      "updated": "2026-02-14T00:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::TaskList::get
+
+---
+request: PATCH /tasks/v1/users/@me/lists/mock_task_list_id_12345
+request_content:
+  title: Updated Task List
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#taskList",
+      "id": "mock_task_list_id_12345",
+      "title": "Updated Task List",
+      "updated": "2026-02-14T01:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::TaskList::update
+
+---
+query_params:
+  fields: 'nextPageToken, items(id, title, status, due)'
+request: GET /tasks/v1/lists/mock_task_list_id_12345/tasks
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#tasks",
+      "nextPageToken": "page2_token",
+      "items": [
+        {
+          "id": "mock_task_id_1",
+          "title": "Test Task",
+          "status": "needsAction"
+        }
+      ]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::TaskList::tasks_max_pages
+
+---
+request: POST /tasks/v1/lists/mock_task_list_id_12345/clear
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::TasksApi1::TaskList::clear
+

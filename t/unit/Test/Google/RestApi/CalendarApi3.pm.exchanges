@@ -1,0 +1,81 @@
+---
+request: POST /calendar/v3/calendars
+request_content:
+  summary: Test Calendar
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#calendar",
+      "etag": "\"test_etag\"",
+      "id": "mock_cal_id_12345@group.calendar.google.com",
+      "summary": "Test Calendar"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::create_and_delete_calendar
+
+---
+request: DELETE /calendar/v3/calendars/mock_cal_id_12345@group.calendar.google.com
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::CalendarApi3::create_and_delete_calendar
+
+---
+query_params:
+  fields: 'nextPageToken, items(id, summary)'
+request: GET /calendar/v3/users/me/calendarList
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#calendarList",
+      "etag": "\"test_etag\"",
+      "items": [
+        {
+          "id": "primary",
+          "summary": "user@gmail.com"
+        },
+        {
+          "id": "en.australian#holiday@group.v.calendar.google.com",
+          "summary": "Holidays in Australia"
+        }
+      ]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::list_calendars
+
+---
+query_params:
+  fields: 'nextPageToken, items(id, summary)'
+request: GET /calendar/v3/users/me/calendarList
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#calendarList",
+      "etag": "\"test_etag\"",
+      "nextPageToken": "page2_token",
+      "items": [
+        {
+          "id": "primary",
+          "summary": "user@gmail.com"
+        }
+      ]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::list_calendars_max_pages
+

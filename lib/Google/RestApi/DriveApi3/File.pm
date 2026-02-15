@@ -153,23 +153,27 @@ sub permission {
 sub permissions {
   my $self = shift;
   state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+    fields    => Str, { optional => 1 },
+    max_pages => Int, { default => 0 },
+    params    => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
+  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'permissions(id, role, type, emailAddress)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'permissions', params => $params);
     push(@list, $result->{permissions}->@*) if $result->{permissions};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -186,23 +190,27 @@ sub revision {
 sub revisions {
   my $self = shift;
   state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+    fields    => Str, { optional => 1 },
+    max_pages => Int, { default => 0 },
+    params    => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
+  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'revisions(id, modifiedTime, keepForever)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'revisions', params => $params);
     push(@list, $result->{revisions}->@*) if $result->{revisions};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -221,10 +229,12 @@ sub comments {
   state $check = compile_named(
     fields          => Str, { optional => 1 },
     include_deleted => Bool, { default => 0 },
+    max_pages       => Int, { default => 0 },
     params          => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
+  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'comments(id, content, author, createdTime)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
@@ -232,12 +242,14 @@ sub comments {
 
   my @list;
   my $next_page_token;
+  my $page = 0;
   do {
     $params->{pageToken} = $next_page_token if $next_page_token;
     my $result = $self->api(uri => 'comments', params => $params);
     push(@list, $result->{comments}->@*) if $result->{comments};
     $next_page_token = $result->{nextPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return @list;
 }
@@ -325,25 +337,28 @@ Sets up a notification channel for file changes.
 Returns a Permission object. If id is provided, represents that permission.
 Without id, can be used to create new permissions.
 
-=head2 permissions()
+=head2 permissions(max_pages => $n)
 
-Lists all permissions on the file.
+Lists all permissions on the file. C<max_pages> limits the number of pages
+fetched (default 0 = unlimited).
 
 =head2 revision(id => $id)
 
 Returns a Revision object for the given revision ID.
 
-=head2 revisions()
+=head2 revisions(max_pages => $n)
 
-Lists all revisions of the file.
+Lists all revisions of the file. C<max_pages> limits the number of pages
+fetched (default 0 = unlimited).
 
 =head2 comment(id => $id)
 
 Returns a Comment object. Without id, can be used to create new comments.
 
-=head2 comments(include_deleted => $bool)
+=head2 comments(include_deleted => $bool, max_pages => $n)
 
-Lists all comments on the file.
+Lists all comments on the file. C<max_pages> limits the number of pages
+fetched (default 0 = unlimited).
 
 =head1 AUTHORS
 

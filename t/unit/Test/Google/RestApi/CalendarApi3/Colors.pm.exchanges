@@ -1,0 +1,23 @@
+---
+request: GET /calendar/v3/colors
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#colors",
+      "updated": "2012-02-14T00:00:00.000Z",
+      "calendar": {
+        "1": { "background": "#ac725e", "foreground": "#1d1d1d" },
+        "2": { "background": "#d06b64", "foreground": "#1d1d1d" }
+      },
+      "event": {
+        "1": { "background": "#a4bdfc", "foreground": "#1d1d1d" },
+        "2": { "background": "#7ae7bf", "foreground": "#1d1d1d" }
+      }
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Colors::get
+

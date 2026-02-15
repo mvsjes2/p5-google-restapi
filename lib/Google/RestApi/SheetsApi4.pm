@@ -1076,6 +1076,24 @@ Clear formatting in the range.
 This api is currently in beta status. It is incomplete. There may be design flaws that need to be addressed in later releases. Later
 releases may break this release. Not all api calls have been implemented.
 
+=head1 SEE ALSO
+
+=over
+
+=item * L<Google::RestApi> - The underlying REST API client
+
+=item * L<Google::RestApi::DriveApi3> - Google Drive API (related module)
+
+=item * L<Google::RestApi::CalendarApi3> - Google Calendar API (related module)
+
+=item * L<Google::RestApi::GmailApi1> - Google Gmail API (related module)
+
+=item * L<Google::RestApi::TasksApi1> - Google Tasks API (related module)
+
+=item * L<https://developers.google.com/sheets/api/reference/rest> - Google Sheets API Reference
+
+=back
+
 =head1 AUTHORS
 
 =over
