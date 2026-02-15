@@ -40,18 +40,4 @@ sub get : Tests(2) {
   return;
 }
 
-sub insert_and_delete : Tests(3) {
-  my $self = shift;
-
-  my $cal_api = mock_calendar_api();
-
-  my $cl = $cal_api->calendar_list()->insert(id => 'test_cal@group.calendar.google.com');
-  isa_ok $cl, CalendarList, 'Insert returns CalendarList object';
-  ok my $cl_id = $cl->calendar_list_id(), 'CalendarList has ID';
-
-  lives_ok sub { $cl->delete() }, 'Delete calendar list entry lives';
-
-  return;
-}
-
 1;

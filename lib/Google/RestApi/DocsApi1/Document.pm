@@ -116,7 +116,7 @@ sub replace_all_text {
     replaceAllText => {
       containsText => {
         text      => $p->{find},
-        matchCase => $p->{match_case} ? JSON::MaybeXS::true : JSON::MaybeXS::false,
+        matchCase => $p->{match_case} ? JSON::MaybeXS::true() : JSON::MaybeXS::false(),
       },
       replaceText => $p->{replacement},
     },

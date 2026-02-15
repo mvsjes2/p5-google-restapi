@@ -7,24 +7,72 @@ response:
   content: |
     {
       "kind": "tasks#taskList",
-      "id": "mock_task_list_id_12345",
+      "id": "ekQ5TlJWUm9wY1BmMG50RQ",
+      "etag": "\"vJ-OTFQkyZo\"",
       "title": "Test Task List",
-      "updated": "2026-02-14T00:00:00.000Z"
+      "updated": "2026-02-15T02:37:04.076Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/users/@me/lists/ekQ5TlJWUm9wY1BmMG50RQ"
     }
   headers:
+    - x-content-type-options
+    - nosniff
+    - x-l2-request-path
+    - l2-managed-14
+    - date
+    - 'Sun, 15 Feb 2026 02:37:04 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-xss-protection
+    - 0
     - content-type
     - application/json; charset=UTF-8
+    - transfer-encoding
+    - chunked
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
+    - accept-ranges
+    - none
   message: OK
 source: Test::Google::RestApi::TasksApi1::create_and_delete_task_list
 
 ---
-request: DELETE /tasks/v1/users/@me/lists/mock_task_list_id_12345
+request: DELETE /tasks/v1/users/@me/lists/ekQ5TlJWUm9wY1BmMG50RQ
 response:
   code: 204
   content: ''
   headers:
     - content-type
-    - text/html
+    - application/json; charset=UTF-8
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - vary
+    - Origin
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - x-xss-protection
+    - 0
+    - server
+    - ESF
+    - x-content-type-options
+    - nosniff
+    - x-l2-request-path
+    - l2-managed-14
+    - content-length
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 02:37:05 GMT'
   message: No Content
 source: Test::Google::RestApi::TasksApi1::create_and_delete_task_list
 
@@ -36,21 +84,44 @@ response:
   code: 200
   content: |
     {
-      "kind": "tasks#taskLists",
       "items": [
         {
-          "id": "mock_task_list_id_12345",
-          "title": "My Tasks"
+          "id": "MDUzODQwNjYxNDM2Mjk4NTMxNjU6MDow",
+          "title": "Default"
         },
         {
-          "id": "mock_task_list_id_67890",
-          "title": "Work Tasks"
+          "id": "NlNSZDQ1MWR3aUJjajZSXw",
+          "title": "St Hill Trip 2022"
         }
       ]
     }
   headers:
+    - x-content-type-options
+    - nosniff
+    - x-l2-request-path
+    - l2-managed-14
+    - date
+    - 'Sun, 15 Feb 2026 02:37:07 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - x-xss-protection
+    - 0
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - transfer-encoding
+    - chunked
     - content-type
     - application/json; charset=UTF-8
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
+    - accept-ranges
+    - none
   message: OK
 source: Test::Google::RestApi::TasksApi1::list_task_lists
 
@@ -62,18 +133,44 @@ response:
   code: 200
   content: |
     {
-      "kind": "tasks#taskLists",
-      "nextPageToken": "page2_token",
       "items": [
         {
-          "id": "mock_task_list_id_12345",
-          "title": "My Tasks"
+          "id": "MDUzODQwNjYxNDM2Mjk4NTMxNjU6MDow",
+          "title": "Default"
+        },
+        {
+          "id": "NlNSZDQ1MWR3aUJjajZSXw",
+          "title": "St Hill Trip 2022"
         }
       ]
     }
   headers:
+    - x-xss-protection
+    - 0
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - transfer-encoding
+    - chunked
     - content-type
     - application/json; charset=UTF-8
+    - server
+    - ESF
+    - accept-ranges
+    - none
+    - x-l2-request-path
+    - l2-managed-14
+    - x-content-type-options
+    - nosniff
+    - date
+    - 'Sun, 15 Feb 2026 02:37:10 GMT'
+    - x-frame-options
+    - SAMEORIGIN
   message: OK
 source: Test::Google::RestApi::TasksApi1::list_task_lists_max_pages
 

@@ -1,53 +1,91 @@
 ---
-request: GET /tasks/v1/users/@me/lists/mock_task_list_id_12345
+request: POST /tasks/v1/lists/enFCUWNOemZ6eU4xNENiSQ/clear
+response:
+  code: 204
+  content: ''
+  headers:
+    - x-l2-request-path
+    - l2-managed-14
+    - content-type
+    - application/json; charset=UTF-8
+    - x-content-type-options
+    - nosniff
+    - date
+    - 'Sun, 15 Feb 2026 02:37:39 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-xss-protection
+    - 0
+    - server
+    - ESF
+    - vary
+    - Origin
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - x-frame-options
+    - SAMEORIGIN
+    - content-length
+    - 0
+  message: No Content
+source: Test::Google::RestApi::TasksApi1::TaskList::clear
+
+---
+request: GET /tasks/v1/users/@me/lists/enFCUWNOemZ6eU4xNENiSQ
 response:
   code: 200
   content: |
     {
       "kind": "tasks#taskList",
-      "id": "mock_task_list_id_12345",
-      "title": "Mock Task List",
-      "updated": "2026-02-14T00:00:00.000Z"
+      "id": "enFCUWNOemZ6eU4xNENiSQ",
+      "etag": "\"GWbG_krBhxM\"",
+      "title": "Test Task List",
+      "updated": "2026-02-15T02:37:36.657Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/users/@me/lists/enFCUWNOemZ6eU4xNENiSQ"
     }
   headers:
+    - transfer-encoding
+    - chunked
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - date
+    - 'Sun, 15 Feb 2026 02:37:41 GMT'
+    - x-content-type-options
+    - nosniff
     - content-type
     - application/json; charset=UTF-8
+    - accept-ranges
+    - none
+    - x-l2-request-path
+    - l2-managed-14
+    - x-frame-options
+    - SAMEORIGIN
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - server
+    - ESF
+    - x-xss-protection
+    - 0
   message: OK
 source: Test::Google::RestApi::TasksApi1::TaskList::get
 
 ---
-request: PATCH /tasks/v1/users/@me/lists/mock_task_list_id_12345
-request_content:
-  title: Updated Task List
-response:
-  code: 200
-  content: |
-    {
-      "kind": "tasks#taskList",
-      "id": "mock_task_list_id_12345",
-      "title": "Updated Task List",
-      "updated": "2026-02-14T01:00:00.000Z"
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::TasksApi1::TaskList::update
-
----
 query_params:
   fields: 'nextPageToken, items(id, title, status, due)'
-request: GET /tasks/v1/lists/mock_task_list_id_12345/tasks
+request: GET /tasks/v1/lists/enFCUWNOemZ6eU4xNENiSQ/tasks
 response:
   code: 200
   content: |
     {
-      "kind": "tasks#tasks",
-      "nextPageToken": "page2_token",
       "items": [
         {
-          "id": "mock_task_id_1",
-          "title": "Test Task",
+          "id": "d3NPVGFIOU84TExTYzU4eA",
+          "title": "Test Task for List",
           "status": "needsAction"
         }
       ]
@@ -55,17 +93,108 @@ response:
   headers:
     - content-type
     - application/json; charset=UTF-8
+    - accept-ranges
+    - none
+    - x-content-type-options
+    - nosniff
+    - x-l2-request-path
+    - l2-managed-14
+    - date
+    - 'Sun, 15 Feb 2026 02:37:44 GMT'
+    - transfer-encoding
+    - chunked
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-xss-protection
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - server
+    - ESF
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
   message: OK
 source: Test::Google::RestApi::TasksApi1::TaskList::tasks_max_pages
 
 ---
-request: POST /tasks/v1/lists/mock_task_list_id_12345/clear
+request: PATCH /tasks/v1/users/@me/lists/enFCUWNOemZ6eU4xNENiSQ
+request_content:
+  title: Updated Task List
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#taskList",
+      "id": "enFCUWNOemZ6eU4xNENiSQ",
+      "etag": "\"R1AuD-OytXs\"",
+      "title": "Updated Task List",
+      "updated": "2026-02-15T02:37:46.868Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/users/@me/lists/enFCUWNOemZ6eU4xNENiSQ"
+    }
+  headers:
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - transfer-encoding
+    - chunked
+    - date
+    - 'Sun, 15 Feb 2026 02:37:46 GMT'
+    - x-l2-request-path
+    - l2-managed-14
+    - x-content-type-options
+    - nosniff
+    - content-type
+    - application/json; charset=UTF-8
+    - accept-ranges
+    - none
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - server
+    - ESF
+    - x-frame-options
+    - SAMEORIGIN
+    - x-xss-protection
+    - 0
+  message: OK
+source: Test::Google::RestApi::TasksApi1::TaskList::update
+
+---
+request: DELETE /tasks/v1/users/@me/lists/enFCUWNOemZ6eU4xNENiSQ
 response:
   code: 204
   content: ''
   headers:
+    - date
+    - 'Sun, 15 Feb 2026 02:37:48 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - content-type
-    - text/html
+    - application/json; charset=UTF-8
+    - x-content-type-options
+    - nosniff
+    - x-l2-request-path
+    - l2-managed-14
+    - x-frame-options
+    - SAMEORIGIN
+    - content-length
+    - 0
+    - server
+    - ESF
+    - vary
+    - Origin
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - x-xss-protection
+    - 0
   message: No Content
-source: Test::Google::RestApi::TasksApi1::TaskList::clear
+source: Test::Google::RestApi::TasksApi1::TaskList::_teardown_live_task_list
 
