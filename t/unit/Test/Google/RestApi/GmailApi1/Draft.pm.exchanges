@@ -1,0 +1,57 @@
+---
+request: POST /gmail/v1/users/me/drafts
+response:
+  code: 200
+  content: |
+    {
+      "id": "mock_draft_id_001",
+      "message": {
+        "id": "mock_msg_id_draft_001",
+        "threadId": "mock_thread_id_draft_001",
+        "labelIds": ["DRAFT"]
+      }
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Draft::create_get_and_delete
+
+---
+request: GET /gmail/v1/users/me/drafts/mock_draft_id_001
+response:
+  code: 200
+  content: |
+    {
+      "id": "mock_draft_id_001",
+      "message": {
+        "id": "mock_msg_id_draft_001",
+        "threadId": "mock_thread_id_draft_001",
+        "labelIds": ["DRAFT"],
+        "snippet": "Test email snippet",
+        "payload": {
+          "mimeType": "text/plain",
+          "headers": [
+            {"name": "To", "value": "test@example.com"},
+            {"name": "Subject", "value": "Test Draft"}
+          ]
+        }
+      }
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Draft::create_get_and_delete
+
+---
+request: DELETE /gmail/v1/users/me/drafts/mock_draft_id_001
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::GmailApi1::Draft::create_get_and_delete
+

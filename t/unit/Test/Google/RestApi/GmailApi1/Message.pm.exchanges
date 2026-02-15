@@ -1,0 +1,91 @@
+---
+request: GET /gmail/v1/users/me/messages/mock_msg_id_001
+response:
+  code: 200
+  content: |
+    {
+      "id": "mock_msg_id_001",
+      "threadId": "mock_thread_id_001",
+      "labelIds": ["INBOX", "UNREAD"],
+      "snippet": "Test email snippet",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {"name": "From", "value": "sender@example.com"},
+          {"name": "To", "value": "user@gmail.com"},
+          {"name": "Subject", "value": "Test Subject"}
+        ]
+      },
+      "sizeEstimate": 1234,
+      "internalDate": "1700000000000"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Message::get_and_modify
+
+---
+request: POST /gmail/v1/users/me/messages/mock_msg_id_001/modify
+request_content:
+  addLabelIds:
+    - STARRED
+  removeLabelIds:
+    - UNREAD
+response:
+  code: 200
+  content: |
+    {
+      "id": "mock_msg_id_001",
+      "threadId": "mock_thread_id_001",
+      "labelIds": ["INBOX", "STARRED"]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Message::get_and_modify
+
+---
+request: POST /gmail/v1/users/me/messages/mock_msg_id_001/trash
+response:
+  code: 200
+  content: |
+    {
+      "id": "mock_msg_id_001",
+      "threadId": "mock_thread_id_001",
+      "labelIds": ["TRASH"]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Message::trash_and_delete
+
+---
+request: POST /gmail/v1/users/me/messages/mock_msg_id_001/untrash
+response:
+  code: 200
+  content: |
+    {
+      "id": "mock_msg_id_001",
+      "threadId": "mock_thread_id_001",
+      "labelIds": ["INBOX"]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Message::trash_and_delete
+
+---
+request: DELETE /gmail/v1/users/me/messages/mock_msg_id_001
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::GmailApi1::Message::trash_and_delete
+

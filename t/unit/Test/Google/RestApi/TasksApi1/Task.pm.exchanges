@@ -1,0 +1,135 @@
+---
+request: POST /tasks/v1/lists/mock_task_list_id_12345/tasks
+request_content:
+  title: Test Task
+  notes: Some notes
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#task",
+      "id": "mock_task_id_12345",
+      "title": "Test Task",
+      "notes": "Some notes",
+      "status": "needsAction",
+      "updated": "2026-02-14T00:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::Task::create_and_delete
+
+---
+request: GET /tasks/v1/lists/mock_task_list_id_12345/tasks/mock_task_id_12345
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#task",
+      "id": "mock_task_id_12345",
+      "title": "Test Task",
+      "notes": "Some notes",
+      "status": "needsAction",
+      "updated": "2026-02-14T00:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::Task::create_and_delete
+
+---
+request: DELETE /tasks/v1/lists/mock_task_list_id_12345/tasks/mock_task_id_12345
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::TasksApi1::Task::create_and_delete
+
+---
+request: PATCH /tasks/v1/lists/mock_task_list_id_12345/tasks/mock_task_id_12345
+request_content:
+  title: Updated Task
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#task",
+      "id": "mock_task_id_12345",
+      "title": "Updated Task",
+      "status": "needsAction",
+      "updated": "2026-02-14T01:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::Task::update
+
+---
+query_params:
+  parent: mock_parent_task_id
+request: POST /tasks/v1/lists/mock_task_list_id_12345/tasks/mock_task_id_12345/move
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#task",
+      "id": "mock_task_id_12345",
+      "title": "Test Task",
+      "parent": "mock_parent_task_id",
+      "status": "needsAction",
+      "updated": "2026-02-14T02:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::Task::move
+
+---
+request: PATCH /tasks/v1/lists/mock_task_list_id_12345/tasks/mock_task_id_12345
+request_content:
+  status: completed
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#task",
+      "id": "mock_task_id_12345",
+      "title": "Test Task",
+      "status": "completed",
+      "completed": "2026-02-14T03:00:00.000Z",
+      "updated": "2026-02-14T03:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::Task::complete_and_uncomplete
+
+---
+request: PATCH /tasks/v1/lists/mock_task_list_id_12345/tasks/mock_task_id_12345
+request_content:
+  status: needsAction
+  completed: ~
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#task",
+      "id": "mock_task_id_12345",
+      "title": "Test Task",
+      "status": "needsAction",
+      "updated": "2026-02-14T04:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::Task::complete_and_uncomplete
+

@@ -1,0 +1,58 @@
+---
+request: POST /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/acl
+request_content:
+  role: reader
+  scope:
+    type: user
+    value: test@example.com
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#aclRule",
+      "etag": "\"test_etag\"",
+      "id": "user:test@example.com",
+      "role": "reader",
+      "scope": {
+        "type": "user",
+        "value": "test@example.com"
+      }
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
+
+---
+request: GET /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/acl/user:test@example.com
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#aclRule",
+      "etag": "\"test_etag\"",
+      "id": "user:test@example.com",
+      "role": "reader",
+      "scope": {
+        "type": "user",
+        "value": "test@example.com"
+      }
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
+
+---
+request: DELETE /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/acl/user:test@example.com
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
+
