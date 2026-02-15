@@ -1,5 +1,11 @@
 Revision history for Perl extension Google::RestApi.
 
+2.0.0 2026-02-15
+        - Built out calendar, docs, gmail and tasks api.
+        - Dropped integration tests since we generate mock files from live api.
+        - Added pagination callbacks for all paged calls.
+        - Breaking change: DriveApi3::list takes names params instead of positional.
+
 1.2.0 2026-02-14
         - Build out drive api calls.
 
