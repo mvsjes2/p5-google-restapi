@@ -10,6 +10,17 @@ use parent 'Test::Unit::TestBase';
 
 init_logger;
 
+sub dont_create_mock_spreadsheets { 1; }
+
+sub _mock_drive {
+  my ($self, %args) = @_;
+  return Drive->new(
+    drive_api => mock_drive_api(),
+    id        => 'drive123',
+    %args,
+  );
+}
+
 sub _constructor : Tests(3) {
   my $self = shift;
 
@@ -23,7 +34,7 @@ sub _constructor : Tests(3) {
   return;
 }
 
-sub requires_id : Tests(4) {
+sub requires_id : Tests(5) {
   my $self = shift;
 
   my $drive = Drive->new(drive_api => mock_drive_api());
@@ -44,10 +55,117 @@ sub requires_id : Tests(4) {
     qr/Drive ID required/i,
     'hide() without ID should throw';
 
+  throws_ok sub { $drive->unhide() },
+    qr/Drive ID required/i,
+    'unhide() without ID should throw';
+
   return;
 }
 
-# Note: Creating/deleting shared drives requires special permissions
-# These tests only verify the constructor and validation logic
+sub accessors : Tests(2) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  is $drive->drive_id(), 'drive123', 'drive_id returns correct ID';
+  isa_ok $drive->drive_api(), 'Google::RestApi::DriveApi3', 'drive_api returns DriveApi3';
+
+  return;
+}
+
+sub get_drive : Tests(2) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  ok my $result = $drive->get(), 'get() returns result';
+  is $result->{name}, 'Test Shared Drive', 'get() returns drive name';
+
+  return;
+}
+
+sub get_with_fields : Tests(1) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  ok my $result = $drive->get(fields => 'name,id'), 'get() with fields returns result';
+
+  return;
+}
+
+sub get_with_domain_admin : Tests(1) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  ok my $result = $drive->get(use_domain_admin_access => 1),
+    'get() with use_domain_admin_access returns result';
+
+  return;
+}
+
+sub update_drive : Tests(1) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  ok my $result = $drive->update(name => 'Renamed Drive'),
+    'update() with name returns result';
+
+  return;
+}
+
+sub update_with_options : Tests(1) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  ok my $result = $drive->update(
+    name      => 'Styled Drive',
+    color_rgb => '#FF0000',
+    theme_id  => 'theme1',
+    background_image_file => { id => 'img123' },
+    restrictions => { adminManagedRestrictions => JSON::MaybeXS::true() },
+    use_domain_admin_access => 1,
+  ), 'update() with all options returns result';
+
+  return;
+}
+
+sub delete_drive : Tests(1) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  lives_ok sub { $drive->delete() }, 'delete() lives';
+
+  return;
+}
+
+sub delete_with_options : Tests(1) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  lives_ok sub {
+    $drive->delete(
+      use_domain_admin_access => 1,
+      allow_item_deletion     => 1,
+    )
+  }, 'delete() with options lives';
+
+  return;
+}
+
+sub hide_drive : Tests(1) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  ok my $result = $drive->hide(), 'hide() returns result';
+
+  return;
+}
+
+sub unhide_drive : Tests(1) {
+  my $self = shift;
+
+  my $drive = $self->_mock_drive();
+  ok my $result = $drive->unhide(), 'unhide() returns result';
+
+  return;
+}
 
 1;
