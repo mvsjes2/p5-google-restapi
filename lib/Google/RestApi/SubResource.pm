@@ -57,30 +57,8 @@ Subclasses must override two methods:
 
 =back
 
-=head2 Chained API Calls
-
-Every Google API module has an C<api()> method. Sub-resource objects
-don't call the Google endpoint directly; instead, each C<api()> prepends
-its own URI segment and delegates to its parent's C<api()>. The calls
-chain upward until they reach the top-level API module (e.g. DriveApi3),
-which prepends the endpoint base URL and hands the fully-assembled URI
-to L<Google::RestApi> for the actual HTTP request.
-
-For example, deleting a reply on a comment on a file produces this chain:
-
- $reply->api(method => 'delete')
-   # Reply prepends "replies/$reply_id"
-   -> $comment->api(uri => "replies/$reply_id", method => 'delete')
-     # Comment prepends "comments/$comment_id"
-     -> $file->api(uri => "comments/$comment_id/replies/$reply_id", ...)
-       # File prepends "files/$file_id"
-       -> $drive->api(uri => "files/$file_id/comments/$comment_id/replies/$reply_id", ...)
-         # DriveApi3 prepends "https://www.googleapis.com/drive/v3/"
-         -> $rest_api->api(uri => "https://www.googleapis.com/drive/v3/files/$file_id/comments/$comment_id/replies/$reply_id", method => 'delete')
-
-Each layer only knows about its own URI segment and its parent accessor.
-This pattern applies uniformly across all six APIs (Drive, Sheets,
-Calendar, Gmail, Tasks, Docs).
+See L<Google::RestApi/Chained API Calls> for a walkthrough of how the
+chained C<api()> delegation works.
 
 =head1 METHODS
 
