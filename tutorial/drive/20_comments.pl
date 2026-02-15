@@ -21,9 +21,8 @@ use Tutorial::Setup;
 init_logger($TRACE) if $ENV{DEBUG};
 
 my $name = spreadsheet_name();
-my $rest_api = rest_api();
-my $sheets_api = sheets_api(api => $rest_api);
-my $drive = drive_api(api => $rest_api);
+my $sheets_api = sheets_api();
+my $drive = drive_api(api => $sheets_api->rest_api());
 
 my $spreadsheet_name = spreadsheet_name();
 end(
@@ -39,7 +38,7 @@ my $file_id = $ss->spreadsheet_id();
 my $file = $drive->file(id => $file_id);
 end("Spreadsheet opened, ID: $file_id.");
 
-$rest_api->api_callback(\&show_api);
+$sheets_api->rest_api()->api_callback(\&show_api);
 
 # create a comment.
 start("Now we'll add a comment to the file.");

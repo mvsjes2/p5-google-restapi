@@ -48,10 +48,12 @@ sub list {
     fields                        => Str, { optional => 1 },
     page_size                     => PositiveInt, { default => 100 },
     drive_id                      => Str, { optional => 1 },
+    max_pages                     => Int, { default => 0 },
     _extra_                       => slurpy Any,
   );
   my $p = named_extra($check->(@_));
 
+  my $max_pages = delete $p->{max_pages};
   my %params = (
     pageToken   => delete $p->{page_token},
     spaces      => delete $p->{spaces},
@@ -66,6 +68,7 @@ sub list {
   my @changes;
   my $next_page_token;
   my $new_start_page_token;
+  my $page = 0;
 
   do {
     $params{pageToken} = $next_page_token if $next_page_token;
@@ -73,7 +76,8 @@ sub list {
     push(@changes, $result->{changes}->@*) if $result->{changes};
     $next_page_token = $result->{nextPageToken};
     $new_start_page_token = $result->{newStartPageToken};
-  } until !$next_page_token;
+    $page++;
+  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
 
   return wantarray ? @changes : { changes => \@changes, newStartPageToken => $new_start_page_token };
 }
@@ -165,6 +169,7 @@ Options:
 - supports_all_drives: Support shared drives (default: true)
 - page_size: Number of changes per page (default: 100)
 - drive_id: Specific shared drive ID
+- max_pages: Maximum pages to fetch (default: 0 = unlimited)
 
 In list context, returns array of changes.
 In scalar context, returns hashref with changes and newStartPageToken.

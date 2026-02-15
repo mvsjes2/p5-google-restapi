@@ -1,0 +1,34 @@
+---
+request: GET /calendar/v3/users/me/settings/timezone
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#setting",
+      "etag": "\"test_etag\"",
+      "id": "timezone",
+      "value": "Australia/Sydney"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Settings::get
+
+---
+request: GET /calendar/v3/users/me/settings/timezone
+response:
+  code: 200
+  content: |
+    {
+      "kind": "calendar#setting",
+      "etag": "\"test_etag\"",
+      "id": "timezone",
+      "value": "Australia/Sydney"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Settings::value
+

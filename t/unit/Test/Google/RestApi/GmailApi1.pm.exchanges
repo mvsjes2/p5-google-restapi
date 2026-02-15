@@ -1,0 +1,114 @@
+---
+request: GET /gmail/v1/users/me/profile
+response:
+  code: 200
+  content: |
+    {
+      "emailAddress": "user@gmail.com",
+      "messagesTotal": 1234,
+      "threadsTotal": 567,
+      "historyId": "12345"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::profile
+
+---
+request: GET /gmail/v1/users/me/labels
+response:
+  code: 200
+  content: |
+    {
+      "labels": [
+        {
+          "id": "INBOX",
+          "name": "INBOX",
+          "type": "system"
+        },
+        {
+          "id": "SENT",
+          "name": "SENT",
+          "type": "system"
+        },
+        {
+          "id": "TRASH",
+          "name": "TRASH",
+          "type": "system"
+        }
+      ]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::list_labels
+
+---
+query_params:
+  fields: 'nextPageToken, resultSizeEstimate, messages(id, threadId)'
+request: GET /gmail/v1/users/me/messages
+response:
+  code: 200
+  content: |
+    {
+      "messages": [
+        {
+          "id": "mock_msg_id_001",
+          "threadId": "mock_thread_id_001"
+        },
+        {
+          "id": "mock_msg_id_002",
+          "threadId": "mock_thread_id_002"
+        }
+      ],
+      "resultSizeEstimate": 2
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::list_messages
+
+---
+query_params:
+  fields: 'nextPageToken, resultSizeEstimate, messages(id, threadId)'
+request: GET /gmail/v1/users/me/messages
+response:
+  code: 200
+  content: |
+    {
+      "messages": [
+        {
+          "id": "mock_msg_id_001",
+          "threadId": "mock_thread_id_001"
+        }
+      ],
+      "nextPageToken": "page2_token",
+      "resultSizeEstimate": 100
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::messages_max_pages
+
+---
+query_params:
+  fields: 'nextPageToken, resultSizeEstimate, threads(id, snippet)'
+request: GET /gmail/v1/users/me/threads
+response:
+  code: 200
+  content: |
+    {
+      "threads": [],
+      "nextPageToken": "page2_token",
+      "resultSizeEstimate": 100
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::threads_max_pages
+

@@ -19,9 +19,8 @@ use Tutorial::Setup;
 init_logger($TRACE) if $ENV{DEBUG};
 
 my $name = spreadsheet_name();
-my $rest_api = rest_api();
-my $sheets_api = sheets_api(api => $rest_api);
-my $drive = drive_api(api => $rest_api);
+my $sheets_api = sheets_api();
+my $drive = drive_api(api => $sheets_api->rest_api());
 
 # clean up any failed previous runs.
 $sheets_api->delete_all_spreadsheets_by_filters("name = '$name'");
@@ -33,7 +32,7 @@ my $file_id = $ss->spreadsheet_id();
 end("Spreadsheet created with ID: $file_id.");
 
 # now set a callback to display the api request/response.
-$rest_api->api_callback(\&show_api);
+$sheets_api->rest_api()->api_callback(\&show_api);
 
 # get file metadata.
 start("Now we'll get the file's metadata using the Drive API.");
