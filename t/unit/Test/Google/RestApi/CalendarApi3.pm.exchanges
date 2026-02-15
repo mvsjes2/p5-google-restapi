@@ -6,25 +6,90 @@ response:
   code: 200
   content: |
     {
-      "kind": "calendar#calendar",
-      "etag": "\"test_etag\"",
-      "id": "mock_cal_id_12345@group.calendar.google.com",
-      "summary": "Test Calendar"
+     "kind": "calendar#calendar",
+     "etag": "\"rxERkOEhzZbWXXTIguGBJwAWYFA\"",
+     "id": "45a0df23279719daa33892a29638e1b6d82b01881b392bf30c2d83fb01a1f443@group.calendar.google.com",
+     "summary": "Test Calendar",
+     "timeZone": "UTC",
+     "dataOwner": "test.user@gmail.com",
+     "conferenceProperties": {
+      "allowedConferenceSolutionTypes": [
+       "hangoutsMeet"
+      ]
+     }
     }
   headers:
+    - transfer-encoding
+    - chunked
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-xss-protection
+    - 0
+    - x-l2-request-path
+    - l2-managed-14
+    - x-content-type-options
+    - nosniff
     - content-type
     - application/json; charset=UTF-8
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - pragma
+    - no-cache
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - date
+    - 'Sun, 15 Feb 2026 02:31:02 GMT'
+    - server
+    - ESF
+    - accept-ranges
+    - none
   message: OK
 source: Test::Google::RestApi::CalendarApi3::create_and_delete_calendar
 
 ---
-request: DELETE /calendar/v3/calendars/mock_cal_id_12345@group.calendar.google.com
+request: DELETE /calendar/v3/calendars/45a0df23279719daa33892a29638e1b6d82b01881b392bf30c2d83fb01a1f443@group.calendar.google.com
 response:
   code: 204
   content: ''
   headers:
+    - content-length
+    - 0
+    - server
+    - ESF
+    - date
+    - 'Sun, 15 Feb 2026 02:31:04 GMT'
+    - pragma
+    - no-cache
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
     - content-type
     - text/html
+    - x-content-type-options
+    - nosniff
+    - x-l2-request-path
+    - l2-managed-14
+    - x-xss-protection
+    - 0
+    - vary
+    - Origin
+    - vary
+    - X-Origin
+    - vary
+    - Referer
   message: No Content
 source: Test::Google::RestApi::CalendarApi3::create_and_delete_calendar
 
@@ -36,22 +101,72 @@ response:
   code: 200
   content: |
     {
-      "kind": "calendar#calendarList",
-      "etag": "\"test_etag\"",
-      "items": [
-        {
-          "id": "primary",
-          "summary": "user@gmail.com"
-        },
-        {
-          "id": "en.australian#holiday@group.v.calendar.google.com",
-          "summary": "Holidays in Australia"
-        }
-      ]
+     "items": [
+      {
+       "id": "78qlfj56o4vcjt0nd63ul2e1rr8cqii3@import.calendar.google.com",
+       "summary": "Village Wellness Appointments"
+      },
+      {
+       "id": "mi6lj40nr9qa41po0ngnmlear4@group.calendar.google.com",
+       "summary": "AAW"
+      },
+      {
+       "id": "ea6vu9fhgbuvcg5etga2k11mhs@group.calendar.google.com",
+       "summary": "Nan Calendar"
+      },
+      {
+       "id": "family05775073520338832520@group.calendar.google.com",
+       "summary": "Family"
+      },
+      {
+       "id": "en.canadian#holiday@group.v.calendar.google.com",
+       "summary": "Holidays in Canada"
+      },
+      {
+       "id": "test.user@gmail.com",
+       "summary": "test.user@gmail.com"
+      },
+      {
+       "id": "friend.user@gmail.com",
+       "summary": "friend.user@gmail.com"
+      },
+      {
+       "id": "0ed31f577c2ee528f5b30f0e2c8b212c61d9cb8c597036f5e5613ffcfc8f7b2f@group.calendar.google.com",
+       "summary": "Test Calendar"
+      }
+     ]
     }
   headers:
+    - transfer-encoding
+    - chunked
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-l2-request-path
+    - l2-managed-14
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
     - content-type
     - application/json; charset=UTF-8
+    - cache-control
+    - 'private, max-age=0, must-revalidate, no-transform'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - expires
+    - 'Sun, 15 Feb 2026 02:31:07 GMT'
+    - date
+    - 'Sun, 15 Feb 2026 02:31:07 GMT'
+    - server
+    - ESF
+    - accept-ranges
+    - none
   message: OK
 source: Test::Google::RestApi::CalendarApi3::list_calendars
 
@@ -63,19 +178,72 @@ response:
   code: 200
   content: |
     {
-      "kind": "calendar#calendarList",
-      "etag": "\"test_etag\"",
-      "nextPageToken": "page2_token",
-      "items": [
-        {
-          "id": "primary",
-          "summary": "user@gmail.com"
-        }
-      ]
+     "items": [
+      {
+       "id": "78qlfj56o4vcjt0nd63ul2e1rr8cqii3@import.calendar.google.com",
+       "summary": "Village Wellness Appointments"
+      },
+      {
+       "id": "mi6lj40nr9qa41po0ngnmlear4@group.calendar.google.com",
+       "summary": "AAW"
+      },
+      {
+       "id": "ea6vu9fhgbuvcg5etga2k11mhs@group.calendar.google.com",
+       "summary": "Nan Calendar"
+      },
+      {
+       "id": "family05775073520338832520@group.calendar.google.com",
+       "summary": "Family"
+      },
+      {
+       "id": "en.canadian#holiday@group.v.calendar.google.com",
+       "summary": "Holidays in Canada"
+      },
+      {
+       "id": "test.user@gmail.com",
+       "summary": "test.user@gmail.com"
+      },
+      {
+       "id": "friend.user@gmail.com",
+       "summary": "friend.user@gmail.com"
+      },
+      {
+       "id": "0ed31f577c2ee528f5b30f0e2c8b212c61d9cb8c597036f5e5613ffcfc8f7b2f@group.calendar.google.com",
+       "summary": "Test Calendar"
+      }
+     ]
     }
   headers:
+    - x-l2-request-path
+    - l2-managed-14
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - transfer-encoding
+    - chunked
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
     - content-type
     - application/json; charset=UTF-8
+    - cache-control
+    - 'private, max-age=0, must-revalidate, no-transform'
+    - date
+    - 'Sun, 15 Feb 2026 02:31:09 GMT'
+    - server
+    - ESF
+    - expires
+    - 'Sun, 15 Feb 2026 02:31:09 GMT'
+    - accept-ranges
+    - none
   message: OK
 source: Test::Google::RestApi::CalendarApi3::list_calendars_max_pages
 

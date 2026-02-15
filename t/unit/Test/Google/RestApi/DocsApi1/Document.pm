@@ -13,10 +13,33 @@ init_logger;
 
 sub dont_create_mock_spreadsheets { 1; }
 
+sub _setup_live_document : Tests(startup) {
+  my $self = shift;
+  return unless $ENV{GOOGLE_RESTAPI_CONFIG};
+  my $docs = mock_docs_api();
+  my $doc = $docs->create_document(title => 'Mock Document');
+  $self->{_live_doc} = $doc;
+  return;
+}
+
+sub _teardown_live_document : Tests(shutdown) {
+  my $self = shift;
+  if ($self->{_live_doc}) {
+    my $docs = mock_docs_api();
+    $docs->delete_document($self->{_live_doc}->document_id());
+  }
+  return;
+}
+
+sub _doc_id {
+  my $self = shift;
+  return $self->{_live_doc} ? $self->{_live_doc}->document_id() : mock_document_id();
+}
+
 sub _mock_document {
   my $self = shift;
   my $docs = mock_docs_api();
-  return $docs->open_document(id => mock_document_id());
+  return $docs->open_document(id => $self->_doc_id());
 }
 
 sub _constructor : Tests(4) {
@@ -27,7 +50,7 @@ sub _constructor : Tests(4) {
     'Constructor without docs_api should throw';
 
   my $docs = mock_docs_api();
-  ok my $doc = Document->new(docs_api => $docs, id => mock_document_id()),
+  ok my $doc = Document->new(docs_api => $docs, id => $self->_doc_id()),
     'Constructor should succeed';
   isa_ok $doc, Document, 'Constructor returns';
   can_ok $doc, qw(api document_id get submit_requests
@@ -47,7 +70,7 @@ sub _constructor : Tests(4) {
 sub document_id : Tests(1) {
   my $self = shift;
   my $doc = $self->_mock_document();
-  is $doc->document_id(), mock_document_id(), 'document_id returns correct ID';
+  is $doc->document_id(), $self->_doc_id(), 'document_id returns correct ID';
   return;
 }
 
