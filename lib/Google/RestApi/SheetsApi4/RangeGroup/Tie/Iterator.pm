@@ -95,7 +95,6 @@ Test User mvsjes@cpan.org
 
 =head1 COPYRIGHT
 
-<<<<<<< Updated upstream
 Copyright (c) 2019-2026 Test User. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.
