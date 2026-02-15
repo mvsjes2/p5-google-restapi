@@ -82,30 +82,24 @@ sub task {
 sub tasks {
   my $self = shift;
   state $check = compile_named(
-    max_pages => Int, { default => 1 },
-    params    => HashRef, { default => {} },
+    max_pages     => Int, { default => 1 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
   LOGDIE "TaskList ID required for tasks()" unless $self->{id};
 
-  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'items(id, title, status, due)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->tasks_api()->api(uri => "lists/$self->{id}/tasks", params => $params);
-    push(@list, $result->{items}->@*) if $result->{items};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->tasks_api()->api(uri => "lists/$self->{id}/tasks", params => $params); },
+    result_key     => 'items',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub create_task {
