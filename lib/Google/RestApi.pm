@@ -289,14 +289,52 @@ Gmail API V1, Tasks API V1, and Docs API V1.
     content => <data_for_body>,
   );
 
+  # --- Drive API ---
   use Google::RestApi::DriveApi3;
   $drive = Google::RestApi::DriveApi3->new(api => $rest_api);
-
-  # file operations
   $file = $drive->file(id => 'xxxx');
   $copy = $file->copy(name => 'my-copy-of-xxx');
-  $file->update(name => 'new-name', description => 'new desc');
-  $file->export(mime_type => 'application/pdf');
+  @files = $drive->list(filter => "name contains 'report'");
+
+  # --- Sheets API ---
+  use Google::RestApi::SheetsApi4;
+  $sheets = Google::RestApi::SheetsApi4->new(api => $rest_api);
+  $spreadsheet = $sheets->open_spreadsheet(name => 'My Sheet');
+  $worksheet = $spreadsheet->open_worksheet(name => 'Sheet1');
+  @values = $worksheet->col('A');
+  $worksheet->row(1, ['Name', 'Email', 'Phone']);
+
+  # --- Calendar API ---
+  use Google::RestApi::CalendarApi3;
+  $calendar_api = Google::RestApi::CalendarApi3->new(api => $rest_api);
+  $calendar = $calendar_api->create_calendar(summary => 'Team Events');
+  $event = $calendar->event();
+  $event->create(
+    summary => 'Meeting',
+    start   => { dateTime => '2026-03-01T10:00:00-05:00' },
+    end     => { dateTime => '2026-03-01T11:00:00-05:00' },
+  );
+
+  # --- Gmail API ---
+  use Google::RestApi::GmailApi1;
+  $gmail = Google::RestApi::GmailApi1->new(api => $rest_api);
+  $gmail->send_message(
+    to => 'user@example.com', subject => 'Hello', body => 'Hi there',
+  );
+  @messages = $gmail->messages();
+
+  # --- Tasks API ---
+  use Google::RestApi::TasksApi1;
+  $tasks = Google::RestApi::TasksApi1->new(api => $rest_api);
+  $task_list = $tasks->create_task_list(title => 'My Tasks');
+  $task_list->create_task(title => 'Buy groceries', notes => 'Milk, eggs');
+
+  # --- Docs API ---
+  use Google::RestApi::DocsApi1;
+  $docs = Google::RestApi::DocsApi1->new(api => $rest_api);
+  $doc = $docs->create_document(title => 'My Document');
+  $doc->insert_text(text => 'Hello, world!');
+  $doc->submit_requests();
 
 See the individual PODs for the different apis for details on how to use each
 one.
