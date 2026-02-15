@@ -27,11 +27,12 @@ sub api : Tests(1) {
   return;
 }
 
-sub ordered_tests : Tests(16) {
+sub ordered_tests : Tests(20) {
   my $self = shift;
   $self->create_spreadsheet;
   $self->copy_spreadsheet;
   $self->spreadsheets;
+  $self->page_callback;
   $self->delete_spreadsheet;
   $self->delete_all_spreadsheets_by_filters;
   return;
@@ -87,7 +88,7 @@ sub spreadsheets {
   return;
 }
 
-sub page_callback : Tests(4) {
+sub page_callback {
   my $self = shift;
   my $sheets_api = mock_sheets_api();
 
