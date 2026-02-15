@@ -1,0 +1,69 @@
+---
+request: GET /v1/documents/mock_document_id_12345
+response:
+  code: 200
+  content: |
+    {
+      "documentId": "mock_document_id_12345",
+      "title": "Mock Document",
+      "body": {
+        "content": [
+          {
+            "endIndex": 1,
+            "sectionBreak": {
+              "sectionStyle": {
+                "columnSeparatorStyle": "NONE",
+                "contentDirection": "LEFT_TO_RIGHT"
+              }
+            }
+          },
+          {
+            "startIndex": 1,
+            "endIndex": 2,
+            "paragraph": {
+              "elements": [
+                {
+                  "startIndex": 1,
+                  "endIndex": 2,
+                  "textRun": {
+                    "content": "\n",
+                    "textStyle": {}
+                  }
+                }
+              ],
+              "paragraphStyle": {
+                "namedStyleType": "NORMAL_TEXT",
+                "direction": "LEFT_TO_RIGHT"
+              }
+            }
+          }
+        ]
+      },
+      "revisionId": "mock_revision_id"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DocsApi1::Document::get_document
+
+---
+request: POST /v1/documents/mock_document_id_12345/:batchUpdate
+response:
+  code: 200
+  content: |
+    {
+      "documentId": "mock_document_id_12345",
+      "replies": [
+        {}
+      ],
+      "writeControl": {
+        "requiredRevisionId": "mock_revision_id_2"
+      }
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DocsApi1::Document::submit_requests
+
