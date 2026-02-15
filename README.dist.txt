@@ -13,7 +13,6 @@
 * make test
 * make dist
 * cpanm Google-RestApi-$new_version.tar.gz
-* make test again to check that everything installed correctly
 * cpan-upload Google-RestApi-${new_version}.tar.gz --user $user
 * make clean
 * rm Google-RestApi-${new_version}.tar.gz

@@ -654,6 +654,8 @@ See L<https://developers.google.com/drive/api/v3/search-files> for full document
 
 =item * L<Google::RestApi::GmailApi1> - Google Gmail API (related module)
 
+=item * L<Google::RestApi::TasksApi1> - Google Tasks API (related module)
+
 =item * L<https://developers.google.com/drive/api/v3/reference> - Google Drive API Reference
 
 =back

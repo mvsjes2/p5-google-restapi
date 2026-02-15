@@ -48,4 +48,19 @@ for my $label (@gmail_labels) {
 }
 end_go("Gmail label delete complete, deleted $gmail_count label(s).");
 
+# clean up task lists.
+my $tasks_name = tasks_list_name();
+start("Now we will delete any task lists named '$tasks_name' or '${tasks_name}_updated'.");
+my $tasks = tasks_api();
+$tasks->rest_api()->api_callback(\&show_api);
+my @task_lists = $tasks->list_task_lists();
+my $tasks_count = 0;
+for my $tl (@task_lists) {
+  if ($tl->{title} && ($tl->{title} eq $tasks_name || $tl->{title} eq "${tasks_name}_updated")) {
+    $tasks->task_list(id => $tl->{id})->delete();
+    $tasks_count++;
+  }
+}
+end_go("Task list delete complete, deleted $tasks_count task list(s).");
+
 message('blue', "We are done, here are some api stats:\n", Dump($sheets_api->stats()));
