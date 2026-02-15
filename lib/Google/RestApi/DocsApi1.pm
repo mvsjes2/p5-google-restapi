@@ -78,7 +78,7 @@ sub delete_all_documents_by_filters {
 
   my $count = 0;
   foreach my $filter (@$filter) {
-    my @documents = $self->documents_by_filter($filter);
+    my @documents = $self->documents_by_filter(filter => $filter);
     $count += scalar @documents;
     DEBUG(sprintf("Deleting %d documents for filter '$filter'", scalar @documents));
     $self->delete_document($_->{id}) foreach (@documents);
@@ -96,20 +96,39 @@ sub delete_all_documents {
 sub documents_by_filter {
   my $self = shift;
 
-  state $check = compile(Optional[Str]);
-  my ($extra_filter) = $check->(@_);
+  state $check = compile_named(
+    filter        => Str, { optional => 1 },
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
+  );
+  my $p = $check->(@_);
 
   my $drive = $self->drive();
   my $filter = $Document_Filter;
-  $filter .= " and ($extra_filter)" if $extra_filter;
-  return $drive->list(filter => $filter);
+  $filter .= " and ($p->{filter})" if $p->{filter};
+  return $drive->list(
+    filter    => $filter,
+    max_pages => $p->{max_pages},
+    params    => $p->{params},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub documents {
   my $self = shift;
-  my ($name) = @_;
-  return $self->documents_by_filter() if !$name;
-  return $self->documents_by_filter("name = '$name'");
+
+  state $check = compile_named(
+    name          => Str, { optional => 1 },
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
+  );
+  my $p = $check->(@_);
+
+  my $name = delete $p->{name};
+  $p->{filter} = "name = '$name'" if $name;
+  return $self->documents_by_filter(%$p);
 }
 
 sub drive {
@@ -184,7 +203,7 @@ Google::RestApi::DocsApi1 - API to Google Docs API V1.
 
  # List documents via Drive
  my @docs = $docs_api->documents();
- my @docs = $docs_api->documents('My Document');
+ my @docs = $docs_api->documents(name => 'My Document');
 
  # Delete a document
  $docs_api->delete_document($document_id);
@@ -314,15 +333,43 @@ Deletes all documents matching the given Drive query filters.
 
 Returns the number of documents deleted.
 
-=head2 documents_by_filter(filter<string>)
+=head2 documents_by_filter(%args)
 
 Lists documents matching a Drive query filter, combined with the document MIME type filter.
 
+%args consists of:
+
+=over
+
+=item * C<filter> <string>: Optional. A Drive query filter string.
+
+=item * C<max_pages> <int>: Optional. Maximum pages to fetch (default 0 = unlimited).
+
+=item * C<page_callback> <coderef>: Optional. Called with the result hashref for each page. Return false to stop pagination. See L<Google::RestApi/PAGE CALLBACKS>.
+
+=item * C<params> <hashref>: Optional. Additional query parameters passed to the Drive API.
+
+=back
+
 Returns a list of file hashrefs with id and name.
 
-=head2 documents(name<string>)
+=head2 documents(%args)
 
 Lists documents, optionally filtered by name.
+
+%args consists of:
+
+=over
+
+=item * C<name> <string>: Optional. Filter by document name.
+
+=item * C<max_pages> <int>: Optional. Maximum pages to fetch (default 0 = unlimited).
+
+=item * C<page_callback> <coderef>: Optional. Called with the result hashref for each page. Return false to stop pagination. See L<Google::RestApi/PAGE CALLBACKS>.
+
+=item * C<params> <hashref>: Optional. Additional query parameters passed to the Drive API.
+
+=back
 
 Returns a list of file hashrefs with id and name.
 

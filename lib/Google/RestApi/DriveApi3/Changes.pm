@@ -176,6 +176,7 @@ Options:
 - page_size: Number of changes per page (default: 100)
 - drive_id: Specific shared drive ID
 - max_pages: Maximum pages to fetch (default: 0 = unlimited)
+- page_callback: See L<Google::RestApi/PAGE CALLBACKS>
 
 In list context, returns array of changes.
 In scalar context, returns hashref with changes and newStartPageToken.

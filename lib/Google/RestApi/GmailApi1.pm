@@ -467,6 +467,8 @@ Lists messages in the user's mailbox.
 
 =item * C<max_pages> <int>: Optional. Maximum number of pages to fetch (default 1). Set to 0 for unlimited.
 
+=item * C<page_callback> <coderef>: Optional. See L<Google::RestApi/PAGE CALLBACKS>.
+
 =item * C<params> <hashref>: Optional. Query parameters (q, maxResults, labelIds, etc).
 
 =back
@@ -485,6 +487,8 @@ Lists threads in the user's mailbox.
 =over
 
 =item * C<max_pages> <int>: Optional. Maximum number of pages to fetch (default 1). Set to 0 for unlimited.
+
+=item * C<page_callback> <coderef>: Optional. See L<Google::RestApi/PAGE CALLBACKS>.
 
 =item * C<params> <hashref>: Optional. Query parameters (q, maxResults, etc).
 

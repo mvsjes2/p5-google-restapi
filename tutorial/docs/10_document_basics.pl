@@ -52,7 +52,7 @@ end("Title: $title_only->{title}");
 
 # list documents again to see our new one.
 start("Listing documents filtered by name '$name'.");
-my @filtered = $docs_api->documents($name);
+my @filtered = $docs_api->documents(name => $name);
 end("Found " . scalar(@filtered) . " document(s) named '$name':\n" . Dump(\@filtered));
 
 # delete the document.

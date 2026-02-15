@@ -64,7 +64,7 @@ sub spreadsheet_id {
       LOGDIE "Unable to extract a sheet id from uri" if !$self->{id};
       DEBUG("Got sheet ID '$self->{id}' via URI '$self->{uri}'.");
     } else {
-      my @spreadsheets = $self->sheets_api()->spreadsheets($self->{name});
+      my @spreadsheets = $self->sheets_api()->spreadsheets(name => $self->{name});
       LOGDIE "Sheet '$self->{name}' not found on Google Drive" unless @spreadsheets;
       LOGDIE "More than one spreadsheet found with name '$self->{name}'. Specify 'id' or 'uri' instead."
         if scalar @spreadsheets > 1;

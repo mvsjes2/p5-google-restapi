@@ -489,7 +489,7 @@ Lists files matching the given query filter.
 =item * C<max_pages> <int>: Optional. Limits the number of pages fetched (default 0 = unlimited).
 
 =item * C<page_callback> <coderef>: Optional. Called after each page with the API result hashref.
-Return true to continue fetching, false to stop.
+Return true to continue fetching, false to stop. See L<Google::RestApi/PAGE CALLBACKS>.
 
 =item * C<params> <hashref>: Optional. Additional query parameters.
 
@@ -562,6 +562,7 @@ Lists all shared drives accessible to the user.
  );
 
 C<max_pages> limits the number of pages fetched (default 0 = unlimited).
+Supports C<page_callback>, see L<Google::RestApi/PAGE CALLBACKS>.
 
 Returns a list of drive hashrefs.
 
@@ -619,6 +620,10 @@ Returns the API response (empty on success).
 =head2 upload_endpoint()
 
 Returns the upload endpoint URL for file uploads. Used internally.
+
+=head2 rest_api()
+
+Returns the underlying L<Google::RestApi> instance.
 
 =head1 QUERY SYNTAX
 
