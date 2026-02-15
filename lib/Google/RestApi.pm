@@ -482,11 +482,6 @@ Returns some statistics on how many get/put/post etc calls were made. Useful for
 
 =back
 
-=head1 STATUS
-
-This api is currently in beta status. It is incomplete. There may be design flaws that need to be addressed in later releases. Later
-releases may break this release. Not all api calls have been implemented.
-
 =head1 AUTHORS
 
 =over
