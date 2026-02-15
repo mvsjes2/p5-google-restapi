@@ -1,5 +1,5 @@
 ---
-request: GET /v1/documents/16ezV6nq6c4nLrf8IQ3KhGUX5Dn38fNdJSOoqqyoRHOQ
+request: GET /v1/documents/13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss
 response:
   code: 200
   content: |
@@ -416,17 +416,61 @@ response:
           }
         ]
       },
-      "revisionId": "AONSffzX4lMnzmPRJ2P_zqam238_EJO2X00ub2CYmb8h5kVrXq7UjtdcWohkem0ksvS9XBO_rInTFw_jdtYVTgNpqOoEaoJmyg9Onz-0HMI",
+      "revisionId": "AIxLkSvicWO0N4nOvAL5xRN-VBuhRUZp3S7xBk0WsDgPem4HLyLH60hxRkwJVbFNR5IFHRvfb7IfKuGyyGqWxNKP23FkPelQwRTTOqnkCXQ",
       "suggestionsViewMode": "SUGGESTIONS_INLINE",
-      "documentId": "16ezV6nq6c4nLrf8IQ3KhGUX5Dn38fNdJSOoqqyoRHOQ"
+      "documentId": "13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss"
     }
   headers:
-    - x-l2-request-path
-    - l2-managed-5
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - transfer-encoding
+    - chunked
     - accept-ranges
     - none
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-l2-request-path
+    - l2-managed-5
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 20:51:02 GMT'
+  message: OK
+source: Test::Google::RestApi::DocsApi1::Document::get_document
+
+---
+query_params:
+  fields: title
+request: GET /v1/documents/13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss
+response:
+  code: 200
+  content: |
+    {
+      "title": "Mock Document"
+    }
+  headers:
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - transfer-encoding
+    - chunked
+    - accept-ranges
+    - none
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - X-Origin
     - vary
@@ -435,23 +479,19 @@ response:
     - 'Origin,Accept-Encoding'
     - server
     - ESF
+    - x-l2-request-path
+    - l2-managed-5
     - date
-    - 'Sun, 15 Feb 2026 02:37:58 GMT'
-    - x-xss-protection
-    - 0
-    - transfer-encoding
-    - chunked
-    - x-content-type-options
-    - nosniff
+    - 'Sun, 15 Feb 2026 20:51:04 GMT'
     - content-type
     - application/json; charset=UTF-8
     - x-frame-options
     - SAMEORIGIN
   message: OK
-source: Test::Google::RestApi::DocsApi1::Document::get_document
+source: Test::Google::RestApi::DocsApi1::Document::get_with_fields
 
 ---
-request: POST /v1/documents/16ezV6nq6c4nLrf8IQ3KhGUX5Dn38fNdJSOoqqyoRHOQ/:batchUpdate
+request: POST /v1/documents/13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss/:batchUpdate
 request_content:
   requests:
     - insertText:
@@ -466,84 +506,70 @@ response:
         {}
       ],
       "writeControl": {
-        "requiredRevisionId": "AONSffyKHCdNaV-SHuMFF7tMT-KzEAfmbmPI_7-azWqGvfIgrOsy0fMot5R1MlAK83vHlAHm5acAWc-tLDbWo0mM9wScXvjmMfSqfZrKxSY"
+        "requiredRevisionId": "AIxLkSu5hDrXspKr9esJoJfgCXzty8iOz2OtKSbJ8wOWvQLkzhfYz9TiKvA9S7PNccrGmDHzv9K1hhhvMrTG-1wzVnRzmY3UE8bpwP_XvXA"
       },
-      "documentId": "16ezV6nq6c4nLrf8IQ3KhGUX5Dn38fNdJSOoqqyoRHOQ"
+      "documentId": "13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss"
     }
   headers:
-    - date
-    - 'Sun, 15 Feb 2026 02:38:00 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - server
-    - ESF
-    - x-frame-options
-    - SAMEORIGIN
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - transfer-encoding
+    - chunked
     - accept-ranges
     - none
-    - x-l2-request-path
-    - l2-managed-5
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
+    - x-l2-request-path
+    - l2-managed-5
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 20:51:06 GMT'
   message: OK
 source: Test::Google::RestApi::DocsApi1::Document::submit_requests
 
 ---
-request: GET /v1/documents/16ezV6nq6c4nLrf8IQ3KhGUX5Dn38fNdJSOoqqyoRHOQ?fields=title
-response:
-  code: 200
-  content: |
-    {
-      "title": "Mock Document"
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::DocsApi1::Document::get_with_fields
-
----
-request: DELETE /drive/v3/files/16ezV6nq6c4nLrf8IQ3KhGUX5Dn38fNdJSOoqqyoRHOQ
+request: DELETE /drive/v3/files/13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss
 response:
   code: 204
   content: ''
   headers:
-    - server
-    - ESF
+    - pragma
+    - no-cache
     - date
-    - 'Sun, 15 Feb 2026 02:38:03 GMT'
-    - content-length
+    - 'Sun, 15 Feb 2026 20:51:08 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - content-type
+    - text/html
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
     - 0
     - vary
     - 'Origin, X-Origin'
     - alt-svc
     - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - text/html
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - pragma
-    - no-cache
     - expires
     - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - server
+    - ESF
+    - content-length
+    - 0
   message: No Content
 source: Test::Google::RestApi::DocsApi1::Document::_teardown_live_document
 

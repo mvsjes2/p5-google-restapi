@@ -1,5 +1,5 @@
 ---
-request: POST /calendar/v3/calendars/95a18ecf652db18cdda17e7e191f2000d191349aaa66241bbe8e5c1b032add57@group.calendar.google.com/acl
+request: POST /calendar/v3/calendars/dc0b5e646a6dcff114ccf3ef9a440503ea2ab789bf38455d53acacf4d26af9e9@group.calendar.google.com/acl
 request_content:
   role: reader
   scope:
@@ -10,7 +10,7 @@ response:
   content: |
     {
      "kind": "calendar#aclRule",
-     "etag": "\"00001771122691899999\"",
+     "etag": "\"00001771188570558831\"",
      "id": "user:test@example.com",
      "scope": {
       "type": "user",
@@ -19,49 +19,49 @@ response:
      "role": "reader"
     }
   headers:
+    - date
+    - 'Sun, 15 Feb 2026 20:49:30 GMT'
+    - pragma
+    - no-cache
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
+    - x-l2-request-path
+    - l2-managed-14
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - x-content-type-options
-    - nosniff
-    - x-frame-options
-    - SAMEORIGIN
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
     - alt-svc
     - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-xss-protection
-    - 0
-    - date
-    - 'Sun, 15 Feb 2026 02:31:32 GMT'
     - server
     - ESF
-    - accept-ranges
-    - none
-    - pragma
-    - no-cache
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
     - transfer-encoding
     - chunked
-    - content-type
-    - application/json; charset=UTF-8
-    - x-l2-request-path
-    - l2-managed-14
+    - accept-ranges
+    - none
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
 
 ---
-request: GET /calendar/v3/calendars/95a18ecf652db18cdda17e7e191f2000d191349aaa66241bbe8e5c1b032add57@group.calendar.google.com/acl/user:test@example.com
+request: GET /calendar/v3/calendars/dc0b5e646a6dcff114ccf3ef9a440503ea2ab789bf38455d53acacf4d26af9e9@group.calendar.google.com/acl/user:test@example.com
 response:
   code: 200
   content: |
     {
      "kind": "calendar#aclRule",
-     "etag": "\"00001771122691899999\"",
+     "etag": "\"00001771188570558831\"",
      "id": "user:test@example.com",
      "scope": {
       "type": "user",
@@ -70,114 +70,114 @@ response:
      "role": "reader"
     }
   headers:
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 20:49:32 GMT'
+    - x-l2-request-path
+    - l2-managed-14
+    - server
+    - ESF
+    - cache-control
+    - 'private, max-age=0, must-revalidate, no-transform'
+    - expires
+    - 'Sun, 15 Feb 2026 20:49:32 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - date
-    - 'Sun, 15 Feb 2026 02:31:33 GMT'
-    - expires
-    - 'Sun, 15 Feb 2026 02:31:33 GMT'
-    - server
-    - ESF
-    - x-content-type-options
-    - nosniff
-    - x-frame-options
-    - SAMEORIGIN
-    - accept-ranges
-    - none
-    - content-type
-    - application/json; charset=UTF-8
     - transfer-encoding
     - chunked
-    - cache-control
-    - 'private, max-age=0, must-revalidate, no-transform'
-    - x-l2-request-path
-    - l2-managed-14
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - accept-ranges
+    - none
     - x-xss-protection
     - 0
+    - x-content-type-options
+    - nosniff
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
 
 ---
-request: DELETE /calendar/v3/calendars/95a18ecf652db18cdda17e7e191f2000d191349aaa66241bbe8e5c1b032add57@group.calendar.google.com/acl/user:test@example.com
+request: DELETE /calendar/v3/calendars/dc0b5e646a6dcff114ccf3ef9a440503ea2ab789bf38455d53acacf4d26af9e9@group.calendar.google.com/acl/user:test@example.com
 response:
   code: 204
   content: ''
   headers:
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - x-xss-protection
-    - 0
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - content-length
-    - 0
-    - x-content-type-options
-    - nosniff
-    - x-frame-options
-    - SAMEORIGIN
     - vary
     - Origin
     - vary
     - X-Origin
     - vary
     - Referer
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - expires
     - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - x-l2-request-path
-    - l2-managed-14
-    - pragma
-    - no-cache
-    - content-type
-    - text/html
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
     - server
     - ESF
+    - content-length
+    - 0
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - pragma
+    - no-cache
     - date
-    - 'Sun, 15 Feb 2026 02:31:35 GMT'
+    - 'Sun, 15 Feb 2026 20:49:33 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - content-type
+    - text/html
+    - x-l2-request-path
+    - l2-managed-14
   message: No Content
 source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
 
 ---
-request: DELETE /calendar/v3/calendars/95a18ecf652db18cdda17e7e191f2000d191349aaa66241bbe8e5c1b032add57@group.calendar.google.com
+request: DELETE /calendar/v3/calendars/dc0b5e646a6dcff114ccf3ef9a440503ea2ab789bf38455d53acacf4d26af9e9@group.calendar.google.com
 response:
   code: 204
   content: ''
   headers:
+    - content-length
+    - 0
     - server
     - ESF
-    - date
-    - 'Sun, 15 Feb 2026 02:31:37 GMT'
-    - x-l2-request-path
-    - l2-managed-14
     - pragma
     - no-cache
+    - date
+    - 'Sun, 15 Feb 2026 20:49:35 GMT'
     - content-type
     - text/html
-    - x-content-type-options
-    - nosniff
-    - x-frame-options
-    - SAMEORIGIN
     - vary
     - Origin
     - vary
     - X-Origin
     - vary
     - Referer
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - expires
     - 'Mon, 01 Jan 1990 00:00:00 GMT'
     - cache-control
     - 'no-cache, no-store, max-age=0, must-revalidate'
+    - x-content-type-options
+    - nosniff
     - x-xss-protection
     - 0
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - content-length
-    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - x-l2-request-path
+    - l2-managed-14
   message: No Content
 source: Test::Google::RestApi::CalendarApi3::Acl::_teardown_live_calendar
 

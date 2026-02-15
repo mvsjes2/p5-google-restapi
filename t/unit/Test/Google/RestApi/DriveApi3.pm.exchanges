@@ -366,8 +366,44 @@ response:
 source: Test::Google::RestApi::DriveApi3::list_page_callback_stop
 
 ---
+request: POST /v4/spreadsheets
+request_content:
+  properties:
+    title: mock_spreadsheet1
+response:
+  code: 200
+  content: |
+    {
+      "spreadsheetId": "extra_ss_for_pagination",
+      "properties": {
+        "title": "mock_spreadsheet1"
+      },
+      "sheets": [
+        {
+          "properties": {
+            "sheetId": 0,
+            "title": "Sheet1",
+            "index": 0,
+            "sheetType": "GRID",
+            "gridProperties": {
+              "rowCount": 1000,
+              "columnCount": 26
+            }
+          }
+        }
+      ],
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/extra_ss_for_pagination/edit"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::DriveApi3::list_page_callback_continue
+
+---
 query_params:
   fields: 'nextPageToken, files(id, name)'
+  pageSize: 1
   q: name = 'mock_spreadsheet1'
 request: GET /drive/v3/files
 response:
@@ -391,6 +427,7 @@ source: Test::Google::RestApi::DriveApi3::list_page_callback_continue
 ---
 query_params:
   fields: 'nextPageToken, files(id, name)'
+  pageSize: 1
   pageToken: page2_token
   q: name = 'mock_spreadsheet1'
 request: GET /drive/v3/files
@@ -409,6 +446,17 @@ response:
     - content-type
     - application/json; charset=UTF-8
   message: OK
+source: Test::Google::RestApi::DriveApi3::list_page_callback_continue
+
+---
+request: DELETE /drive/v3/files/extra_ss_for_pagination
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
 source: Test::Google::RestApi::DriveApi3::list_page_callback_continue
 
 ---

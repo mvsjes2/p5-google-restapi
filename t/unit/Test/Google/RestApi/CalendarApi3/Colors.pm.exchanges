@@ -152,36 +152,36 @@ response:
      }
     }
   headers:
-    - x-frame-options
-    - SAMEORIGIN
-    - cache-control
-    - 'private, max-age=3600, must-revalidate, no-transform'
+    - expires
+    - 'Sun, 15 Feb 2026 20:54:41 GMT'
     - alt-svc
     - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-content-type-options
-    - nosniff
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - x-l2-request-path
-    - l2-managed-14
-    - date
-    - 'Sun, 15 Feb 2026 02:31:43 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-xss-protection
-    - 0
-    - expires
-    - 'Sun, 15 Feb 2026 02:31:43 GMT'
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
     - server
     - ESF
+    - cache-control
+    - 'private, max-age=3600, must-revalidate, no-transform'
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - transfer-encoding
+    - chunked
+    - accept-ranges
+    - none
+    - date
+    - 'Sun, 15 Feb 2026 20:54:41 GMT'
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
+    - x-l2-request-path
+    - l2-managed-14
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Colors::get
 
