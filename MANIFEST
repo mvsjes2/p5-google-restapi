@@ -62,6 +62,8 @@ README.dist.txt
 README.install.txt
 README.md
 t/99_changes.t
+t/bin/fix_drive_exchanges.pl
+t/bin/regenerate_exchanges.sh
 t/etc/log4perl.conf
 t/etc/log4perl_debug.conf
 t/etc/perlcriticrc

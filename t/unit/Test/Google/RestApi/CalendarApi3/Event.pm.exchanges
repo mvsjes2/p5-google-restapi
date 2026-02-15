@@ -1,5 +1,5 @@
 ---
-request: POST /calendar/v3/calendars/90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com/events
+request: POST /calendar/v3/calendars/a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com/events
 request_content:
   end:
     dateTime: 2026-03-01T11:00:00Z
@@ -11,18 +11,18 @@ response:
   content: |
     {
      "kind": "calendar#event",
-     "etag": "\"3542245419995710\"",
-     "id": "ig1a4qq9i0slbt468jbnq0i3k8",
+     "etag": "\"3542377111541566\"",
+     "id": "834rf291kslv99c6gon95b77fo",
      "status": "confirmed",
-     "htmlLink": "https://www.google.com/calendar/event?eid=aWcxYTRxcTlpMHNsYnQ0NjhqYm5xMGkzazggOTBkYjk3ZWY1MzMyYmM4YmZkMWFhNjVmY2FkZjRlYzFkNDdlY2NiMjRkZGU2Y2FmNGVkOGNiYzk5MTM5MTc2NkBn",
-     "created": "2026-02-15T02:31:49.000Z",
-     "updated": "2026-02-15T02:31:49.997Z",
+     "htmlLink": "https://www.google.com/calendar/event?eid=ODM0cmYyOTFrc2x2OTljNmdvbjk1Yjc3Zm8gYTAxYzNkMmNkZTg0ZGViNTVmOGQ0NzczZDMxNWRiMmQ4ZDNlYTMyNmQ3Zjk5YmE3MTZiZThmZGY4YjIzZDdiOUBn",
+     "created": "2026-02-15T20:49:15.000Z",
+     "updated": "2026-02-15T20:49:15.770Z",
      "summary": "Test Event",
      "creator": {
       "email": "nibor.yarrum@gmail.com"
      },
      "organizer": {
-      "email": "90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com",
+      "email": "a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com",
       "displayName": "Test Calendar Events",
       "self": true
      },
@@ -34,7 +34,7 @@ response:
       "dateTime": "2026-03-01T11:00:00Z",
       "timeZone": "America/Halifax"
      },
-     "iCalUID": "ig1a4qq9i0slbt468jbnq0i3k8@google.com",
+     "iCalUID": "834rf291kslv99c6gon95b77fo@google.com",
      "sequence": 0,
      "reminders": {
       "useDefault": true
@@ -42,60 +42,60 @@ response:
      "eventType": "default"
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
+    - accept-ranges
+    - none
+    - transfer-encoding
+    - chunked
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - server
+    - ESF
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - expires
     - 'Mon, 01 Jan 1990 00:00:00 GMT'
     - x-l2-request-path
     - l2-managed-14
-    - date
-    - 'Sun, 15 Feb 2026 02:31:50 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - transfer-encoding
-    - chunked
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - pragma
-    - no-cache
-    - accept-ranges
-    - none
     - x-frame-options
     - SAMEORIGIN
+    - content-type
+    - application/json; charset=UTF-8
+    - pragma
+    - no-cache
+    - date
+    - 'Sun, 15 Feb 2026 20:49:15 GMT'
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Event::create_and_delete
 
 ---
-request: GET /calendar/v3/calendars/90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com/events/ig1a4qq9i0slbt468jbnq0i3k8
+request: GET /calendar/v3/calendars/a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com/events/834rf291kslv99c6gon95b77fo
 response:
   code: 200
   content: |
     {
      "kind": "calendar#event",
-     "etag": "\"3542245419995710\"",
-     "id": "ig1a4qq9i0slbt468jbnq0i3k8",
+     "etag": "\"3542377111541566\"",
+     "id": "834rf291kslv99c6gon95b77fo",
      "status": "confirmed",
-     "htmlLink": "https://www.google.com/calendar/event?eid=aWcxYTRxcTlpMHNsYnQ0NjhqYm5xMGkzazggOTBkYjk3ZWY1MzMyYmM4YmZkMWFhNjVmY2FkZjRlYzFkNDdlY2NiMjRkZGU2Y2FmNGVkOGNiYzk5MTM5MTc2NkBn",
-     "created": "2026-02-15T02:31:49.000Z",
-     "updated": "2026-02-15T02:31:49.997Z",
+     "htmlLink": "https://www.google.com/calendar/event?eid=ODM0cmYyOTFrc2x2OTljNmdvbjk1Yjc3Zm8gYTAxYzNkMmNkZTg0ZGViNTVmOGQ0NzczZDMxNWRiMmQ4ZDNlYTMyNmQ3Zjk5YmE3MTZiZThmZGY4YjIzZDdiOUBn",
+     "created": "2026-02-15T20:49:15.000Z",
+     "updated": "2026-02-15T20:49:15.770Z",
      "summary": "Test Event",
      "creator": {
       "email": "nibor.yarrum@gmail.com"
      },
      "organizer": {
-      "email": "90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com",
+      "email": "a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com",
       "displayName": "Test Calendar Events",
       "self": true
      },
@@ -107,7 +107,7 @@ response:
       "dateTime": "2026-03-01T11:00:00Z",
       "timeZone": "America/Halifax"
      },
-     "iCalUID": "ig1a4qq9i0slbt468jbnq0i3k8@google.com",
+     "iCalUID": "834rf291kslv99c6gon95b77fo@google.com",
      "sequence": 0,
      "reminders": {
       "useDefault": true
@@ -115,99 +115,99 @@ response:
      "eventType": "default"
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
+    - expires
+    - 'Sun, 15 Feb 2026 20:49:17 GMT'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - expires
-    - 'Sun, 15 Feb 2026 02:31:51 GMT'
-    - transfer-encoding
-    - chunked
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
+    - cache-control
+    - 'private, max-age=0, must-revalidate, no-transform'
     - x-xss-protection
     - 0
     - x-content-type-options
     - nosniff
-    - x-l2-request-path
-    - l2-managed-14
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - date
-    - 'Sun, 15 Feb 2026 02:31:51 GMT'
-    - cache-control
-    - 'private, max-age=0, must-revalidate, no-transform'
-    - server
-    - ESF
-    - x-frame-options
-    - SAMEORIGIN
+    - transfer-encoding
+    - chunked
     - accept-ranges
     - none
+    - date
+    - 'Sun, 15 Feb 2026 20:49:17 GMT'
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
+    - x-l2-request-path
+    - l2-managed-14
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Event::create_and_delete
 
 ---
-request: DELETE /calendar/v3/calendars/90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com/events/ig1a4qq9i0slbt468jbnq0i3k8
+request: DELETE /calendar/v3/calendars/a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com/events/834rf291kslv99c6gon95b77fo
 response:
   code: 204
   content: ''
   headers:
-    - content-type
-    - text/html
+    - server
+    - ESF
+    - content-length
+    - 0
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - Origin
     - vary
     - X-Origin
     - vary
     - Referer
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - x-l2-request-path
-    - l2-managed-14
-    - date
-    - 'Sun, 15 Feb 2026 02:31:53 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - content-length
-    - 0
     - x-xss-protection
     - 0
     - x-content-type-options
     - nosniff
-    - server
-    - ESF
-    - pragma
-    - no-cache
+    - content-type
+    - text/html
     - x-frame-options
     - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 20:49:18 GMT'
+    - pragma
+    - no-cache
+    - x-l2-request-path
+    - l2-managed-14
   message: No Content
 source: Test::Google::RestApi::CalendarApi3::Event::create_and_delete
 
 ---
 query_params:
   text: Lunch tomorrow at noon
-request: POST /calendar/v3/calendars/90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com/events/quickAdd
+request: POST /calendar/v3/calendars/a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com/events/quickAdd
 response:
   code: 200
   content: |
     {
      "kind": "calendar#event",
-     "etag": "\"3542245430859486\"",
-     "id": "vgr9o313sj6qlnnp8uutof4qr8",
+     "etag": "\"3542377121844702\"",
+     "id": "u0v7h14qfrv9cpbvk1ha0uocgg",
      "status": "confirmed",
-     "htmlLink": "https://www.google.com/calendar/event?eid=dmdyOW8zMTNzajZxbG5ucDh1dXRvZjRxcjggOTBkYjk3ZWY1MzMyYmM4YmZkMWFhNjVmY2FkZjRlYzFkNDdlY2NiMjRkZGU2Y2FmNGVkOGNiYzk5MTM5MTc2NkBn",
-     "created": "2026-02-15T02:31:55.000Z",
-     "updated": "2026-02-15T02:31:55.429Z",
+     "htmlLink": "https://www.google.com/calendar/event?eid=dTB2N2gxNHFmcnY5Y3BidmsxaGEwdW9jZ2cgYTAxYzNkMmNkZTg0ZGViNTVmOGQ0NzczZDMxNWRiMmQ4ZDNlYTMyNmQ3Zjk5YmE3MTZiZThmZGY4YjIzZDdiOUBn",
+     "created": "2026-02-15T20:49:20.000Z",
+     "updated": "2026-02-15T20:49:20.922Z",
      "summary": "Lunch",
      "creator": {
       "email": "nibor.yarrum@gmail.com"
      },
      "organizer": {
-      "email": "90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com",
+      "email": "a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com",
       "displayName": "Test Calendar Events",
       "self": true
      },
@@ -219,7 +219,7 @@ response:
       "dateTime": "2026-02-16T13:00:00Z",
       "timeZone": "UTC"
      },
-     "iCalUID": "vgr9o313sj6qlnnp8uutof4qr8@google.com",
+     "iCalUID": "u0v7h14qfrv9cpbvk1ha0uocgg@google.com",
      "sequence": 0,
      "reminders": {
       "useDefault": true
@@ -227,116 +227,116 @@ response:
      "eventType": "default"
     }
   headers:
-    - server
-    - ESF
-    - accept-ranges
-    - none
-    - pragma
-    - no-cache
-    - x-frame-options
-    - SAMEORIGIN
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - content-type
-    - application/json; charset=UTF-8
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - date
-    - 'Sun, 15 Feb 2026 02:31:55 GMT'
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
     - cache-control
     - 'no-cache, no-store, max-age=0, must-revalidate'
-    - x-l2-request-path
-    - l2-managed-14
-    - x-xss-protection
-    - 0
+    - server
+    - ESF
     - x-content-type-options
     - nosniff
+    - x-xss-protection
+    - 0
+    - accept-ranges
+    - none
     - transfer-encoding
     - chunked
+    - pragma
+    - no-cache
+    - date
+    - 'Sun, 15 Feb 2026 20:49:21 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - content-type
+    - application/json; charset=UTF-8
+    - x-l2-request-path
+    - l2-managed-14
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Event::quick_add
 
 ---
-request: DELETE /calendar/v3/calendars/90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com/events/vgr9o313sj6qlnnp8uutof4qr8
+request: DELETE /calendar/v3/calendars/a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com/events/u0v7h14qfrv9cpbvk1ha0uocgg
 response:
   code: 204
   content: ''
   headers:
-    - pragma
-    - no-cache
-    - x-frame-options
-    - SAMEORIGIN
-    - server
-    - ESF
     - x-l2-request-path
     - l2-managed-14
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - content-type
+    - text/html
+    - x-frame-options
+    - SAMEORIGIN
     - date
-    - 'Sun, 15 Feb 2026 02:31:56 GMT'
+    - 'Sun, 15 Feb 2026 20:49:22 GMT'
+    - pragma
+    - no-cache
+    - x-xss-protection
+    - 0
     - x-content-type-options
     - nosniff
     - content-length
     - 0
-    - x-xss-protection
-    - 0
+    - server
+    - ESF
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - Origin
     - vary
     - X-Origin
     - vary
     - Referer
-    - content-type
-    - text/html
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
   message: No Content
 source: Test::Google::RestApi::CalendarApi3::Event::quick_add
 
 ---
-request: DELETE /calendar/v3/calendars/90db97ef5332bc8bfd1aa65fcadf4ec1d47eccb24dde6caf4ed8cbc991391766@group.calendar.google.com
+request: DELETE /calendar/v3/calendars/a01c3d2cde84deb55f8d4773d315db2d8d3ea326d7f99ba716be8fdf8b23d7b9@group.calendar.google.com
 response:
   code: 204
   content: ''
   headers:
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - server
+    - ESF
+    - content-length
+    - 0
     - content-type
     - text/html
+    - pragma
+    - no-cache
+    - date
+    - 'Sun, 15 Feb 2026 20:49:24 GMT'
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - Origin
     - vary
     - X-Origin
     - vary
     - Referer
-    - x-xss-protection
-    - 0
-    - content-length
-    - 0
-    - x-content-type-options
-    - nosniff
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - date
-    - 'Sun, 15 Feb 2026 02:31:58 GMT'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
     - x-l2-request-path
     - l2-managed-14
-    - server
-    - ESF
     - x-frame-options
     - SAMEORIGIN
-    - pragma
-    - no-cache
   message: No Content
 source: Test::Google::RestApi::CalendarApi3::Event::_teardown_live_calendar
 

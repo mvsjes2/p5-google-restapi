@@ -2,58 +2,58 @@
 request: POST /gmail/v1/users/me/drafts
 request_content:
   message:
-    raw: Q29udGVudC1EaXNwb3NpdGlvbjogaW5saW5lCkNvbnRlbnQtTGVuZ3RoOiAxNQpDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nOiBiaW5hcnkKQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PSJVVEYtOCIKTUlNRS1WZXJzaW9uOiAxLjAKWC1NYWlsZXI6IE1JTUU6OkxpdGUgMy4wMzcgKEYyLjg2OyBCMy4xNl8wMTsgUTMuMTZfMDEpCkRhdGU6IFNhdCwgMTQgRmViIDIwMjYgMjI6MzI6MTggLTA0MDAKVG86IHRlc3RAZXhhbXBsZS5jb20KU3ViamVjdDogVGVzdCBEcmFmdAoKRHJhZnQgYm9keSB0ZXh0
+    raw: Q29udGVudC1EaXNwb3NpdGlvbjogaW5saW5lCkNvbnRlbnQtTGVuZ3RoOiAxNQpDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nOiBiaW5hcnkKQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PSJVVEYtOCIKTUlNRS1WZXJzaW9uOiAxLjAKWC1NYWlsZXI6IE1JTUU6OkxpdGUgMy4wMzcgKEYyLjg2OyBCMy4xNl8wMTsgUTMuMTZfMDEpCkRhdGU6IFN1biwgMTUgRmViIDIwMjYgMTY6NTA6NTMgLTA0MDAKVG86IHRlc3RAZXhhbXBsZS5jb20KU3ViamVjdDogVGVzdCBEcmFmdAoKRHJhZnQgYm9keSB0ZXh0
 response:
   code: 200
   content: |
     {
-      "id": "r-4864652945055675831",
+      "id": "r4586340438308124448",
       "message": {
-        "id": "19c5f244814547f2",
-        "threadId": "19c5f244814547f2",
+        "id": "19c6312113de6d06",
+        "threadId": "19c6312113de6d06",
         "labelIds": [
           "DRAFT"
         ]
       }
     }
   headers:
-    - x-xss-protection
-    - 0
-    - x-frame-options
-    - SAMEORIGIN
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
     - server
     - ESF
-    - date
-    - 'Sun, 15 Feb 2026 02:32:19 GMT'
-    - content-type
-    - application/json; charset=UTF-8
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
+    - accept-ranges
+    - none
+    - transfer-encoding
+    - chunked
     - x-content-type-options
     - nosniff
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-xss-protection
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - content-type
+    - application/json; charset=UTF-8
+    - date
+    - 'Sun, 15 Feb 2026 20:50:54 GMT'
   message: OK
 source: Test::Google::RestApi::GmailApi1::Draft::create_get_and_delete
 
 ---
-request: GET /gmail/v1/users/me/drafts/r-4864652945055675831
+request: GET /gmail/v1/users/me/drafts/r4586340438308124448
 response:
   code: 200
   content: |
     {
-      "id": "r-4864652945055675831",
+      "id": "r4586340438308124448",
       "message": {
-        "id": "19c5f244814547f2",
-        "threadId": "19c5f244814547f2",
+        "id": "19c6312113de6d06",
+        "threadId": "19c6312113de6d06",
         "labelIds": [
           "DRAFT"
         ],
@@ -65,7 +65,7 @@ response:
           "headers": [
             {
               "name": "Received",
-              "value": "from 750099593382 named unknown by gmailapi.google.com with HTTPREST; Sat, 14 Feb 2026 18:32:19 -0800"
+              "value": "from 750099593382 named unknown by gmailapi.google.com with HTTPREST; Sun, 15 Feb 2026 15:50:54 -0500"
             },
             {
               "name": "Content-Disposition",
@@ -93,7 +93,7 @@ response:
             },
             {
               "name": "Date",
-              "value": "Sat, 14 Feb 2026 18:32:19 -0800"
+              "value": "Sun, 15 Feb 2026 15:50:54 -0500"
             },
             {
               "name": "To",
@@ -105,7 +105,7 @@ response:
             },
             {
               "name": "Message-Id",
-              "value": "\u003cCAM=e+8oc8Cws3v_0DNqQTXs8m5VhKsWZvAG5CCCpT0CGnzuJHg@mail.gmail.com\u003e"
+              "value": "\u003cCAM=e+8oS5q1DMtke5=rOND2M8_8w3mW2y_=qCdYTJmaL+KsJYA@mail.gmail.com\u003e"
             },
             {
               "name": "From",
@@ -118,8 +118,8 @@ response:
           }
         },
         "sizeEstimate": 534,
-        "historyId": "21208968",
-        "internalDate": "1771122739000"
+        "historyId": "21211358",
+        "internalDate": "1771188654000"
       }
     }
   headers:
@@ -131,53 +131,53 @@ response:
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-content-type-options
-    - nosniff
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - date
-    - 'Sun, 15 Feb 2026 02:32:20 GMT'
     - server
     - ESF
-    - x-frame-options
-    - SAMEORIGIN
     - x-xss-protection
     - 0
+    - x-content-type-options
+    - nosniff
+    - transfer-encoding
+    - chunked
+    - accept-ranges
+    - none
+    - date
+    - 'Sun, 15 Feb 2026 20:50:55 GMT'
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
   message: OK
 source: Test::Google::RestApi::GmailApi1::Draft::create_get_and_delete
 
 ---
-request: DELETE /gmail/v1/users/me/drafts/r-4864652945055675831
+request: DELETE /gmail/v1/users/me/drafts/r4586340438308124448
 response:
   code: 204
   content: ''
   headers:
-    - server
-    - ESF
-    - date
-    - 'Sun, 15 Feb 2026 02:32:22 GMT'
-    - x-xss-protection
-    - 0
     - x-frame-options
     - SAMEORIGIN
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - content-length
-    - 0
-    - x-content-type-options
-    - nosniff
     - content-type
     - application/json; charset=UTF-8
+    - date
+    - 'Sun, 15 Feb 2026 20:50:57 GMT'
+    - server
+    - ESF
+    - content-length
+    - 0
     - vary
     - Origin
     - vary
     - X-Origin
     - vary
     - Referer
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
   message: No Content
 source: Test::Google::RestApi::GmailApi1::Draft::create_get_and_delete
 

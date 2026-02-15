@@ -118,13 +118,19 @@ sub list_page_callback_continue : Tests(2) {
   my $ss = $self->mock_spreadsheet();
   my $drive = mock_drive_api();
 
+  # Create a second spreadsheet so there are 2 files to paginate over.
+  my $ss2 = mock_sheets_api()->create_spreadsheet(title => mock_spreadsheet_name());
+
   my $callback_called = 0;
   my @files = $drive->list(
     filter        => "name = '" . mock_spreadsheet_name() . "'",
+    params        => { pageSize => 1 },
     page_callback => sub { $callback_called++; return 1; },
   );
   ok $callback_called == 2, 'Callback was called for both pages';
   ok scalar(@files) >= 2, 'Should return results from both pages';
+
+  mock_sheets_api()->delete_spreadsheet($ss2->spreadsheet_id());
 
   return;
 }

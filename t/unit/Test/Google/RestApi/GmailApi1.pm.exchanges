@@ -160,30 +160,30 @@ response:
       ]
     }
   headers:
-    - transfer-encoding
-    - chunked
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 20:54:11 GMT'
+    - server
+    - ESF
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - date
-    - 'Sun, 15 Feb 2026 02:32:06 GMT'
-    - server
-    - ESF
     - alt-svc
     - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - transfer-encoding
+    - chunked
     - accept-ranges
     - none
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
   message: OK
 source: Test::Google::RestApi::GmailApi1::list_labels
 
@@ -197,6 +197,74 @@ response:
     {
       "messages": [
         {
+          "id": "19c62e9a1b0a34b4",
+          "threadId": "19c62e9a1b0a34b4"
+        },
+        {
+          "id": "19c6275ab2dd1787",
+          "threadId": "19ac221eec7703d2"
+        },
+        {
+          "id": "19c6257f7cb4b8a5",
+          "threadId": "19c6257f7cb4b8a5"
+        },
+        {
+          "id": "19c625789e2ff055",
+          "threadId": "19c625789e2ff055"
+        },
+        {
+          "id": "19c61d4f7b47648b",
+          "threadId": "19c61d4f7b47648b"
+        },
+        {
+          "id": "19c61d4d2ee6c0bd",
+          "threadId": "19c61d4d2ee6c0bd"
+        },
+        {
+          "id": "19c6195e257cde4b",
+          "threadId": "19c6195e257cde4b"
+        },
+        {
+          "id": "19c60f63bfee93e6",
+          "threadId": "19c60f63bfee93e6"
+        },
+        {
+          "id": "19c609122164b1e9",
+          "threadId": "19c609122164b1e9"
+        },
+        {
+          "id": "19c60175722053d7",
+          "threadId": "19c60175722053d7"
+        },
+        {
+          "id": "19c5fcf3f51acc90",
+          "threadId": "19ac221eec7703d2"
+        },
+        {
+          "id": "19c5fc8d774a30e7",
+          "threadId": "19ac221eec7703d2"
+        },
+        {
+          "id": "19c5f86dd2f3afc4",
+          "threadId": "19c5f86dd2f3afc4"
+        },
+        {
+          "id": "19c5f857c982d285",
+          "threadId": "19c5f857c982d285"
+        },
+        {
+          "id": "19c5f7b129a2ea3a",
+          "threadId": "19c5f7b129a2ea3a"
+        },
+        {
+          "id": "19c5f746bae33c34",
+          "threadId": "19c5f746bae33c34"
+        },
+        {
+          "id": "19c5f724aa61ff65",
+          "threadId": "19c5f724aa61ff65"
+        },
+        {
           "id": "19c5f10bc03223f0",
           "threadId": "19c5f10bc03223f0"
         },
@@ -527,104 +595,36 @@ response:
         {
           "id": "19c284b7b374110f",
           "threadId": "19c284b7b374110f"
-        },
-        {
-          "id": "19c27e6a5a9d2ef8",
-          "threadId": "19c27e6a5a9d2ef8"
-        },
-        {
-          "id": "19c268d3697a8e6d",
-          "threadId": "19c268d3697a8e6d"
-        },
-        {
-          "id": "19c25f69eedf4c04",
-          "threadId": "19c25f69eedf4c04"
-        },
-        {
-          "id": "19c25d9d86496a89",
-          "threadId": "19c25d9d86496a89"
-        },
-        {
-          "id": "19c258180bd8788c",
-          "threadId": "19c258180bd8788c"
-        },
-        {
-          "id": "19c25541e18aa8bd",
-          "threadId": "19c20f837fb2b1fe"
-        },
-        {
-          "id": "19c24ebeaf521710",
-          "threadId": "19c24ebeaf521710"
-        },
-        {
-          "id": "19c24a92519c5296",
-          "threadId": "19c24a92519c5296"
-        },
-        {
-          "id": "19c23f895b66cf4f",
-          "threadId": "19c23f895b66cf4f"
-        },
-        {
-          "id": "19c23edf40ac603d",
-          "threadId": "19c23edf40ac603d"
-        },
-        {
-          "id": "19c20f837fb2b1fe",
-          "threadId": "19c20f837fb2b1fe"
-        },
-        {
-          "id": "19c20981bc40cac5",
-          "threadId": "19c20981bc40cac5"
-        },
-        {
-          "id": "19c2088c97f83baa",
-          "threadId": "19c2088c97f83baa"
-        },
-        {
-          "id": "19c205240ae21e44",
-          "threadId": "19c204d08d5abfdc"
-        },
-        {
-          "id": "19c20520c4bad58e",
-          "threadId": "19c204ad0d2d394b"
-        },
-        {
-          "id": "19c2051aac841d16",
-          "threadId": "19c204d0b35a73d2"
-        },
-        {
-          "id": "19c2050b1ba79b43",
-          "threadId": "19c204d0c487d9fa"
         }
       ],
-      "nextPageToken": "06305497022273273683",
+      "nextPageToken": "13246545994019666809",
       "resultSizeEstimate": 201
     }
   headers:
     - accept-ranges
     - none
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - server
-    - ESF
-    - x-xss-protection
-    - 0
-    - date
-    - 'Sun, 15 Feb 2026 02:32:09 GMT'
+    - transfer-encoding
+    - chunked
     - x-content-type-options
     - nosniff
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
+    - x-xss-protection
+    - 0
+    - server
+    - ESF
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - content-type
+    - application/json; charset=UTF-8
+    - date
+    - 'Sun, 15 Feb 2026 20:54:13 GMT'
   message: OK
 source: Test::Google::RestApi::GmailApi1::list_messages
 
@@ -638,6 +638,74 @@ response:
     {
       "messages": [
         {
+          "id": "19c62e9a1b0a34b4",
+          "threadId": "19c62e9a1b0a34b4"
+        },
+        {
+          "id": "19c6275ab2dd1787",
+          "threadId": "19ac221eec7703d2"
+        },
+        {
+          "id": "19c6257f7cb4b8a5",
+          "threadId": "19c6257f7cb4b8a5"
+        },
+        {
+          "id": "19c625789e2ff055",
+          "threadId": "19c625789e2ff055"
+        },
+        {
+          "id": "19c61d4f7b47648b",
+          "threadId": "19c61d4f7b47648b"
+        },
+        {
+          "id": "19c61d4d2ee6c0bd",
+          "threadId": "19c61d4d2ee6c0bd"
+        },
+        {
+          "id": "19c6195e257cde4b",
+          "threadId": "19c6195e257cde4b"
+        },
+        {
+          "id": "19c60f63bfee93e6",
+          "threadId": "19c60f63bfee93e6"
+        },
+        {
+          "id": "19c609122164b1e9",
+          "threadId": "19c609122164b1e9"
+        },
+        {
+          "id": "19c60175722053d7",
+          "threadId": "19c60175722053d7"
+        },
+        {
+          "id": "19c5fcf3f51acc90",
+          "threadId": "19ac221eec7703d2"
+        },
+        {
+          "id": "19c5fc8d774a30e7",
+          "threadId": "19ac221eec7703d2"
+        },
+        {
+          "id": "19c5f86dd2f3afc4",
+          "threadId": "19c5f86dd2f3afc4"
+        },
+        {
+          "id": "19c5f857c982d285",
+          "threadId": "19c5f857c982d285"
+        },
+        {
+          "id": "19c5f7b129a2ea3a",
+          "threadId": "19c5f7b129a2ea3a"
+        },
+        {
+          "id": "19c5f746bae33c34",
+          "threadId": "19c5f746bae33c34"
+        },
+        {
+          "id": "19c5f724aa61ff65",
+          "threadId": "19c5f724aa61ff65"
+        },
+        {
           "id": "19c5f10bc03223f0",
           "threadId": "19c5f10bc03223f0"
         },
@@ -968,104 +1036,36 @@ response:
         {
           "id": "19c284b7b374110f",
           "threadId": "19c284b7b374110f"
-        },
-        {
-          "id": "19c27e6a5a9d2ef8",
-          "threadId": "19c27e6a5a9d2ef8"
-        },
-        {
-          "id": "19c268d3697a8e6d",
-          "threadId": "19c268d3697a8e6d"
-        },
-        {
-          "id": "19c25f69eedf4c04",
-          "threadId": "19c25f69eedf4c04"
-        },
-        {
-          "id": "19c25d9d86496a89",
-          "threadId": "19c25d9d86496a89"
-        },
-        {
-          "id": "19c258180bd8788c",
-          "threadId": "19c258180bd8788c"
-        },
-        {
-          "id": "19c25541e18aa8bd",
-          "threadId": "19c20f837fb2b1fe"
-        },
-        {
-          "id": "19c24ebeaf521710",
-          "threadId": "19c24ebeaf521710"
-        },
-        {
-          "id": "19c24a92519c5296",
-          "threadId": "19c24a92519c5296"
-        },
-        {
-          "id": "19c23f895b66cf4f",
-          "threadId": "19c23f895b66cf4f"
-        },
-        {
-          "id": "19c23edf40ac603d",
-          "threadId": "19c23edf40ac603d"
-        },
-        {
-          "id": "19c20f837fb2b1fe",
-          "threadId": "19c20f837fb2b1fe"
-        },
-        {
-          "id": "19c20981bc40cac5",
-          "threadId": "19c20981bc40cac5"
-        },
-        {
-          "id": "19c2088c97f83baa",
-          "threadId": "19c2088c97f83baa"
-        },
-        {
-          "id": "19c205240ae21e44",
-          "threadId": "19c204d08d5abfdc"
-        },
-        {
-          "id": "19c20520c4bad58e",
-          "threadId": "19c204ad0d2d394b"
-        },
-        {
-          "id": "19c2051aac841d16",
-          "threadId": "19c204d0b35a73d2"
-        },
-        {
-          "id": "19c2050b1ba79b43",
-          "threadId": "19c204d0c487d9fa"
         }
       ],
-      "nextPageToken": "06305497022273273683",
+      "nextPageToken": "13246545994019666809",
       "resultSizeEstimate": 201
     }
   headers:
+    - transfer-encoding
+    - chunked
     - accept-ranges
     - none
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - server
-    - ESF
     - x-xss-protection
     - 0
-    - date
-    - 'Sun, 15 Feb 2026 02:32:11 GMT'
     - x-content-type-options
     - nosniff
-    - x-frame-options
-    - SAMEORIGIN
+    - server
+    - ESF
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - content-type
     - application/json; charset=UTF-8
-    - transfer-encoding
-    - chunked
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 20:54:15 GMT'
   message: OK
 source: Test::Google::RestApi::GmailApi1::messages_max_pages
 
@@ -1076,35 +1076,35 @@ response:
   content: |
     {
       "emailAddress": "nibor.yarrum@gmail.com",
-      "messagesTotal": 41013,
-      "threadsTotal": 20551,
-      "historyId": "21208964"
+      "messagesTotal": 41030,
+      "threadsTotal": 20565,
+      "historyId": "21211568"
     }
   headers:
-    - x-frame-options
-    - SAMEORIGIN
-    - x-content-type-options
-    - nosniff
+    - accept-ranges
+    - none
     - transfer-encoding
     - chunked
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
+    - x-frame-options
+    - SAMEORIGIN
     - content-type
     - application/json; charset=UTF-8
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - accept-ranges
-    - none
     - date
-    - 'Sun, 15 Feb 2026 02:32:13 GMT'
-    - x-xss-protection
-    - 0
-    - server
-    - ESF
+    - 'Sun, 15 Feb 2026 20:54:17 GMT'
   message: OK
 source: Test::Google::RestApi::GmailApi1::profile
 
@@ -1117,6 +1117,66 @@ response:
   content: |
     {
       "threads": [
+        {
+          "id": "19c62e9a1b0a34b4",
+          "snippet": "Your receipt from Anthropic, PBC #2998-0914-4184 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+        },
+        {
+          "id": "19c6257f7cb4b8a5",
+          "snippet": "Your receipt from Anthropic, PBC #2192-8466-9459 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+        },
+        {
+          "id": "19c625789e2ff055",
+          "snippet": "Hey there, 24 hours later â still waiting for you. Continue Where You Left Off Best regards, Daniel Product Manager, Use AI Facebook Instagram Â© 2026 Use AI, All rights reserved. 1034 E Brandon Blvd,"
+        },
+        {
+          "id": "19c61d4f7b47648b",
+          "snippet": "Hi Robin, Your billboard cut through Ottawa&#39;s government entitlement culture. Thanks to taxfighters like you, we put a sidewalk billboard right in front of Parliament Hill and right outside of the"
+        },
+        {
+          "id": "19c61d4d2ee6c0bd",
+          "snippet": "Your receipt from Anthropic, PBC #2085-2592-7064 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
+        },
+        {
+          "id": "19c6195e257cde4b",
+          "snippet": "Hello, Your access to the Claude API has been disabled because your organization &#39;Robin&#39;s Individual Org&#39; is out of usage credits. Go to the Billing page to add credits and manage your"
+        },
+        {
+          "id": "19c60f63bfee93e6",
+          "snippet": "Hate being interrupted while you&#39;re cooking? Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í"
+        },
+        {
+          "id": "19c609122164b1e9",
+          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Sun Feb 15, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
+        },
+        {
+          "id": "19c60175722053d7",
+          "snippet": "Hi Leslie, Did you get my text? I want you to attend. The CO has something important she wants you to know. Pls let me know by sending your email! -Jakob"
+        },
+        {
+          "id": "19ac221eec7703d2",
+          "snippet": "If you have an account in Wolfville I should be able to just email it to you. Is your email hooked up to the account? -- Robin Murray Seabright, Nova Scotia, Canada On Sun, Feb 15, 2026, 1:39 am Jancis"
+        },
+        {
+          "id": "19c5f86dd2f3afc4",
+          "snippet": "The following report has been written by the PAUSE namespace indexer. Please contact modules@perl.org if there are any open questions. User: MVSJES (Robin Murray) Distribution file: Google-RestApi-2.0."
+        },
+        {
+          "id": "19c5f857c982d285",
+          "snippet": "The uploaded file Google-RestApi-2.0.0.tar.gz has entered CPAN as file: $CPAN/authors/id/M/MV/MVSJES/Google-RestApi-2.0.0.tar.gz size: 187548 bytes sha256:"
+        },
+        {
+          "id": "19c5f7b129a2ea3a",
+          "snippet": "https://www.facebook.com/share/v/1EA7PzViMW/ Simone Todoroff - Owner 416 578-1221"
+        },
+        {
+          "id": "19c5f746bae33c34",
+          "snippet": "[mvsjes2/p5-google-restapi] CI workflow run CI: All jobs have failed View workflow run Status Job Annotations CI / linux (5.38) Failed in 1 minute and 40 seconds annotations for CI / linux (5.38) 1 CI"
+        },
+        {
+          "id": "19c5f724aa61ff65",
+          "snippet": "[mvsjes2/p5-google-restapi] CI workflow run CI: All jobs have failed View workflow run Status Job Annotations CI / linux (5.38) Failed in 1 minute and 39 seconds annotations for CI / linux (5.38) 1 CI"
+        },
         {
           "id": "19c5f10bc03223f0",
           "snippet": "Prime Video Amazon Prime Video | Your account Order confirmation Order #D01-5421172-3632247 Hello Robin Murray, Find all of your previous Amazon Prime Video purchases and unexpired rentals in Purchases"
@@ -1180,10 +1240,6 @@ response:
         {
           "id": "19c5cd84b3f011e3",
           "snippet": "Dear All, We have been having some issues with our email programs. Can you let me know if you have received this email? Happy Valentine&#39;s Day! ARC, Jackie âAdmiration is a particle which unites and"
-        },
-        {
-          "id": "19ac221eec7703d2",
-          "snippet": "Hi Jancis, would you mind calling your bank and ensuring they will accept a Canadian cheque if you don&#39;t know already? Our banks and yours don&#39;t always get along all that well. -- Robin Murray"
         },
         {
           "id": "19c5cb628f2f0d7f",
@@ -1460,92 +1516,36 @@ response:
         {
           "id": "19c18de0b87ab4ca",
           "snippet": "Hate being interrupted while you&#39;re cooking? Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í \u200c \ufeff Í"
-        },
-        {
-          "id": "19c18a37605f8660",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Sun Feb 1, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
-        },
-        {
-          "id": "19c15aef807e846d",
-          "snippet": "Posted on 1/30/2026 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
-        },
-        {
-          "id": "19c14c9c4ee42a68",
-          "snippet": "Most Popular Classifieds This Week Email not displaying correctly? View it in your browser. Welcome to the Canuck Audio Mart weekly newsletter. As usual we&#39;ve had hundreds of new listings this week"
-        },
-        {
-          "id": "19c13f9dabee8f3f",
-          "snippet": "Your participation is critical!\u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c"
-        },
-        {
-          "id": "19c135b6c2d87e7f",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Sat Jan 31, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
-        },
-        {
-          "id": "19c0ffb18f33a144",
-          "snippet": "This winter deal roundup is coming to a close: UP TO $500 OFF Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í\u200c Í \u200c Í\u200c"
-        },
-        {
-          "id": "19c0f77cb2f10c3c",
-          "snippet": "Hi Robin, Today is your LAST CHANCE to win Ottawa&#39;s industrial carbon tax consultations. The government&#39;s consultation on the industrial carbon taxes ends TODAY (Jan. 30). You can be sure"
-        },
-        {
-          "id": "19c0c19b7b8698ce",
-          "snippet": "Shipped: âHAIBEI Resistance Bands Set...âÍ \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c"
-        },
-        {
-          "id": "19c0b6247592e7ec",
-          "snippet": "Posted on 1/20/2026 Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í Í"
-        },
-        {
-          "id": "19c0aee8a5bb0212",
-          "snippet": "Hi Robin, You deserve to know the cost of Aboriginal title claims for taxpayers and your lawyers are ready to demand that transparency. Your team at the CTF filed freedom-of-information requests to the"
-        },
-        {
-          "id": "19c0a1457ff260b5",
-          "snippet": "Ordering is now open! Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c"
-        },
-        {
-          "id": "19c0a11a276ef357",
-          "snippet": ""
-        },
-        {
-          "id": "19c09bb309ccd783",
-          "snippet": "Ordered: &quot;HAIBEI Resistance Bands Set...&quot;Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í \u200c Í"
-        },
-        {
-          "id": "19c090bc22a1099e",
-          "snippet": "Google Calendar Robin Murray, you have no events scheduled today Thu Jan 29, 2026 You are receiving this email at the account nibor.yarrum@gmail.com because you are subscribed to receive daily agendas"
         }
       ],
-      "nextPageToken": "06637341418068066512",
+      "nextPageToken": "15855394057523639658",
       "resultSizeEstimate": 201
     }
   headers:
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
     - date
-    - 'Sun, 15 Feb 2026 02:32:16 GMT'
-    - server
-    - ESF
+    - 'Sun, 15 Feb 2026 20:54:19 GMT'
+    - content-type
+    - application/json; charset=UTF-8
     - x-frame-options
     - SAMEORIGIN
+    - x-xss-protection
+    - 0
     - x-content-type-options
     - nosniff
     - transfer-encoding
     - chunked
+    - accept-ranges
+    - none
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - content-type
-    - application/json; charset=UTF-8
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
   message: OK
 source: Test::Google::RestApi::GmailApi1::threads_max_pages
 
