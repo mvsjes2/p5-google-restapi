@@ -31,6 +31,7 @@ lib/Google/RestApi/GmailApi1/Message.pm
 lib/Google/RestApi/GmailApi1/Thread.pm
 lib/Google/RestApi/Request.pm
 lib/Google/RestApi/Setup.pm
+lib/Google/RestApi/SubResource.pm
 lib/Google/RestApi/SheetsApi4.pm
 lib/Google/RestApi/SheetsApi4/Range.pm
 lib/Google/RestApi/SheetsApi4/Range/All.pm

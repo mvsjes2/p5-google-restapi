@@ -4,6 +4,8 @@ our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 use aliased 'Google::RestApi::DriveApi3::Reply';
 
 sub new {
@@ -18,15 +20,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "comments";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->file()->api(%p, uri => $uri);
-}
+sub _uri_base { 'comments' }
+sub _parent_accessor { 'file' }
 
 sub create {
   my $self = shift;
@@ -68,7 +63,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Comment ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params = (
     fields => $p->{fields},
@@ -89,7 +84,7 @@ sub update {
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Comment ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content = (
     content => delete $p->{content},
@@ -105,7 +100,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Comment ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting comment '%s' from file '%s'", $self->{id}, $self->file()->file_id()));
   return $self->api(method => 'delete');
@@ -121,7 +116,7 @@ sub reply {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Comment ID required for reply()" unless $self->{id};
+  $self->require_id('reply');
 
   return Reply->new(comment => $self, %$p);
 }
@@ -140,17 +135,17 @@ sub replies {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Comment ID required for replies()" unless $self->{id};
+  $self->require_id('replies');
 
-  my $params = $p->{params};
-  $params->{fields} //= 'replies(id, content, author, createdTime)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-  $params->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
+  $p->{params}->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
 
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'replies', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'replies',
     result_key     => 'replies',
+    default_fields => 'replies(id, content, author, createdTime)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }

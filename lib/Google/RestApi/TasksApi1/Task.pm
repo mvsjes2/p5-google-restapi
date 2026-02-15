@@ -4,6 +4,8 @@ our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
   state $check = signature(
@@ -16,15 +18,8 @@ sub new {
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "lists/" . $self->task_list()->task_list_id() . "/tasks";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->tasks_api()->api(%p, uri => $uri);
-}
+sub _uri_base { "lists/" . $_[0]->task_list()->task_list_id() . "/tasks" }
+sub _parent_accessor { 'tasks_api' }
 
 sub get {
   my $self = shift;
@@ -36,7 +31,7 @@ sub get {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Task ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -58,7 +53,7 @@ sub update {
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Task ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content;
   $content{title} = delete $p->{title} if defined $p->{title};
@@ -76,7 +71,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Task ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting task '%s'", $self->{id}));
   return $self->api(method => 'delete');
@@ -94,7 +89,7 @@ sub move {
   );
   my $p = $check->(@_);
 
-  LOGDIE "Task ID required for move()" unless $self->{id};
+  $self->require_id('move');
 
   my %params;
   $params{parent} = $p->{parent} if defined $p->{parent};
@@ -112,7 +107,7 @@ sub move {
 sub complete {
   my $self = shift;
 
-  LOGDIE "Task ID required for complete()" unless $self->{id};
+  $self->require_id('complete');
 
   DEBUG(sprintf("Completing task '%s'", $self->{id}));
   return $self->api(
@@ -124,7 +119,7 @@ sub complete {
 sub uncomplete {
   my $self = shift;
 
-  LOGDIE "Task ID required for uncomplete()" unless $self->{id};
+  $self->require_id('uncomplete');
 
   DEBUG(sprintf("Uncompleting task '%s'", $self->{id}));
   return $self->api(

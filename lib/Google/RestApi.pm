@@ -505,6 +505,8 @@ or false to stop early.
 
 =item * L<Google::RestApi::DriveApi3::Revision>
 
+=item * L<Google::RestApi::SubResource>
+
 =item * L<Google::RestApi::SheetsApi4>
 
 =item * L<Google::RestApi::SheetsApi4::Spreadsheet>
