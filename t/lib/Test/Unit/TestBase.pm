@@ -12,7 +12,7 @@ use Furl::Response;
 use Hash::Merge qw(merge);
 use HTTP::Status qw(:constants status_message);
 use Module::Load qw(load);
-use PerlX::Maybe;
+use PerlX::Maybe qw(maybe provided);
 use Sub::Override;
 use Try::Tiny;
 use URI ();
@@ -66,6 +66,9 @@ sub startup : Tests(startup) {
     # otherwise unit tests take ages to run.
     $self->_sub_override('Algorithm::Backoff::Exponential', '_failure', sub { 0.1; });
   } else {
+    $self->_sub_override('Furl::HTTP', 'connect',
+      sub { confess "For unit testing you need to capture exchanges first"; }
+    );
     $self->mock_auth;
     $self->mock_http_no_retries() unless $self->dont_suppress_retries;
   }

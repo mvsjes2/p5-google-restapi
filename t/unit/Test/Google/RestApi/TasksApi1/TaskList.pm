@@ -13,15 +13,38 @@ init_logger;
 
 sub dont_create_mock_spreadsheets { 1; }
 
+sub _setup_live_task_list : Tests(startup) {
+  my $self = shift;
+  return unless $ENV{GOOGLE_RESTAPI_CONFIG};
+  my $tasks_api = mock_tasks_api();
+  my $tl = $tasks_api->create_task_list(title => 'Test Task List');
+  $self->{_live_tl} = $tl;
+  # Create a task so tasks_max_pages has something to return
+  my $task = $tl->create_task(title => 'Test Task for List');
+  $self->{_live_task} = $task;
+  return;
+}
+
+sub _teardown_live_task_list : Tests(shutdown) {
+  my $self = shift;
+  $self->{_live_tl}->delete() if $self->{_live_tl};
+  return;
+}
+
+sub _tl_id {
+  my $self = shift;
+  return $self->{_live_tl} ? $self->{_live_tl}->task_list_id() : mock_task_list_id();
+}
+
 sub _constructor : Tests(3) {
   my $self = shift;
 
   my $tasks_api = mock_tasks_api();
 
-  ok my $tl = TaskList->new(tasks_api => $tasks_api, id => mock_task_list_id()),
+  ok my $tl = TaskList->new(tasks_api => $tasks_api, id => $self->_tl_id()),
     'Constructor should succeed';
   isa_ok $tl, TaskList, 'Constructor returns';
-  is $tl->task_list_id(), mock_task_list_id(), 'TaskList has correct ID';
+  is $tl->task_list_id(), $self->_tl_id(), 'TaskList has correct ID';
 
   return;
 }
@@ -55,7 +78,7 @@ sub get : Tests(2) {
   my $self = shift;
 
   my $tasks_api = mock_tasks_api();
-  my $tl = $tasks_api->task_list(id => mock_task_list_id());
+  my $tl = $tasks_api->task_list(id => $self->_tl_id());
 
   my $metadata = $tl->get();
   ok $metadata, 'Get returns metadata';
@@ -68,7 +91,7 @@ sub update : Tests(1) {
   my $self = shift;
 
   my $tasks_api = mock_tasks_api();
-  my $tl = $tasks_api->task_list(id => mock_task_list_id());
+  my $tl = $tasks_api->task_list(id => $self->_tl_id());
 
   lives_ok sub { $tl->update(title => 'Updated Task List') }, 'Update lives';
 
@@ -79,7 +102,7 @@ sub task_factory : Tests(2) {
   my $self = shift;
 
   my $tasks_api = mock_tasks_api();
-  my $tl = $tasks_api->task_list(id => mock_task_list_id());
+  my $tl = $tasks_api->task_list(id => $self->_tl_id());
 
   ok my $task = $tl->task(), 'Task factory without ID should succeed';
   isa_ok $task, Task, 'Task factory returns';
@@ -91,7 +114,7 @@ sub tasks_max_pages : Tests(2) {
   my $self = shift;
 
   my $tasks_api = mock_tasks_api();
-  my $tl = $tasks_api->task_list(id => mock_task_list_id());
+  my $tl = $tasks_api->task_list(id => $self->_tl_id());
 
   my @tasks = $tl->tasks(max_pages => 1);
   ok scalar(@tasks) >= 1, 'Tasks with max_pages returns results';
@@ -104,7 +127,7 @@ sub clear : Tests(1) {
   my $self = shift;
 
   my $tasks_api = mock_tasks_api();
-  my $tl = $tasks_api->task_list(id => mock_task_list_id());
+  my $tl = $tasks_api->task_list(id => $self->_tl_id());
 
   lives_ok sub { $tl->clear() }, 'Clear lives';
 

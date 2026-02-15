@@ -4,47 +4,67 @@ response:
   code: 200
   content: |
     {
-      "kind": "calendar#calendarListEntry",
-      "etag": "\"test_etag\"",
-      "id": "primary",
-      "summary": "user@gmail.com",
-      "timeZone": "Australia/Sydney",
-      "accessRole": "owner"
+     "kind": "calendar#calendarListEntry",
+     "etag": "\"1749496229953071\"",
+     "id": "test.user@gmail.com",
+     "summary": "test.user@gmail.com",
+     "timeZone": "America/Halifax",
+     "colorId": "17",
+     "backgroundColor": "#9a9cff",
+     "foregroundColor": "#000000",
+     "selected": true,
+     "accessRole": "owner",
+     "defaultReminders": [],
+     "notificationSettings": {
+      "notifications": [
+       {
+        "type": "eventResponse",
+        "method": "email"
+       },
+       {
+        "type": "agenda",
+        "method": "email"
+       }
+      ]
+     },
+     "primary": true,
+     "conferenceProperties": {
+      "allowedConferenceSolutionTypes": [
+       "hangoutsMeet"
+      ]
+     }
     }
   headers:
+    - server
+    - ESF
+    - transfer-encoding
+    - chunked
+    - date
+    - 'Sun, 15 Feb 2026 02:31:40 GMT'
+    - accept-ranges
+    - none
+    - x-frame-options
+    - SAMEORIGIN
+    - x-l2-request-path
+    - l2-managed-14
+    - x-xss-protection
+    - 0
+    - cache-control
+    - 'private, max-age=0, must-revalidate, no-transform'
     - content-type
     - application/json; charset=UTF-8
+    - expires
+    - 'Sun, 15 Feb 2026 02:31:40 GMT'
+    - x-content-type-options
+    - nosniff
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
   message: OK
 source: Test::Google::RestApi::CalendarApi3::CalendarList::get
-
----
-request: POST /calendar/v3/users/me/calendarList
-request_content:
-  id: test_cal@group.calendar.google.com
-response:
-  code: 200
-  content: |
-    {
-      "kind": "calendar#calendarListEntry",
-      "etag": "\"test_etag\"",
-      "id": "test_cal@group.calendar.google.com",
-      "summary": "Test Calendar",
-      "accessRole": "owner"
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::CalendarApi3::CalendarList::insert_and_delete
-
----
-request: DELETE /calendar/v3/users/me/calendarList/test_cal@group.calendar.google.com
-response:
-  code: 204
-  content: ''
-  headers:
-    - content-type
-    - text/html
-  message: No Content
-source: Test::Google::RestApi::CalendarApi3::CalendarList::insert_and_delete
 

@@ -6,48 +6,111 @@ response:
   code: 200
   content: |
     {
-      "id": "Label_42",
+      "id": "Label_17",
       "name": "Test Label",
-      "type": "user",
-      "labelListVisibility": "labelShow",
-      "messageListVisibility": "show"
+      "messageListVisibility": "show",
+      "labelListVisibility": "labelShow"
     }
   headers:
+    - date
+    - 'Sun, 15 Feb 2026 02:32:25 GMT'
+    - x-content-type-options
+    - nosniff
+    - x-frame-options
+    - SAMEORIGIN
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-xss-protection
+    - 0
     - content-type
     - application/json; charset=UTF-8
+    - accept-ranges
+    - none
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - transfer-encoding
+    - chunked
   message: OK
 source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
 
 ---
-request: GET /gmail/v1/users/me/labels/Label_42
+request: GET /gmail/v1/users/me/labels/Label_17
 response:
   code: 200
   content: |
     {
-      "id": "Label_42",
+      "id": "Label_17",
       "name": "Test Label",
-      "type": "user",
-      "labelListVisibility": "labelShow",
       "messageListVisibility": "show",
+      "labelListVisibility": "labelShow",
+      "type": "user",
       "messagesTotal": 0,
       "messagesUnread": 0,
       "threadsTotal": 0,
       "threadsUnread": 0
     }
   headers:
+    - x-xss-protection
+    - 0
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-frame-options
+    - SAMEORIGIN
+    - x-content-type-options
+    - nosniff
+    - date
+    - 'Sun, 15 Feb 2026 02:32:26 GMT'
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - transfer-encoding
+    - chunked
+    - accept-ranges
+    - none
     - content-type
     - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
 
 ---
-request: DELETE /gmail/v1/users/me/labels/Label_42
+request: DELETE /gmail/v1/users/me/labels/Label_17
 response:
   code: 204
   content: ''
   headers:
+    - content-length
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - x-content-type-options
+    - nosniff
+    - date
+    - 'Sun, 15 Feb 2026 02:32:28 GMT'
+    - vary
+    - Origin
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - x-xss-protection
+    - 0
     - content-type
-    - text/html
+    - application/json; charset=UTF-8
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
   message: No Content
 source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
 

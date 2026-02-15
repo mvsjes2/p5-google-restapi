@@ -1,32 +1,114 @@
 ---
-request: GET /gmail/v1/users/me/messages/mock_msg_id_001
+request: GET /gmail/v1/users/me/messages/19c5f2836f624182
 response:
   code: 200
   content: |
     {
-      "id": "mock_msg_id_001",
-      "threadId": "mock_thread_id_001",
-      "labelIds": ["INBOX", "UNREAD"],
+      "id": "19c5f2836f624182",
+      "threadId": "19c5f2836f624182",
+      "labelIds": [
+        "UNREAD",
+        "SENT",
+        "INBOX"
+      ],
       "snippet": "Test email snippet",
       "payload": {
+        "partId": "",
         "mimeType": "text/plain",
+        "filename": "",
         "headers": [
-          {"name": "From", "value": "sender@example.com"},
-          {"name": "To", "value": "user@gmail.com"},
-          {"name": "Subject", "value": "Test Subject"}
-        ]
+          {
+            "name": "Received",
+            "value": "from 750099593382 named unknown by gmailapi.google.com with HTTPREST; Sat, 14 Feb 2026 21:36:36 -0500"
+          },
+          {
+            "name": "Received",
+            "value": "from 750099593382 named unknown by gmailapi.google.com with HTTPREST; Sat, 14 Feb 2026 21:36:36 -0500"
+          },
+          {
+            "name": "Content-Disposition",
+            "value": "inline"
+          },
+          {
+            "name": "Content-Length",
+            "value": "28"
+          },
+          {
+            "name": "Content-Transfer-Encoding",
+            "value": "binary"
+          },
+          {
+            "name": "Content-Type",
+            "value": "text/plain; charset=\"UTF-8\""
+          },
+          {
+            "name": "MIME-Version",
+            "value": "1.0"
+          },
+          {
+            "name": "X-Mailer",
+            "value": "MIME::Lite 3.037 (F2.86; B3.16_01; Q3.16_01)"
+          },
+          {
+            "name": "Date",
+            "value": "Sat, 14 Feb 2026 21:36:36 -0500"
+          },
+          {
+            "name": "To",
+            "value": "test.user@gmail.com"
+          },
+          {
+            "name": "Subject",
+            "value": "Test Message for Unit Tests"
+          },
+          {
+            "name": "Message-Id",
+            "value": "\u003cCAM=e+8qBDtu+9rXLqMdTwB5RccUDD4APZt2eHVx3vjPUs8Tk9A@mail.gmail.com\u003e"
+          },
+          {
+            "name": "From",
+            "value": "test.user@gmail.com"
+          }
+        ],
+        "body": {
+          "size": 28,
+          "data": "VGhpcyBpcyBhIHRlc3QgbWVzc2FnZSBib2R5Lg=="
+        }
       },
-      "sizeEstimate": 1234,
-      "internalDate": "1700000000000"
+      "sizeEstimate": 691,
+      "historyId": "21209069",
+      "internalDate": "1771122996000"
     }
   headers:
     - content-type
     - application/json; charset=UTF-8
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 02:36:39 GMT'
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - accept-ranges
+    - none
+    - transfer-encoding
+    - chunked
   message: OK
 source: Test::Google::RestApi::GmailApi1::Message::get_and_modify
 
 ---
-request: POST /gmail/v1/users/me/messages/mock_msg_id_001/modify
+request: POST /gmail/v1/users/me/messages/19c5f2836f624182/modify
 request_content:
   addLabelIds:
     - STARRED
@@ -36,56 +118,164 @@ response:
   code: 200
   content: |
     {
-      "id": "mock_msg_id_001",
-      "threadId": "mock_thread_id_001",
-      "labelIds": ["INBOX", "STARRED"]
+      "id": "19c5f2836f624182",
+      "threadId": "19c5f2836f624182",
+      "labelIds": [
+        "STARRED",
+        "SENT",
+        "INBOX"
+      ]
     }
   headers:
+    - accept-ranges
+    - none
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - transfer-encoding
+    - chunked
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 02:36:40 GMT'
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
     - content-type
     - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::GmailApi1::Message::get_and_modify
 
 ---
-request: POST /gmail/v1/users/me/messages/mock_msg_id_001/trash
+request: POST /gmail/v1/users/me/messages/19c5f2836f624182/trash
 response:
   code: 200
   content: |
     {
-      "id": "mock_msg_id_001",
-      "threadId": "mock_thread_id_001",
-      "labelIds": ["TRASH"]
+      "id": "19c5f2836f624182",
+      "threadId": "19c5f2836f624182",
+      "labelIds": [
+        "STARRED",
+        "TRASH",
+        "SENT"
+      ]
     }
   headers:
     - content-type
     - application/json; charset=UTF-8
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 02:36:43 GMT'
+    - transfer-encoding
+    - chunked
+    - accept-ranges
+    - none
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
   message: OK
-source: Test::Google::RestApi::GmailApi1::Message::trash_and_delete
+source: Test::Google::RestApi::GmailApi1::Message::trash_and_untrash
 
 ---
-request: POST /gmail/v1/users/me/messages/mock_msg_id_001/untrash
+request: POST /gmail/v1/users/me/messages/19c5f2836f624182/untrash
 response:
   code: 200
   content: |
     {
-      "id": "mock_msg_id_001",
-      "threadId": "mock_thread_id_001",
-      "labelIds": ["INBOX"]
+      "id": "19c5f2836f624182",
+      "threadId": "19c5f2836f624182",
+      "labelIds": [
+        "STARRED",
+        "SENT"
+      ]
     }
   headers:
+    - accept-ranges
+    - none
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - transfer-encoding
+    - chunked
+    - date
+    - 'Sun, 15 Feb 2026 02:36:44 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
     - content-type
     - application/json; charset=UTF-8
   message: OK
-source: Test::Google::RestApi::GmailApi1::Message::trash_and_delete
+source: Test::Google::RestApi::GmailApi1::Message::trash_and_untrash
 
 ---
-request: DELETE /gmail/v1/users/me/messages/mock_msg_id_001
+request: POST /gmail/v1/users/me/messages/19c5f2836f624182/trash
 response:
-  code: 204
-  content: ''
+  code: 200
+  content: |
+    {
+      "id": "19c5f2836f624182",
+      "threadId": "19c5f2836f624182",
+      "labelIds": [
+        "STARRED",
+        "TRASH",
+        "SENT"
+      ]
+    }
   headers:
+    - transfer-encoding
+    - chunked
+    - accept-ranges
+    - none
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - date
+    - 'Sun, 15 Feb 2026 02:36:45 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - server
+    - ESF
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
     - content-type
-    - text/html
-  message: No Content
-source: Test::Google::RestApi::GmailApi1::Message::trash_and_delete
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Message::_teardown_live_message
 
