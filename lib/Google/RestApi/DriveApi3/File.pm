@@ -153,29 +153,23 @@ sub permission {
 sub permissions {
   my $self = shift;
   state $check = compile_named(
-    fields    => Str, { optional => 1 },
-    max_pages => Int, { default => 0 },
-    params    => HashRef, { default => {} },
+    fields        => Str, { optional => 1 },
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
-  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'permissions(id, role, type, emailAddress)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->api(uri => 'permissions', params => $params);
-    push(@list, $result->{permissions}->@*) if $result->{permissions};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'permissions', params => $params); },
+    result_key     => 'permissions',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub revision {
@@ -190,29 +184,23 @@ sub revision {
 sub revisions {
   my $self = shift;
   state $check = compile_named(
-    fields    => Str, { optional => 1 },
-    max_pages => Int, { default => 0 },
-    params    => HashRef, { default => {} },
+    fields        => Str, { optional => 1 },
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
-  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'revisions(id, modifiedTime, keepForever)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->api(uri => 'revisions', params => $params);
-    push(@list, $result->{revisions}->@*) if $result->{revisions};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'revisions', params => $params); },
+    result_key     => 'revisions',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub comment {
@@ -230,28 +218,22 @@ sub comments {
     fields          => Str, { optional => 1 },
     include_deleted => Bool, { default => 0 },
     max_pages       => Int, { default => 0 },
+    page_callback   => CodeRef, { optional => 1 },
     params          => HashRef, { default => {} },
   );
   my $p = $check->(@_);
 
-  my $max_pages = $p->{max_pages};
   my $params = $p->{params};
   $params->{fields} //= 'comments(id, content, author, createdTime)';
   $params->{fields} = 'nextPageToken, ' . $params->{fields};
   $params->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
 
-  my @list;
-  my $next_page_token;
-  my $page = 0;
-  do {
-    $params->{pageToken} = $next_page_token if $next_page_token;
-    my $result = $self->api(uri => 'comments', params => $params);
-    push(@list, $result->{comments}->@*) if $result->{comments};
-    $next_page_token = $result->{nextPageToken};
-    $page++;
-  } until !$next_page_token || ($max_pages > 0 && $page >= $max_pages);
-
-  return @list;
+  return paginate_api(
+    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'comments', params => $params); },
+    result_key     => 'comments',
+    max_pages      => $p->{max_pages},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub file_id { shift->{id}; }
