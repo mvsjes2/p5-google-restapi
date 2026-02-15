@@ -1,6 +1,6 @@
 package Google::RestApi::GmailApi1::Attachment;
 
-our $VERSION = '1.2.0';
+our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 

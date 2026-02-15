@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4;
 
-our $VERSION = '1.2.0';
+our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
@@ -1070,11 +1070,6 @@ Clear values in the range.
 Clear formatting in the range.
 
 =back
-
-=head1 STATUS
-
-This api is currently in beta status. It is incomplete. There may be design flaws that need to be addressed in later releases. Later
-releases may break this release. Not all api calls have been implemented.
 
 =head1 SEE ALSO
 
