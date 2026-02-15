@@ -1,0 +1,79 @@
+---
+request: POST /tasks/v1/users/@me/lists
+request_content:
+  title: Test Task List
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#taskList",
+      "id": "mock_task_list_id_12345",
+      "title": "Test Task List",
+      "updated": "2026-02-14T00:00:00.000Z"
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::create_and_delete_task_list
+
+---
+request: DELETE /tasks/v1/users/@me/lists/mock_task_list_id_12345
+response:
+  code: 204
+  content: ''
+  headers:
+    - content-type
+    - text/html
+  message: No Content
+source: Test::Google::RestApi::TasksApi1::create_and_delete_task_list
+
+---
+query_params:
+  fields: 'nextPageToken, items(id, title)'
+request: GET /tasks/v1/users/@me/lists
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#taskLists",
+      "items": [
+        {
+          "id": "mock_task_list_id_12345",
+          "title": "My Tasks"
+        },
+        {
+          "id": "mock_task_list_id_67890",
+          "title": "Work Tasks"
+        }
+      ]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::list_task_lists
+
+---
+query_params:
+  fields: 'nextPageToken, items(id, title)'
+request: GET /tasks/v1/users/@me/lists
+response:
+  code: 200
+  content: |
+    {
+      "kind": "tasks#taskLists",
+      "nextPageToken": "page2_token",
+      "items": [
+        {
+          "id": "mock_task_list_id_12345",
+          "title": "My Tasks"
+        }
+      ]
+    }
+  headers:
+    - content-type
+    - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::TasksApi1::list_task_lists_max_pages
+

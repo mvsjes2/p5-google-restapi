@@ -18,6 +18,9 @@ lib/Google/RestApi/GmailApi1/Draft.pm
 lib/Google/RestApi/GmailApi1/Label.pm
 lib/Google/RestApi/GmailApi1/Message.pm
 lib/Google/RestApi/GmailApi1/Thread.pm
+lib/Google/RestApi/TasksApi1.pm
+lib/Google/RestApi/TasksApi1/Task.pm
+lib/Google/RestApi/TasksApi1/TaskList.pm
 lib/Google/RestApi/DriveApi3.pm
 lib/Google/RestApi/DriveApi3/About.pm
 lib/Google/RestApi/DriveApi3/Changes.pm
@@ -110,6 +113,12 @@ t/unit/Test/Google/RestApi/GmailApi1/Message.pm
 t/unit/Test/Google/RestApi/GmailApi1/Message.pm.exchanges
 t/unit/Test/Google/RestApi/GmailApi1/Thread.pm
 t/unit/Test/Google/RestApi/GmailApi1/Thread.pm.exchanges
+t/unit/Test/Google/RestApi/TasksApi1.pm
+t/unit/Test/Google/RestApi/TasksApi1.pm.exchanges
+t/unit/Test/Google/RestApi/TasksApi1/Task.pm
+t/unit/Test/Google/RestApi/TasksApi1/Task.pm.exchanges
+t/unit/Test/Google/RestApi/TasksApi1/TaskList.pm
+t/unit/Test/Google/RestApi/TasksApi1/TaskList.pm.exchanges
 t/unit/Test/Google/RestApi/DriveApi3.pm
 t/unit/Test/Google/RestApi/DriveApi3.pm.exchanges
 t/unit/Test/Google/RestApi/DriveApi3/About.pm
@@ -168,6 +177,9 @@ tutorial/calendar/30_sharing.pl
 tutorial/gmail/10_gmail_basics.pl
 tutorial/gmail/20_send_and_read.pl
 tutorial/gmail/30_threads_and_drafts.pl
+tutorial/tasks/10_task_list_basics.pl
+tutorial/tasks/20_task_operations.pl
+tutorial/tasks/30_organize_tasks.pl
 tutorial/drive/10_file_operations.pl
 tutorial/drive/20_comments.pl
 tutorial/lib/Tutorial/Setup.pm
