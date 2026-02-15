@@ -266,6 +266,9 @@ sub _build_mime {
 }
 
 sub rest_api { shift->{api}; }
+sub transaction { shift->rest_api()->transaction(); }
+sub stats { shift->rest_api()->stats(); }
+sub reset_stats { shift->rest_api->reset_stats(); }
 
 1;
 
