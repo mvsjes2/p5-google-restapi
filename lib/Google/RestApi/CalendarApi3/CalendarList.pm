@@ -75,8 +75,8 @@ sub update {
   my %content;
   $content{summaryOverride} = delete $p->{summary_override} if defined $p->{summary_override};
   $content{colorId} = delete $p->{color_id} if defined $p->{color_id};
-  $content{hidden} = delete $p->{hidden} ? JSON::MaybeXS::true : JSON::MaybeXS::false if defined $p->{hidden};
-  $content{selected} = delete $p->{selected} ? JSON::MaybeXS::true : JSON::MaybeXS::false if defined $p->{selected};
+  $content{hidden} = delete $p->{hidden} ? JSON::MaybeXS::true() : JSON::MaybeXS::false() if defined $p->{hidden};
+  $content{selected} = delete $p->{selected} ? JSON::MaybeXS::true() : JSON::MaybeXS::false() if defined $p->{selected};
 
   DEBUG(sprintf("Updating calendar list entry '%s'", $self->{id}));
   return $self->api(

@@ -1,79 +1,249 @@
 ---
-request: GET /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com
+query_params:
+  fields: 'nextPageToken, items(id, role, scope)'
+request: GET /calendar/v3/calendars/052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com/acl
 response:
   code: 200
   content: |
     {
-      "kind": "calendar#calendar",
-      "etag": "\"test_etag\"",
-      "id": "mock_calendar_id@group.calendar.google.com",
-      "summary": "Mock Calendar",
-      "timeZone": "Australia/Sydney"
+     "items": [
+      {
+       "id": "user:052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com",
+       "scope": {
+        "type": "user",
+        "value": "052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com"
+       },
+       "role": "owner"
+      },
+      {
+       "id": "user:nibor.yarrum@gmail.com",
+       "scope": {
+        "type": "user",
+        "value": "nibor.yarrum@gmail.com"
+       },
+       "role": "owner"
+      }
+     ]
     }
   headers:
+    - server
+    - ESF
+    - x-xss-protection
+    - 0
+    - x-l2-request-path
+    - l2-managed-14
+    - date
+    - 'Sun, 15 Feb 2026 02:31:16 GMT'
+    - cache-control
+    - 'private, max-age=0, must-revalidate, no-transform'
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-content-type-options
+    - nosniff
+    - accept-ranges
+    - none
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - expires
+    - 'Sun, 15 Feb 2026 02:31:16 GMT'
+    - transfer-encoding
+    - chunked
     - content-type
     - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Calendar::acl_rules_max_pages
+
+---
+query_params:
+  fields: 'nextPageToken, items(id, summary, start, end)'
+request: GET /calendar/v3/calendars/052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com/events
+response:
+  code: 200
+  content: "{\n \"items\": []\n}\n"
+  headers:
+    - transfer-encoding
+    - chunked
+    - content-type
+    - application/json; charset=UTF-8
+    - accept-ranges
+    - none
+    - expires
+    - 'Sun, 15 Feb 2026 02:31:18 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - x-content-type-options
+    - nosniff
+    - cache-control
+    - 'private, max-age=0, must-revalidate, no-transform'
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - x-l2-request-path
+    - l2-managed-14
+    - x-xss-protection
+    - 0
+    - server
+    - ESF
+    - date
+    - 'Sun, 15 Feb 2026 02:31:18 GMT'
+  message: OK
+source: Test::Google::RestApi::CalendarApi3::Calendar::events_max_pages
+
+---
+request: GET /calendar/v3/calendars/052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com
+response:
+  code: 200
+  content: |
+    {
+     "kind": "calendar#calendar",
+     "etag": "\"vrOVdXKLUGjPDtIEpBdiecqN1Ss\"",
+     "id": "052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com",
+     "summary": "Test Calendar",
+     "timeZone": "UTC",
+     "dataOwner": "nibor.yarrum@gmail.com",
+     "conferenceProperties": {
+      "allowedConferenceSolutionTypes": [
+       "hangoutsMeet"
+      ]
+     }
+    }
+  headers:
+    - date
+    - 'Sun, 15 Feb 2026 02:31:20 GMT'
+    - server
+    - ESF
+    - x-xss-protection
+    - 0
+    - x-l2-request-path
+    - l2-managed-14
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - cache-control
+    - 'private, max-age=0, must-revalidate, no-transform'
+    - x-content-type-options
+    - nosniff
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - expires
+    - 'Sun, 15 Feb 2026 02:31:20 GMT'
+    - accept-ranges
+    - none
+    - content-type
+    - application/json; charset=UTF-8
+    - transfer-encoding
+    - chunked
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Calendar::get
 
 ---
-request: PUT /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com
+request: PUT /calendar/v3/calendars/052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com
 request_content:
   summary: Updated Calendar
 response:
   code: 200
   content: |
     {
-      "kind": "calendar#calendar",
-      "etag": "\"updated_etag\"",
-      "id": "mock_calendar_id@group.calendar.google.com",
-      "summary": "Updated Calendar",
-      "timeZone": "Australia/Sydney"
+     "kind": "calendar#calendar",
+     "etag": "\"pDsF4NR6ZClE-0gCn972tJ7jYkg\"",
+     "id": "052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com",
+     "summary": "Updated Calendar",
+     "timeZone": "UTC",
+     "dataOwner": "nibor.yarrum@gmail.com",
+     "conferenceProperties": {
+      "allowedConferenceSolutionTypes": [
+       "hangoutsMeet"
+      ]
+     }
     }
   headers:
+    - date
+    - 'Sun, 15 Feb 2026 02:31:23 GMT'
+    - pragma
+    - no-cache
+    - x-l2-request-path
+    - l2-managed-14
+    - x-xss-protection
+    - 0
+    - server
+    - ESF
+    - x-content-type-options
+    - nosniff
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - vary
+    - 'Origin,Accept-Encoding'
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - x-frame-options
+    - SAMEORIGIN
+    - accept-ranges
+    - none
     - content-type
     - application/json; charset=UTF-8
+    - transfer-encoding
+    - chunked
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Calendar::update
 
 ---
-request: GET /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/events
+request: DELETE /calendar/v3/calendars/052ad5ac6dc236a2939d05bbe25df09603e5af88ba4cd85f0f532da850467a09@group.calendar.google.com
 response:
-  code: 200
-  content: |
-    {
-      "kind": "calendar#events",
-      "etag": "\"test_etag\"",
-      "nextPageToken": "page2_token",
-      "items": [
-        {
-          "id": "mock_event_id_1",
-          "summary": "Test Event",
-          "start": { "dateTime": "2026-03-01T10:00:00Z" },
-          "end": { "dateTime": "2026-03-01T11:00:00Z" }
-        }
-      ]
-    }
+  code: 204
+  content: ''
   headers:
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - content-length
+    - 0
     - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::CalendarApi3::Calendar::events_max_pages
-
----
-request: GET /calendar/v3/calendars/mock_calendar_id@group.calendar.google.com/acl
-response:
-  code: 200
-  content: |
-    {
-      "kind": "calendar#acl",
-      "etag": "\"test_etag\"",
-      "nextPageToken": "page2_token",
-      "items": []
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::CalendarApi3::Calendar::acl_rules_max_pages
+    - text/html
+    - x-xss-protection
+    - 0
+    - x-l2-request-path
+    - l2-managed-14
+    - server
+    - ESF
+    - date
+    - 'Sun, 15 Feb 2026 02:31:25 GMT'
+    - pragma
+    - no-cache
+    - x-content-type-options
+    - nosniff
+    - vary
+    - Origin
+    - vary
+    - X-Origin
+    - vary
+    - Referer
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+  message: No Content
+source: Test::Google::RestApi::CalendarApi3::Calendar::_teardown_live_calendar
 

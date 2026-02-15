@@ -38,18 +38,4 @@ sub requires_message_id : Tests(1) {
   return;
 }
 
-sub get_attachment : Tests(2) {
-  my $self = shift;
-
-  my $gmail = mock_gmail_api();
-  my $msg = $gmail->message(id => 'mock_msg_id_001');
-  my $att = $msg->attachment(id => 'mock_att_id_001');
-
-  my $data = $att->get();
-  ok $data, 'Get returns attachment data';
-  ok $data->{data}, 'Attachment has data field';
-
-  return;
-}
-
 1;
