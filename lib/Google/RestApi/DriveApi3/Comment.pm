@@ -203,10 +203,11 @@ Deletes the comment. Requires comment ID.
 
 Returns a Reply object. Without id, can create new replies.
 
-=head2 replies(include_deleted => $bool, max_pages => $n)
+=head2 replies(include_deleted => $bool, max_pages => $n, page_callback => $coderef)
 
 Lists all replies to the comment. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 comment_id()
 

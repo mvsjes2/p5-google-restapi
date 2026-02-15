@@ -232,10 +232,11 @@ Deletes the event. Requires event ID.
 
 Creates an event using natural language text parsing.
 
-=head2 instances(params => \%params, max_pages => $n)
+=head2 instances(params => \%params, max_pages => $n, page_callback => $coderef)
 
 Lists instances of a recurring event. Requires event ID. C<max_pages> limits
-the number of pages fetched (default 0 = unlimited).
+the number of pages fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 move(destination => $calendar_id)
 

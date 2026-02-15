@@ -274,6 +274,7 @@ Lists all task lists for the user.
  my @lists = $tasks_api->list_task_lists(max_pages => 2);
 
 C<max_pages> limits the number of pages fetched (default 0 = unlimited).
+Supports C<page_callback>, see L<Google::RestApi/PAGE CALLBACKS>.
 
 Returns a list of task list hashrefs with id and title.
 

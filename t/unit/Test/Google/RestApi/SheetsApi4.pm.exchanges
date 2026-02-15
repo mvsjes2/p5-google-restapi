@@ -1042,3 +1042,63 @@ response:
   message: OK
 source: Test::Google::RestApi::SheetsApi4::delete_all_spreadsheets_by_filters
 
+---
+query_params:
+  fields: nextPageToken, files(id, name)
+  q: mimeType = 'application/vnd.google-apps.spreadsheet'and (name = 'mock_spreadsheet1')
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: |
+    {
+      "files": [
+        {
+          "id": "1_zikLvGEUoZW5f51iyAO8nvQFDmBvIRx3-z45fadhs8",
+          "name": "mock_spreadsheet1"
+        },
+        {
+          "id": "1nz_bq2aCK9khe04bOAx4AxhlppBTlfl9MjZ5eWi0IDE",
+          "name": "mock_spreadsheet1"
+        }
+      ]
+    }
+  headers:
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - date
+  - Sat, 03 Jan 2026 00:39:00 GMT
+  message: OK
+source: Test::Google::RestApi::SheetsApi4::page_callback
+
+---
+query_params:
+  fields: nextPageToken, files(id, name)
+  q: mimeType = 'application/vnd.google-apps.spreadsheet'and (name contains 'mock_spreadsheet')
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: |
+    {
+      "files": [
+        {
+          "id": "1tvTbWTHATGpTJvussXiJ9HhV7H-TJrptQHXkXVQyr1k",
+          "name": "mock_spreadsheet2"
+        },
+        {
+          "id": "1_zikLvGEUoZW5f51iyAO8nvQFDmBvIRx3-z45fadhs8",
+          "name": "mock_spreadsheet1"
+        }
+      ]
+    }
+  headers:
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - date
+  - Sat, 03 Jan 2026 00:39:02 GMT
+  message: OK
+source: Test::Google::RestApi::SheetsApi4::page_callback
+

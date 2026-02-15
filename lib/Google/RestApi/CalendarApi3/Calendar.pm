@@ -205,19 +205,21 @@ Clears all events from a calendar. Only works on the primary calendar.
 
 Returns an Event object. Without id, can be used to create new events.
 
-=head2 events(max_pages => $n)
+=head2 events(max_pages => $n, page_callback => $coderef)
 
 Lists all events on the calendar. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 acl(id => $id)
 
 Returns an Acl object. Without id, can be used to create new ACL rules.
 
-=head2 acl_rules(max_pages => $n)
+=head2 acl_rules(max_pages => $n, page_callback => $coderef)
 
 Lists all ACL rules on the calendar. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 calendar_id()
 

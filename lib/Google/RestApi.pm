@@ -256,12 +256,14 @@ __END__
 
 =head1 NAME
 
-Google::RestApi - Connection to Google REST APIs (currently Drive, Sheets, and Calendar).
+Google::RestApi - API to Google Drive API V3, Sheets API V4, Calendar API V3,
+Gmail API V1, Tasks API V1, and Docs API V1.
 
 =head1 SYNOPSIS
 
 =over
 
+  # create a new RestApi object to be used by the apis.
   use Google::RestApi;
   $rest_api = Google::RestApi->new(
     config_file   => <path_to_config_file>,
@@ -271,6 +273,8 @@ Google::RestApi - Connection to Google REST APIs (currently Drive, Sheets, and C
     api_callback  => <coderef>,
   );
 
+  # you can call the raw api directly, but usually the apis will take care of
+  # forming the correct API calls for you.
   $response = $rest_api->api(
     uri     => <google_api_url>,
     method  => get|head|put|patch|post|delete,
@@ -279,31 +283,161 @@ Google::RestApi - Connection to Google REST APIs (currently Drive, Sheets, and C
     content => <data_for_body>,
   );
 
-  use Google::RestApi::SheetsApi4;
-  $sheets_api = Google::RestApi::SheetsApi4->new(api => $rest_api);
-  $sheet = $sheets_api->open_spreadsheet(title => "payroll");
-
   use Google::RestApi::DriveApi3;
   $drive = Google::RestApi::DriveApi3->new(api => $rest_api);
+
+  # file operations
   $file = $drive->file(id => 'xxxx');
   $copy = $file->copy(name => 'my-copy-of-xxx');
-  $file->update(description => 'Updated via API');
+  $file->update(name => 'new-name', description => 'new desc');
+  $file->export(mime_type => 'application/pdf');
 
-  # permissions, comments, replies, revisions
-  $file->permission()->create(role => 'reader', type => 'anyone');
-  $comment = $file->comment()->create(content => 'Looks good!');
-  $comment->reply()->create(content => 'Thanks!');
-  @revisions = $file->revisions();
-
-  print YAML::Any::Dump($rest_api->stats());
+See the individual PODs for the different apis for details on how to use each
+one.
 
 =back
 
 =head1 DESCRIPTION
 
-Google Rest API is the foundation class used by the included Drive (L<Google::RestApi::DriveApi3>), Sheets (L<Google::RestApi::SheetsApi4>),
-Calendar (L<Google::RestApi::CalendarApi3>), Gmail (L<Google::RestApi::GmailApi1>), Tasks (L<Google::RestApi::TasksApi1>), and Docs (L<Google::RestApi::DocsApi1>) APIs.
-It is used to send API requests to the Google API endpoint on behalf of the underlying API classes.
+Google::RestApi is a framework for interfacing with Google products, currently
+Drive (L<Google::RestApi::DriveApi3>), Sheets (L<Google::RestApi::SheetsApi4>),
+Calendar (L<Google::RestApi::CalendarApi3>), Gmail (L<Google::RestApi::GmailApi1>),
+Tasks (L<Google::RestApi::TasksApi1>), and Docs (L<Google::RestApi::DocsApi1>).
+
+The biggest hurdle to using this library is actually setting up the authorization
+to access your Google account via a script. The Google development web space is
+huge and complex. All that's required here is an OAuth2 token to authorize your
+script that uses this library. See C<bin/google_restapi_oauth_token_creator> for
+instructions on how to do so. Once you've done it a couple of times it's
+straight forward.
+
+The synopsis above is a quick reference. For more detailed information, see the
+pods listed in the L</NAVIGATION> section below.
+
+Once you have successfully created your OAuth2 token, you can run the tutorials
+to ensure everything is working correctly. Set the environment variable
+C<GOOGLE_RESTAPI_CONFIG> to the path to your auth config file. See the
+C<tutorial/> directory for step-by-step tutorials covering Sheets, Drive,
+Calendar, Documents, Gmail, and Tasks. These will help you understand how the
+API interacts with Google.
+
+=head1 SUBROUTINES
+
+=over
+
+=item new(%args); %args consists of:
+
+=over
+
+=item * C<config_file> <path_to_config_file>: Optional YAML configuration file that can specify any or all of the following args...
+
+=item * C<auth> <hash|object>: A hashref to create the specified auth class, or (outside the config file) an instance of the blessed class itself.
+If this is an object, it must provide the 'params' and 'headers' subroutines to provide the appropriate Google authentication/authorization.
+See below for more details.
+
+=item * C<api_callback> <coderef>: A coderef to call after each API call. 
+
+=item * C<throttle> <int>: Used in development to sleep the number of seconds specified between API calls to avoid rate limit violations from Google.
+
+=back
+
+You can specify any of the arguments in the optional YAML config file. Any passed-in arguments will override what is in the config file.
+
+The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::* classes (e.g. 'OAuth2Client'), or, for convenience sake,
+you may specify a hash of the required arguments to create an instance of that class:
+
+  auth:
+    class: OAuth2Client
+    client_id: xxxxxx
+    client_secret: xxxxxx
+    token_file: <path_to_token_file>
+
+Note that the auth hash itself can also contain a config_file:
+
+  auth:
+    class: OAuth2Client
+    config_file: <path_to_oauth_config_file>
+
+This allows you the option to keep the auth file in a separate, more secure place.
+
+=item api(%args);
+
+The ultimate Google API call for the underlying classes. Handles timeouts and retries etc. %args consists of:
+
+=over
+
+=item * C<uri> <uri_string>: The Google API endpoint such as https://www.googleapis.com/drive/v3 along with any path segments added.
+
+=item * C<method> <http_method_string>: The http method being used get|head|put|patch|post|delete.
+
+=item * C<headers> <headers_string_array>: Array ref of http headers.
+
+=item * C<params> <query_parameters_hash>: Http query params to be added to the uri.
+
+=item * C<content> <payload hash>: The body being sent for post/put etc. Will be encoded to JSON.
+
+=back
+
+You would not normally call this directly unless you were making a Google API call not currently supported by this API framework.
+
+Returns the response hash from Google API.
+
+=item api_callback(<coderef>);
+
+=over
+
+=item C<coderef> is user code that will be called back after each call to the Google API.
+
+=back
+
+The last transaction details are passed to the callback. What you do with this information is up to you. For an example of how this is used, see the
+C<tutorial/sheets/*> and C<tutorial/drive/*> scripts.
+
+Returns the previous callback, if any.
+
+=item transaction();
+
+Returns the transaction information from the last Google API call. This is the same information that is provided by the callback
+above, but can be accessed directly if you have no need to provide a callback.
+
+=item stats();
+
+Returns some statistics on how many get/put/post etc calls were made. Useful for performance tuning during development.
+
+=back
+
+=head1 PAGE CALLBACKS
+
+Many list methods across the API support a C<page_callback> parameter for
+processing paginated results. The callback is called with the raw API result
+hashref after each page is fetched. Return a true value to continue fetching,
+or false to stop early.
+
+ # print progress while listing files:
+ my @files = $drive->list(
+   filter        => "name contains 'report'",
+   page_callback => sub {
+     my ($result) = @_;
+     print "Fetched a page of results...\n";
+     return 1;  # continue fetching
+   },
+ );
+
+ # stop after finding what you need:
+ my $target;
+ my @messages = $gmail_api->messages(
+   max_pages     => 0,       # allow unlimited pages
+   page_callback => sub {
+     my ($result) = @_;
+     foreach my $msg (@{ $result->{messages} || [] }) {
+       if ($msg->{id} eq $some_id) {
+         $target = $msg;
+         return 0;  # stop pagination
+       }
+     }
+     return 1;  # keep going
+   },
+ );
 
 =head1 NAVIGATION
 
@@ -397,90 +531,23 @@ It is used to send API requests to the Google API endpoint on behalf of the unde
 
 =back
 
-=head1 SUBROUTINES
+=head1 STATUS
 
-=over
+Partial sheets and drive apis were hand-written by the author. Anthropic
+Claude was used to generate the missing api calls for these, and the rest of
+the google apis were added using Claude, based on the original hand-wrieetn
+patterns. If all works for you, it will be due to the author's stunning
+intellect. If it doesn't, or you see strange and wild code, it's all Claude's
+fault, nothing to do with the author.
 
-=item new(%args); %args consists of:
+All mock exchanges were generated by running the unit tests and opening the
+live api to save the requests/responses for later playback. This process is
+used as an integration test. Because all the tests pass using this process,
+it's a pretty good indicator that the calls work.
 
-=over
+=head1 BUGS
 
-=item * C<config_file> <path_to_config_file>: Optional YAML configuration file that can specify any or all of the following args...
-
-=item * C<auth> <hash|object>: A hashref to create the specified auth class, or (outside the config file) an instance of the blessed class itself.
-If this is an object, it must provide the 'params' and 'headers' subroutines to provide the appropriate Google authentication/authorization.
-See below for more details.
-
-=item * C<api_callback> <coderef>: A coderef to call after each API call. 
-
-=item * C<throttle> <int>: Used in development to sleep the number of seconds specified between API calls to avoid rate limit violations from Google.
-
-=back
-
-You can specify any of the arguments in the optional YAML config file. Any passed-in arguments will override what is in the config file.
-
-The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::* classes (e.g. 'OAuth2Client'), or, for convenience sake,
-you may specify a hash of the required arguments to create an instance of that class:
-
-  auth:
-    class: OAuth2Client
-    client_id: xxxxxx
-    client_secret: xxxxxx
-    token_file: <path_to_token_file>
-
-Note that the auth hash itself can also contain a config_file:
-
-  auth:
-    class: OAuth2Client
-    config_file: <path_to_oauth_config_file>
-
-This allows you the option to keep the auth file in a separate, more secure place.
-
-=item api(%args);
-
-The ultimate Google API call for the underlying classes. Handles timeouts and retries etc. %args consists of:
-
-=over
-
-=item * C<uri> <uri_string>: The Google API endpoint such as https://www.googleapis.com/drive/v3 along with any path segments added.
-
-=item * C<method> <http_method_string>: The http method being used get|head|put|patch|post|delete.
-
-=item * C<headers> <headers_string_array>: Array ref of http headers.
-
-=item * C<params> <query_parameters_hash>: Http query params to be added to the uri.
-
-=item * C<content> <payload hash>: The body being sent for post/put etc. Will be encoded to JSON.
-
-=back
-
-You would not normally call this directly unless you were making a Google API call not currently supported by this API framework.
-
-Returns the response hash from Google API.
-
-=item api_callback(<coderef>);
-
-=over
-
-=item C<coderef> is user code that will be called back after each call to the Google API.
-
-=back
-
-The last transaction details are passed to the callback. What you do with this information is up to you. For an example of how this is used, see the
-C<tutorial/sheets/*> and C<tutorial/drive/*> scripts.
-
-Returns the previous callback, if any.
-
-=item transaction();
-
-Returns the transaction information from the last Google API call. This is the same information that is provided by the callback
-above, but can be accessed directly if you have no need to provide a callback.
-
-=item stats();
-
-Returns some statistics on how many get/put/post etc calls were made. Useful for performance tuning during development.
-
-=back
+Please report a bug or missing api call by creating an issue at the git repo.
 
 =head1 AUTHORS
 

@@ -874,3 +874,59 @@ response:
   message: OK
 source: Test::Google::RestApi::DocsApi1::create_document
 
+---
+query_params:
+  fields: nextPageToken, files(id, name)
+  q: mimeType = 'application/vnd.google-apps.document'and (name = 'Test Document')
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: |
+    {
+      "files": [
+        {
+          "id": "1nO_EzGC_J0cjjOIAi_HFwijWIeSJ8B2f-zHEPeuGrZA",
+          "name": "Test Document"
+        }
+      ]
+    }
+  headers:
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - date
+  - Sun, 15 Feb 2026 02:38:00 GMT
+  message: OK
+source: Test::Google::RestApi::DocsApi1::page_callback
+
+---
+query_params:
+  fields: nextPageToken, files(id, name)
+  q: mimeType = 'application/vnd.google-apps.document'and (name contains 'Test')
+request: GET /drive/v3/files
+response:
+  code: 200
+  content: |
+    {
+      "files": [
+        {
+          "id": "1nO_EzGC_J0cjjOIAi_HFwijWIeSJ8B2f-zHEPeuGrZA",
+          "name": "Test Document"
+        },
+        {
+          "id": "2aB_CdEF_G1hijKLMnOpQrStUvWxYz3a4b-cDeFgHiJk",
+          "name": "Test Notes"
+        }
+      ]
+    }
+  headers:
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - date
+  - Sun, 15 Feb 2026 02:38:02 GMT
+  message: OK
+source: Test::Google::RestApi::DocsApi1::page_callback
+

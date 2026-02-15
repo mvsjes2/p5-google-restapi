@@ -199,10 +199,11 @@ Permanently deletes the task list. Requires task list ID.
 
 Returns a Task object. Without id, can be used to create new tasks.
 
-=head2 tasks(max_pages => $n)
+=head2 tasks(max_pages => $n, page_callback => $coderef)
 
 Lists all tasks on the task list. Requires task list ID. C<max_pages> limits
 the number of pages fetched (default 1). Set to 0 for unlimited.
+Supports C<page_callback>, see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 create_task(title => $title, notes => $notes, due => $due)
 
