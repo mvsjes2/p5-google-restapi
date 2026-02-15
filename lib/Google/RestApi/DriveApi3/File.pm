@@ -12,9 +12,12 @@ use aliased 'Google::RestApi::DriveApi3::Comment';
 sub new {
   my $class = shift;
   my $qr_id = $Google::RestApi::DriveApi3::Drive_File_Id;
-  state $check = compile_named(
-    drive => HasApi,
-    id    => StrMatch[qr/$qr_id/],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      drive => HasApi,
+      id    => StrMatch[qr/$qr_id/],
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -31,10 +34,13 @@ sub api {
 sub copy {
   my $self = shift;
 
-  state $check = compile_named(
-    name    => Str, { optional => 1 },
-    title   => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name    => Str, { optional => 1 },
+      title   => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   $p->{name} //= $p->{title};
@@ -60,9 +66,12 @@ sub delete {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+      params => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -74,13 +83,16 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    name        => Str, { optional => 1 },
-    description => Str, { optional => 1 },
-    mime_type   => Str, { optional => 1 },
-    add_parents    => Str, { optional => 1 },
-    remove_parents => Str, { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name        => Str, { optional => 1 },
+      description => Str, { optional => 1 },
+      mime_type   => Str, { optional => 1 },
+      add_parents    => Str, { optional => 1 },
+      remove_parents => Str, { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -103,8 +115,11 @@ sub update {
 
 sub export {
   my $self = shift;
-  state $check = compile_named(
-    mime_type => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      mime_type => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -117,12 +132,15 @@ sub export {
 
 sub watch {
   my $self = shift;
-  state $check = compile_named(
-    id         => Str,
-    type       => Str, { default => 'web_hook' },
-    address    => Str,
-    expiration => Int, { optional => 1 },
-    _extra_    => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id         => Str,
+      type       => Str, { default => 'web_hook' },
+      address    => Str,
+      expiration => Int, { optional => 1 },
+      _extra_    => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -143,8 +161,11 @@ sub watch {
 
 sub permission {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Permission->new(file => $self, %$p);
@@ -152,11 +173,14 @@ sub permission {
 
 sub permissions {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -174,8 +198,11 @@ sub permissions {
 
 sub revision {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Revision->new(file => $self, %$p);
@@ -183,11 +210,14 @@ sub revision {
 
 sub revisions {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -205,8 +235,11 @@ sub revisions {
 
 sub comment {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Comment->new(file => $self, %$p);
@@ -214,12 +247,15 @@ sub comment {
 
 sub comments {
   my $self = shift;
-  state $check = compile_named(
-    fields          => Str, { optional => 1 },
-    include_deleted => Bool, { default => 0 },
-    max_pages       => Int, { default => 0 },
-    page_callback   => CodeRef, { optional => 1 },
-    params          => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields          => Str, { optional => 1 },
+      include_deleted => Bool, { default => 0 },
+      max_pages       => Int, { default => 0 },
+      page_callback   => CodeRef, { optional => 1 },
+      params          => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 

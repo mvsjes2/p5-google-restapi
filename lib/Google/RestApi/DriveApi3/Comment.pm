@@ -8,9 +8,12 @@ use aliased 'Google::RestApi::DriveApi3::Reply';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    file => HasApi,
-    id   => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      file => HasApi,
+      id   => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -27,11 +30,14 @@ sub api {
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    content        => Str,
-    anchor         => Str, { optional => 1 },
-    quoted_content => Str, { optional => 1 },
-    _extra_        => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      content        => Str,
+      anchor         => Str, { optional => 1 },
+      quoted_content => Str, { optional => 1 },
+      _extra_        => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -53,9 +59,12 @@ sub create {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields          => Str, { default => 'id,content,author,createdTime,modifiedTime' },
-    include_deleted => Bool, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields          => Str, { default => 'id,content,author,createdTime,modifiedTime' },
+      include_deleted => Bool, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -71,9 +80,12 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    content => Str,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      content => Str,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -101,8 +113,11 @@ sub delete {
 
 sub reply {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -113,12 +128,15 @@ sub reply {
 
 sub replies {
   my $self = shift;
-  state $check = compile_named(
-    fields          => Str, { optional => 1 },
-    include_deleted => Bool, { default => 0 },
-    max_pages       => Int, { default => 0 },
-    page_callback   => CodeRef, { optional => 1 },
-    params          => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields          => Str, { optional => 1 },
+      include_deleted => Bool, { default => 0 },
+      max_pages       => Int, { default => 0 },
+      page_callback   => CodeRef, { optional => 1 },
+      params          => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 

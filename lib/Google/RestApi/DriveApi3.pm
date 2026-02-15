@@ -18,18 +18,24 @@ Readonly our $Drive_Id       => '[a-zA-Z0-9-_]+';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    api      => HasApi,
-    endpoint => Str, { default => $Drive_Endpoint },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api      => HasApi,
+      endpoint => Str, { default => $Drive_Endpoint },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   my $uri = "$self->{endpoint}/";
@@ -39,11 +45,14 @@ sub api {
 
 sub list {
   my $self = shift;
-  state $check = compile_named(
-    filter        => Str,
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      filter        => Str,
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -77,8 +86,11 @@ sub changes { Changes->new(drive_api => shift); }
 
 sub shared_drive {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Drive->new(drive_api => $self, %$p);
@@ -86,10 +98,13 @@ sub shared_drive {
 
 sub list_drives {
   my $self = shift;
-  state $check = compile_named(
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -107,10 +122,13 @@ sub list_drives {
 
 sub create_drive {
   my $self = shift;
-  state $check = compile_named(
-    name       => Str,
-    request_id => Str,
-    _extra_    => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name       => Str,
+      request_id => Str,
+      _extra_    => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -126,9 +144,12 @@ sub create_drive {
 
 sub generate_ids {
   my $self = shift;
-  state $check = compile_named(
-    count => PositiveInt, { default => 10 },
-    space => Str, { default => 'drive' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      count => PositiveInt, { default => 10 },
+      space => Str, { default => 'drive' },
+    ],
   );
   my $p = $check->(@_);
 

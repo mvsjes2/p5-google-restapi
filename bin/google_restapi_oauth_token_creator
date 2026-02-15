@@ -8,7 +8,7 @@ use lib "$FindBin::RealBin/../lib";
 use File::Basename qw( dirname );
 use Storable qw( store );
 use Term::Prompt qw( prompt );
-use Type::Params qw( compile_named );
+use Type::Params qw( signature );
 use Types::Standard qw( Str StrMatch );
 use YAML::Any qw( Dump LoadFile );
 
@@ -30,11 +30,14 @@ my $config = eval { LoadFile($config_file); };
 die "Unable to load YAML config file '$config_file': $@\n" if $@;
 
 print "Validating config:\n", Dump($config);
-my $check = compile_named(
-  class         => StrMatch[qr/^OAuth2Client$/],
-  client_id     => Str,
-  client_secret => Str,
-  token_file    => Str,
+my $check = signature(
+  bless => !!0,
+  named => [
+    class         => StrMatch[qr/^OAuth2Client$/],
+    client_id     => Str,
+    client_secret => Str,
+    token_file    => Str,
+  ],
 );
 $check->(%{ $config->{auth} });
 

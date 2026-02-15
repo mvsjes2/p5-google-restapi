@@ -25,7 +25,7 @@ sub new {
   # if factory has already been used, then this should resolve here.
   my $err;
   try {
-    state $check = compile(RangeCell);
+    state $check = signature(positional => [RangeCell]);
     ($self{range}) = $check->($self{range});
   } catch {
     $err = $_;
@@ -44,9 +44,12 @@ sub new {
 
 sub values {
   my $self = shift;
-  state $check = compile_named(
-    values => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   $p->{values} = [[ $p->{values} ]] if defined $p->{values};
@@ -57,8 +60,11 @@ sub values {
 sub batch_values {
   my $self = shift;
 
-  state $check = compile_named(
-    values => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -69,7 +75,7 @@ sub batch_values {
 # is this 0 or infinity? return self if offset is 0, undef otherwise.
 sub cell_at_offset {
   my $self = shift;
-  state $check = compile(Int, DimColRow, { optional => 1 });
+  state $check = signature(positional => [Int, DimColRow, { optional => 1 }]);
   my ($offset) = $check->(@_);   # we're a cell, no dim required.
   return $self if !$offset;
   return;
@@ -77,7 +83,7 @@ sub cell_at_offset {
 
 sub is_other_inside {
   my $self = shift;
-  state $check = compile(HasRange);
+  state $check = signature(positional => [HasRange]);
   my ($inside_range) = $check->(@_);
   return $self->range() eq $inside_range->range();
 }

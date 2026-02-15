@@ -21,12 +21,15 @@ sub new {
   my $class = shift;
 
   my $qr_worksheet_uri = $Google::RestApi::SheetsApi4::Worksheet_Uri;
-  state $check = compile_named(
-    spreadsheet => HasApi,
-    id          => Str, { optional => 1 },    # the worksheet id (1, 2, 3 etc).
-    name        => Str, { optional => 1 },    # the name of the worksheet.
-    title       => Str, { optional => 1 },
-    uri         => StrMatch[qr|$qr_worksheet_uri|], { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      spreadsheet => HasApi,
+      id          => Str, { optional => 1 },    # the worksheet id (1, 2, 3 etc).
+      name        => Str, { optional => 1 },    # the name of the worksheet.
+      title       => Str, { optional => 1 },
+      uri         => StrMatch[qr|$qr_worksheet_uri|], { optional => 1 },
+    ],
   );
   my $self = $check->(@_);
   $self = bless $self, $class;
@@ -90,7 +93,7 @@ sub properties {
 # first arg is a range in any format. allow the range_col call to verify it.
 sub col {
   my $self = shift;
-  state $check = compile(Defined, ArrayRef[Str], { optional => 1 });   # A or 1
+  state $check = signature(positional => [Defined, ArrayRef[Str], { optional => 1 }]);   # A or 1
   my ($col, $values) = $check->(@_);
   my $range = $self->range_col($col);
   return $range->values(defined $values ? (values => $values) : ());
@@ -99,7 +102,7 @@ sub col {
 sub cols {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Defined], ArrayRef[ArrayRef[Str]], { optional => 1 });
+  state $check = signature(positional => [ArrayRef[Defined], ArrayRef[ArrayRef[Str]], { optional => 1 }]);
   my ($cols, $values) = $check->(@_);
 
   my $range_group = $self->range_group_cols($cols);
@@ -117,7 +120,7 @@ sub cols {
 
 sub row {
   my $self = shift;
-  state $check = compile(Defined, ArrayRef[Str], { optional => 1 });
+  state $check = signature(positional => [Defined, ArrayRef[Str], { optional => 1 }]);
   my ($row, $values) = $check->(@_);
   my $range = $self->range_row($row);
   return $range->values(defined $values ? (values => $values) : ());
@@ -126,7 +129,7 @@ sub row {
 sub rows {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Defined], ArrayRef[ArrayRef[Str]], { optional => 1 });
+  state $check = signature(positional => [ArrayRef[Defined], ArrayRef[ArrayRef[Str]], { optional => 1 }]);
   my ($rows, $values) = $check->(@_);
 
   my $range_group = $self->range_group_rows($rows);
@@ -144,7 +147,7 @@ sub rows {
 
 sub cell {
   my $self = shift;
-   state $check = compile(Defined, Str, { optional => 1 });
+   state $check = signature(positional => [Defined, Str, { optional => 1 }]);
   my ($cell, $value) = $check->(@_);
   my $range = $self->range_cell($cell);
   return $range->values(defined $value ? (values => $value) : ());
@@ -153,7 +156,7 @@ sub cell {
 sub cells {
   my $self = shift;
 
-  state $check = compile(ArrayRef[Defined], ArrayRef[Str], { optional => 1 });
+  state $check = signature(positional => [ArrayRef[Defined], ArrayRef[Str], { optional => 1 }]);
   my ($cells, $values) = $check->(@_);
 
   my $range_group = $self->range_group_cells($cells);
@@ -187,7 +190,7 @@ sub resolve_header_range {
 sub resolve_header_range_col {
   my $self = shift;
 
-  state $check = compile(RangeNamed);
+  state $check = signature(positional => [RangeNamed]);
   my ($header) = $check->(@_);
   
   my $headers = $self->header_col() or return;
@@ -200,7 +203,7 @@ sub resolve_header_range_col {
 sub resolve_header_range_row {
   my $self = shift;
 
-  state $check = compile(RangeNamed);
+  state $check = signature(positional => [RangeNamed]);
   my ($header) = $check->(@_);
   
   my $headers = $self->header_row() or return;
@@ -288,7 +291,7 @@ sub header_row_enabled { shift->{header_row_enabled}; }
 sub normalize_named {
   my $self = shift;
 
-  state $check = compile(RangeNamed);
+  state $check = signature(positional => [RangeNamed]);
   my ($named_range_name) = $check->(@_);
 
   my ($sheet_id, $range) = $self->spreadsheet()->normalize_named($named_range_name);
@@ -303,9 +306,11 @@ sub normalize_named {
 sub name_value_pairs {
   my $self = shift;
 
-  state $check = compile(
-    Defined, { default => 1 },   # column of names (hash keys).
-    Defined, { default => 2 },   # column of values.
+  state $check = signature(
+    positional => [
+      Defined, { default => 1 },   # column of names (hash keys).
+      Defined, { default => 2 },   # column of values.
+    ],
   );
   my ($name_col, $value_col) = $check->(@_);
 
@@ -329,9 +334,11 @@ sub tie_ranges { shift->_tie('range_factory', @_); }
 sub _tie {
   my $self = shift;
 
-  state $check = compile(
-    Str->where( sub { /^range/ && $self->can($_) or die "Must be a 'range' method"; } ),
-    slurpy HashRef,
+  state $check = signature(
+    positional => [
+      Str->where( sub { /^range/ && $self->can($_) or die "Must be a 'range' method"; } ),
+      slurpy HashRef,
+    ],
   );
   my ($method, $ranges) = $check->(@_);
 
@@ -348,7 +355,7 @@ sub tie {
 
 sub range_group_cols {
   my $self = shift;
-  state $check = compile(ArrayRef[Defined]);
+  state $check = signature(positional => [ArrayRef[Defined]]);
   my ($cols) = $check->(@_);
   my @cols = map { $self->range_col($_); } @$cols;
   return $self->spreadsheet()->range_group(@cols);
@@ -356,7 +363,7 @@ sub range_group_cols {
 
 sub range_group_rows {
   my $self = shift;
-  state $check = compile(ArrayRef[Defined]);
+  state $check = signature(positional => [ArrayRef[Defined]]);
   my ($rows) = $check->(@_);
   my @rows = map { $self->range_row($_); } @$rows;
   return $self->spreadsheet()->range_group(@rows);
@@ -364,7 +371,7 @@ sub range_group_rows {
 
 sub range_group_cells {
   my $self = shift;
-  state $check = compile(ArrayRef[Defined]);
+  state $check = signature(positional => [ArrayRef[Defined]]);
   my ($cells) = $check->(@_);
   my @cells = map { $self->range_cell($_); } @$cells;
   return $self->spreadsheet()->range_group(@cells);
@@ -373,7 +380,7 @@ sub range_group_cells {
 # an arbitrary mix of ranges.
 sub range_group {
   my $self = shift;
-  state $check = compile(ArrayRef[Defined]);
+  state $check = signature(positional => [ArrayRef[Defined]]);
   my ($ranges) = $check->(@_);
   my @ranges = map { $self->range_factory($_); } @$ranges;
   return $self->spreadsheet()->range_group(@ranges);

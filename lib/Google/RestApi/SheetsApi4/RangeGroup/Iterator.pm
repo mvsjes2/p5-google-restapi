@@ -8,12 +8,15 @@ use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    range_group => HasMethods[qw(ranges)],
-    dim         => StrMatch[qr/^(col|row)$/], { default => 'row' },
-    by          => PositiveInt, { default => 1 },
-    from        => PositiveOrZeroInt, { optional => 1 },
-    to          => PositiveOrZeroInt, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range_group => HasMethods[qw(ranges)],
+      dim         => StrMatch[qr/^(col|row)$/], { default => 'row' },
+      by          => PositiveInt, { default => 1 },
+      from        => PositiveOrZeroInt, { optional => 1 },
+      to          => PositiveOrZeroInt, { optional => 1 },
+    ],
   );
   my $self = $check->(@_);
   $self->{current} = delete $self->{from} || 0;

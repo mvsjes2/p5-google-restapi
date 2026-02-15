@@ -6,8 +6,11 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    drive_api => HasApi,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      drive_api => HasApi,
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -19,8 +22,11 @@ sub api {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { default => '*' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { default => '*' },
+    ],
   );
   my $p = $check->(@_);
 

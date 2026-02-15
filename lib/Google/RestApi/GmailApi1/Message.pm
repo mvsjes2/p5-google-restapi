@@ -8,9 +8,12 @@ use aliased 'Google::RestApi::GmailApi1::Attachment';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    gmail_api => HasApi,
-    id        => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      gmail_api => HasApi,
+      id        => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -27,9 +30,12 @@ sub api {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    format => Str, { optional => 1 },
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      format => Str, { optional => 1 },
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -44,9 +50,12 @@ sub get {
 
 sub modify {
   my $self = shift;
-  state $check = compile_named(
-    add_label_ids    => ArrayRef[Str], { default => [] },
-    remove_label_ids => ArrayRef[Str], { default => [] },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      add_label_ids    => ArrayRef[Str], { default => [] },
+      remove_label_ids => ArrayRef[Str], { default => [] },
+    ],
   );
   my $p = $check->(@_);
 
@@ -93,8 +102,11 @@ sub delete {
 
 sub attachment {
   my $self = shift;
-  state $check = compile_named(
-    id => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str,
+    ],
   );
   my $p = $check->(@_);
 

@@ -6,9 +6,12 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar => HasApi,
-    id       => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar => HasApi,
+      id       => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -25,14 +28,17 @@ sub api {
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    summary     => Str,
-    start       => HashRef,
-    end         => HashRef,
-    description => Str, { optional => 1 },
-    location    => Str, { optional => 1 },
-    attendees   => ArrayRef[HashRef], { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      summary     => Str,
+      start       => HashRef,
+      end         => HashRef,
+      description => Str, { optional => 1 },
+      location    => Str, { optional => 1 },
+      attendees   => ArrayRef[HashRef], { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -56,8 +62,11 @@ sub create {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -71,14 +80,17 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    summary     => Str, { optional => 1 },
-    description => Str, { optional => 1 },
-    location    => Str, { optional => 1 },
-    start       => HashRef, { optional => 1 },
-    end         => HashRef, { optional => 1 },
-    attendees   => ArrayRef[HashRef], { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      summary     => Str, { optional => 1 },
+      description => Str, { optional => 1 },
+      location    => Str, { optional => 1 },
+      start       => HashRef, { optional => 1 },
+      end         => HashRef, { optional => 1 },
+      attendees   => ArrayRef[HashRef], { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -110,8 +122,11 @@ sub delete {
 
 sub quick_add {
   my $self = shift;
-  state $check = compile_named(
-    text => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      text => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -126,11 +141,14 @@ sub quick_add {
 
 sub instances {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -150,8 +168,11 @@ sub instances {
 
 sub move {
   my $self = shift;
-  state $check = compile_named(
-    destination => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      destination => Str,
+    ],
   );
   my $p = $check->(@_);
 
