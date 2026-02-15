@@ -8,23 +8,7 @@ use Hash::Merge ();
 use List::MoreUtils qw( first_index );
 use Storable ();
 
-sub submit_requests { LOGDIE "Pure virtual function 'submit_requests' must be overridden"; }
-
-sub batch_requests {
-  my $self = shift;
-
-  my %request = @_;
-
-  $self->{requests} ||= [];
-  my $requests = $self->{requests};
-
-  if (%request) {
-    delete $self->{requests_response};  # any previous responses are no longer valid.
-    push(@$requests, \%request) if !$self->merge_request(\%request);
-  }
-
-  return @$requests;
-}
+use parent "Google::RestApi::Request";
 
 sub merge_request {
   my $self = shift;
@@ -86,66 +70,19 @@ sub _can_merge {
   return 1;
 }
 
-sub requests_response_from_api {
-  my $self = shift;
-
-  # we didn't ask for any requests, nothing more to do.
-  return if @_ && !$self->{requests};
-
-  state $check = compile(ArrayRef, { optional => 1 });
-  my ($requests) = $check->(@_);
-  return $self->{requests_response} if !$requests;
-
-  # strip off a response for each request made.
-  $self->{requests_response} = [];
-  push(@{ $self->{requests_response} }, shift @$requests)
-    for (1..scalar @{ $self->{requests} });
-
-  # don't store the original requests now that they've been done.
-  delete $self->{requests};
-
-  return $self->{requests_response};
-}
-
 1;
 
 __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Request - A base class to build Google API's batchRequest.
+Google::RestApi::SheetsApi4::Request - Build Google Sheets API batchRequests with merge support.
 
 =head1 DESCRIPTION
 
-A Request is a lightweight object that is used to collect and then
-submit a number of batch requests such as formatting, spreadsheet
-properties, worksheet properties etc.
-
-Other classes in this api derive from this object and its child
-objects. You would not normally have to interact with this object
-directly as it is already built in to the other classes in this
-api. It is documented here for background understanding.
-
-Batch requests are formulated and queued up to be submitted later
-via 'submit_requests'. This class hierarchy encapsulates the
-tedious work of constructing the complex, deep hashes required for
-cell formatting or setting various properties.
-
- Spreadsheet: Derives from Request::Spreadsheet.
- Worksheet: Derives from Request::Spreadsheet::Worksheet.
- Range: Derives from Request::Spreadsheet::Worksheet::Range.
-
-A Spreadsheet object can only submit requests that have to do with
-spreadsheets. A Worksheet object can submit requests that have to
-do with worksheets, and also for parent spreadsheets. A Range object
-can submit requests that have to do with ranges, worksheets, and
-spreadsheets.
-
-In some cases, multiple calls for the same-named request can be
-merged into a single request. For example $range->bold()->blue()->center()
-targets three Google API requests of the same name: 'repeatCell'.
-Instead of sending three small 'repeatCell' requests, these are
-all merged together into one 'repeatCell' request for efficiency.
+Inherits from L<Google::RestApi::Request> and adds Sheets-specific
+request merging logic. Multiple calls for the same-named request
+(e.g. repeatCell) can be merged into a single request for efficiency.
 
 See the description and synopsis at Google::RestApi::SheetsApi4.
 
@@ -153,11 +90,11 @@ See the description and synopsis at Google::RestApi::SheetsApi4.
 
 =over
 
-=item batch_requests(%request);
+=item merge_request(\%request);
 
-Returns all the queued requests if none is passed, or adds the passed
-request to the queue. A request may be merged into an already-existing
-request of the same name.
+Attempts to merge the given request with an existing queued request
+of the same type. For example, $range->bold()->blue()->center()
+targets three 'repeatCell' requests that get merged into one.
 
 =item submit_requests(%args);
 

@@ -12,9 +12,9 @@ our @EXPORT_OK = qw(
   mock_config_file mock_token_file
   mock_spreadsheet_name mock_spreadsheet_name2
   mock_worksheet_id mock_worksheet_name
-  mock_rest_api mock_sheets_api mock_drive_api mock_calendar_api mock_gmail_api mock_tasks_api
-  mock_file_id mock_file_name mock_calendar_id mock_task_list_id
-  drive_endpoint sheets_endpoint calendar_endpoint gmail_endpoint tasks_endpoint
+  mock_rest_api mock_sheets_api mock_drive_api mock_calendar_api mock_gmail_api mock_tasks_api mock_docs_api
+  mock_file_id mock_file_name mock_calendar_id mock_task_list_id mock_document_id
+  drive_endpoint sheets_endpoint calendar_endpoint gmail_endpoint tasks_endpoint docs_endpoint
 );
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
@@ -32,16 +32,19 @@ sub mock_drive_api { _load_and_new('Google::RestApi::DriveApi3', api => mock_res
 sub mock_calendar_api { _load_and_new('Google::RestApi::CalendarApi3', api => mock_rest_api(), @_); }
 sub mock_gmail_api { _load_and_new('Google::RestApi::GmailApi1', api => mock_rest_api(), @_); }
 sub mock_tasks_api { _load_and_new('Google::RestApi::TasksApi1', api => mock_rest_api(), @_); }
+sub mock_docs_api { _load_and_new('Google::RestApi::DocsApi1', api => mock_rest_api(), @_); }
 sub mock_file_id { 'mock_file_id_12345'; }
 sub mock_file_name { 'mock_file_name'; }
 sub mock_calendar_id { 'mock_calendar_id@group.calendar.google.com'; }
 sub mock_task_list_id { 'mock_task_list_id_12345'; }
+sub mock_document_id { 'mock_document_id_12345'; }
 
 sub drive_endpoint { $Google::RestApi::DriveApi3::Drive_Endpoint; }
 sub sheets_endpoint { $Google::RestApi::SheetsApi4::Sheets_Endpoint; }
 sub calendar_endpoint { $Google::RestApi::CalendarApi3::Calendar_Endpoint; }
 sub gmail_endpoint { $Google::RestApi::GmailApi1::Gmail_Endpoint; }
 sub tasks_endpoint { $Google::RestApi::TasksApi1::Tasks_Endpoint; }
+sub docs_endpoint { $Google::RestApi::DocsApi1::Docs_Endpoint; }
 
 sub _load_and_new {
   my $class = shift;
