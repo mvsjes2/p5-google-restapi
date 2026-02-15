@@ -161,18 +161,10 @@ The synopsis above is a quick reference. For more detailed information, most of 
     Google::RestApi::SheetsApi4::Worksheet
     Google::RestApi::SheetsApi4::Range
 
-<<<<<<< Updated upstream
 Once you have successfully created your OAuth2 token, you can run the tutorials to ensure everything is working correctly.
 Set the environment variable GOOGLE_RESTAPI_CONFIG to the path to your auth config file.
 See the tutorial/ directory for step-by-step tutorials covering Sheets, Drive, Calendar, Documents, Gmail, and Tasks.
 These will help you understand how the API interacts with Google.
-=======
-Once you have successfully created your OAuth2 token, you can run the integration tests to ensure everything is working correctly.
-Set the environment variable GOOGLE_RESTAPI_CONFIG = to the path to your auth config file for the integration scripts to run.
-See t/run_integration for further instructions.
-
-tutorial/sheets also has a step-by-step tutorial of creating and updating a spreadsheet, showing you the API calls and return values for each step. This will help you understand how the API interacts with Google.
->>>>>>> Stashed changes
 
 # STATUS
 
