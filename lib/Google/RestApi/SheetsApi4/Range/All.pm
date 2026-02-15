@@ -2,7 +2,7 @@ package Google::RestApi::SheetsApi4::Range::All;
 
 # TODO: this class has not been fully tested. use at your own risk.
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -10,8 +10,11 @@ use parent 'Google::RestApi::SheetsApi4::Range';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    worksheet => HasMethods[qw(api worksheet_name)],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      worksheet => HasMethods[qw(api worksheet_name)],
+    ],
   );
   my $self = $check->(@_);
   return bless $self, $class;

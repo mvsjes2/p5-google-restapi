@@ -1,38 +1,39 @@
 package Google::RestApi::CalendarApi3::Event;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar => HasApi,
-    id       => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar => HasApi,
+      id       => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "events";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->calendar()->api(%p, uri => $uri);
-}
+sub _uri_base { 'events' }
+sub _parent_accessor { 'calendar' }
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    summary     => Str,
-    start       => HashRef,
-    end         => HashRef,
-    description => Str, { optional => 1 },
-    location    => Str, { optional => 1 },
-    attendees   => ArrayRef[HashRef], { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      summary     => Str,
+      start       => HashRef,
+      end         => HashRef,
+      description => Str, { optional => 1 },
+      location    => Str, { optional => 1 },
+      attendees   => ArrayRef[HashRef], { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -56,12 +57,15 @@ sub create {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Event ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -71,18 +75,21 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    summary     => Str, { optional => 1 },
-    description => Str, { optional => 1 },
-    location    => Str, { optional => 1 },
-    start       => HashRef, { optional => 1 },
-    end         => HashRef, { optional => 1 },
-    attendees   => ArrayRef[HashRef], { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      summary     => Str, { optional => 1 },
+      description => Str, { optional => 1 },
+      location    => Str, { optional => 1 },
+      start       => HashRef, { optional => 1 },
+      end         => HashRef, { optional => 1 },
+      attendees   => ArrayRef[HashRef], { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Event ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content;
   $content{summary} = delete $p->{summary} if defined $p->{summary};
@@ -102,7 +109,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Event ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting event '%s'", $self->{id}));
   return $self->api(method => 'delete');
@@ -110,8 +117,11 @@ sub delete {
 
 sub quick_add {
   my $self = shift;
-  state $check = compile_named(
-    text => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      text => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -126,36 +136,41 @@ sub quick_add {
 
 sub instances {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Event ID required for instances()" unless $self->{id};
+  $self->require_id('instances');
 
-  my $params = $p->{params};
-  $params->{fields} //= 'items(id, summary, start, end)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'instances', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'instances',
     result_key     => 'items',
+    default_fields => 'items(id, summary, start, end)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
 
 sub move {
   my $self = shift;
-  state $check = compile_named(
-    destination => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      destination => Str,
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Event ID required for move()" unless $self->{id};
+  $self->require_id('move');
 
   DEBUG(sprintf("Moving event '%s' to calendar '%s'", $self->{id}, $p->{destination}));
   my $result = $self->api(
@@ -232,10 +247,11 @@ Deletes the event. Requires event ID.
 
 Creates an event using natural language text parsing.
 
-=head2 instances(params => \%params, max_pages => $n)
+=head2 instances(params => \%params, max_pages => $n, page_callback => $coderef)
 
 Lists instances of a recurring event. Requires event ID. C<max_pages> limits
-the number of pages fetched (default 0 = unlimited).
+the number of pages fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 move(destination => $calendar_id)
 

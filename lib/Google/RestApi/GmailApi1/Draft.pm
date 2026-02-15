@@ -1,38 +1,39 @@
 package Google::RestApi::GmailApi1::Draft;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    gmail_api => HasApi,
-    id        => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      gmail_api => HasApi,
+      id        => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "drafts";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->gmail_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'drafts' }
+sub _parent_accessor { 'gmail_api' }
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    to           => Str,
-    subject      => Str,
-    body         => Str,
-    from         => Str, { optional => 1 },
-    cc           => Str, { optional => 1 },
-    bcc          => Str, { optional => 1 },
-    content_type => Str, { default => 'text/plain' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      to           => Str,
+      subject      => Str,
+      body         => Str,
+      from         => Str, { optional => 1 },
+      cc           => Str, { optional => 1 },
+      bcc          => Str, { optional => 1 },
+      content_type => Str, { default => 'text/plain' },
+    ],
   );
   my $p = $check->(@_);
 
@@ -49,8 +50,11 @@ sub create {
 
 sub create_raw {
   my $self = shift;
-  state $check = compile_named(
-    raw => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      raw => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -65,13 +69,16 @@ sub create_raw {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    format => Str, { optional => 1 },
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      format => Str, { optional => 1 },
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Draft ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{format} = $p->{format} if defined $p->{format};
@@ -82,18 +89,21 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    to           => Str,
-    subject      => Str,
-    body         => Str,
-    from         => Str, { optional => 1 },
-    cc           => Str, { optional => 1 },
-    bcc          => Str, { optional => 1 },
-    content_type => Str, { default => 'text/plain' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      to           => Str,
+      subject      => Str,
+      body         => Str,
+      from         => Str, { optional => 1 },
+      cc           => Str, { optional => 1 },
+      bcc          => Str, { optional => 1 },
+      content_type => Str, { default => 'text/plain' },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Draft ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my $raw = $self->gmail_api()->_build_mime(%$p);
 
@@ -107,7 +117,7 @@ sub update {
 sub send {
   my $self = shift;
 
-  LOGDIE "Draft ID required for send()" unless $self->{id};
+  $self->require_id('send');
 
   DEBUG(sprintf("Sending draft '%s'", $self->{id}));
   return $self->gmail_api()->api(
@@ -120,7 +130,7 @@ sub send {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Draft ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting draft '%s'", $self->{id}));
   return $self->api(method => 'delete');

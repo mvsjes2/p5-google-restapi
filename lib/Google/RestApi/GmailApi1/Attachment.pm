@@ -1,32 +1,30 @@
 package Google::RestApi::GmailApi1::Attachment;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    message => HasApi,
-    id      => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      message => HasApi,
+      id      => Str,
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "attachments";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->message()->api(%p, uri => $uri);
-}
+sub _uri_base { 'attachments' }
+sub _parent_accessor { 'message' }
 
 sub get {
   my $self = shift;
 
-  LOGDIE "Attachment ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   return $self->api();
 }

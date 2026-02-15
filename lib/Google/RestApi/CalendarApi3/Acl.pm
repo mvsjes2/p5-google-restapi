@@ -1,35 +1,37 @@
 package Google::RestApi::CalendarApi3::Acl;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar => HasApi,
-    id       => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar => HasApi,
+      id       => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "acl";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->calendar()->api(%p, uri => $uri);
-}
+sub _uri_base { 'acl' }
+sub _parent_accessor { 'calendar' }
+sub _resource_name { 'ACL' }
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    role        => Str,
-    scope_type  => Str,
-    scope_value => Str, { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      role        => Str,
+      scope_type  => Str,
+      scope_value => Str, { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -52,12 +54,15 @@ sub create {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "ACL ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -67,13 +72,16 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    role    => Str,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      role    => Str,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "ACL ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content = (
     role => delete $p->{role},
@@ -89,7 +97,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "ACL ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting ACL rule '%s' from calendar '%s'", $self->{id}, $self->calendar()->calendar_id()));
   return $self->api(method => 'delete');

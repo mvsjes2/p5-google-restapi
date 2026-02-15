@@ -3,7 +3,7 @@ package Google::RestApi::Setup;
 use strict;
 use warnings;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use parent 'ToolSet';
 
@@ -17,7 +17,7 @@ ToolSet->export(
   'autodie'                            =>  [],
   'Log::Log4perl'                      => ':easy',
   'namespace::autoclean'               =>  [],
-  'Type::Params'                       => 'compile compile_named multisig validate',
+  'Type::Params'                       => 'signature',
   'Types::Standard'                    => 'Undef Defined Value Bool Str StrMatch Int Num ArrayRef HashRef Dict CodeRef Object HasMethods slurpy Any Maybe Optional',
   'Types::Common::Numeric'             => 'PositiveNum PositiveOrZeroNum PositiveInt PositiveOrZeroInt',
   'YAML::Any'                          => 'Dump',

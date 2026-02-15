@@ -4,31 +4,32 @@ our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    comment => HasApi,
-    id      => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      comment => HasApi,
+      id      => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "replies";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->comment()->api(%p, uri => $uri);
-}
+sub _uri_base { 'replies' }
+sub _parent_accessor { 'comment' }
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    content => Str,
-    action  => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      content => Str,
+      action  => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -49,13 +50,16 @@ sub create {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields          => Str, { default => 'id,content,author,createdTime,modifiedTime' },
-    include_deleted => Bool, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields          => Str, { default => 'id,content,author,createdTime,modifiedTime' },
+      include_deleted => Bool, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Reply ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params = (
     fields => $p->{fields},
@@ -67,13 +71,16 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    content => Str,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      content => Str,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Reply ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content = (
     content => delete $p->{content},
@@ -89,7 +96,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Reply ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting reply '%s'", $self->{id}));
   return $self->api(method => 'delete');

@@ -1,32 +1,30 @@
 package Google::RestApi::CalendarApi3::Settings;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar_api => HasApi,
-    id           => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar_api => HasApi,
+      id           => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "users/me/settings";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->calendar_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'users/me/settings' }
+sub _parent_accessor { 'calendar_api' }
 
 sub get {
   my $self = shift;
 
-  LOGDIE "Settings ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   return $self->api();
 }

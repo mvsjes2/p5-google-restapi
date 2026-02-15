@@ -1,6 +1,6 @@
 package Google::RestApi::GmailApi1;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -19,19 +19,25 @@ Readonly our $Gmail_Endpoint => 'https://gmail.googleapis.com/gmail/v1/users';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    api      => HasApi,
-    user_id  => Str, { default => 'me' },
-    endpoint => Str, { default => $Gmail_Endpoint },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api      => HasApi,
+      user_id  => Str, { default => 'me' },
+      endpoint => Str, { default => $Gmail_Endpoint },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   my $uri = "$self->{endpoint}/$self->{user_id}/";
@@ -41,8 +47,11 @@ sub api {
 
 sub message {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Message->new(gmail_api => $self, %$p);
@@ -50,8 +59,11 @@ sub message {
 
 sub thread {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Thread->new(gmail_api => $self, %$p);
@@ -59,8 +71,11 @@ sub thread {
 
 sub draft {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Draft->new(gmail_api => $self, %$p);
@@ -68,8 +83,11 @@ sub draft {
 
 sub label {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Label->new(gmail_api => $self, %$p);
@@ -82,42 +100,48 @@ sub profile {
 
 sub messages {
   my $self = shift;
-  state $check = compile_named(
-    max_pages     => Int, { default => 1 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      max_pages     => Int, { default => 1 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'messages(id, threadId)';
-  $params->{fields} = 'nextPageToken, resultSizeEstimate, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'messages', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'messages',
     result_key     => 'messages',
+    default_fields => 'messages(id, threadId)',
+    fields_prefix  => 'nextPageToken, resultSizeEstimate',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
 
 sub threads {
   my $self = shift;
-  state $check = compile_named(
-    max_pages     => Int, { default => 1 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      max_pages     => Int, { default => 1 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'threads(id, snippet)';
-  $params->{fields} = 'nextPageToken, resultSizeEstimate, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'threads', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'threads',
     result_key     => 'threads',
+    default_fields => 'threads(id, snippet)',
+    fields_prefix  => 'nextPageToken, resultSizeEstimate',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -130,14 +154,17 @@ sub labels {
 
 sub send_message {
   my $self = shift;
-  state $check = compile_named(
-    to           => Str,
-    subject      => Str,
-    body         => Str,
-    from         => Str, { optional => 1 },
-    cc           => Str, { optional => 1 },
-    bcc          => Str, { optional => 1 },
-    content_type => Str, { default => 'text/plain' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      to           => Str,
+      subject      => Str,
+      body         => Str,
+      from         => Str, { optional => 1 },
+      cc           => Str, { optional => 1 },
+      bcc          => Str, { optional => 1 },
+      content_type => Str, { default => 'text/plain' },
+    ],
   );
   my $p = $check->(@_);
 
@@ -154,8 +181,11 @@ sub send_message {
 
 sub send_raw_message {
   my $self = shift;
-  state $check = compile_named(
-    raw => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      raw => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -170,10 +200,13 @@ sub send_raw_message {
 
 sub batch_modify_messages {
   my $self = shift;
-  state $check = compile_named(
-    ids              => ArrayRef[Str],
-    add_label_ids    => ArrayRef[Str], { default => [] },
-    remove_label_ids => ArrayRef[Str], { default => [] },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      ids              => ArrayRef[Str],
+      add_label_ids    => ArrayRef[Str], { default => [] },
+      remove_label_ids => ArrayRef[Str], { default => [] },
+    ],
   );
   my $p = $check->(@_);
 
@@ -193,8 +226,11 @@ sub batch_modify_messages {
 
 sub batch_delete_messages {
   my $self = shift;
-  state $check = compile_named(
-    ids => ArrayRef[Str],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      ids => ArrayRef[Str],
+    ],
   );
   my $p = $check->(@_);
 
@@ -230,6 +266,9 @@ sub _build_mime {
 }
 
 sub rest_api { shift->{api}; }
+sub transaction { shift->rest_api()->transaction(); }
+sub stats { shift->rest_api()->stats(); }
+sub reset_stats { shift->rest_api->reset_stats(); }
 
 1;
 
@@ -467,6 +506,8 @@ Lists messages in the user's mailbox.
 
 =item * C<max_pages> <int>: Optional. Maximum number of pages to fetch (default 1). Set to 0 for unlimited.
 
+=item * C<page_callback> <coderef>: Optional. See L<Google::RestApi/PAGE CALLBACKS>.
+
 =item * C<params> <hashref>: Optional. Query parameters (q, maxResults, labelIds, etc).
 
 =back
@@ -485,6 +526,8 @@ Lists threads in the user's mailbox.
 =over
 
 =item * C<max_pages> <int>: Optional. Maximum number of pages to fetch (default 1). Set to 0 for unlimited.
+
+=item * C<page_callback> <coderef>: Optional. See L<Google::RestApi/PAGE CALLBACKS>.
 
 =item * C<params> <hashref>: Optional. Query parameters (q, maxResults, etc).
 

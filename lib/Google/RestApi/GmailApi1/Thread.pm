@@ -1,37 +1,38 @@
 package Google::RestApi::GmailApi1::Thread;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    gmail_api => HasApi,
-    id        => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      gmail_api => HasApi,
+      id        => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "threads";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->gmail_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'threads' }
+sub _parent_accessor { 'gmail_api' }
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    format => Str, { optional => 1 },
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      format => Str, { optional => 1 },
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Thread ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{format} = $p->{format} if defined $p->{format};
@@ -42,13 +43,16 @@ sub get {
 
 sub modify {
   my $self = shift;
-  state $check = compile_named(
-    add_label_ids    => ArrayRef[Str], { default => [] },
-    remove_label_ids => ArrayRef[Str], { default => [] },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      add_label_ids    => ArrayRef[Str], { default => [] },
+      remove_label_ids => ArrayRef[Str], { default => [] },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Thread ID required for modify()" unless $self->{id};
+  $self->require_id('modify');
 
   my %content;
   $content{addLabelIds} = $p->{add_label_ids} if $p->{add_label_ids}->@*;
@@ -65,7 +69,7 @@ sub modify {
 sub trash {
   my $self = shift;
 
-  LOGDIE "Thread ID required for trash()" unless $self->{id};
+  $self->require_id('trash');
 
   DEBUG(sprintf("Trashing thread '%s'", $self->{id}));
   return $self->api(uri => 'trash', method => 'post');
@@ -74,7 +78,7 @@ sub trash {
 sub untrash {
   my $self = shift;
 
-  LOGDIE "Thread ID required for untrash()" unless $self->{id};
+  $self->require_id('untrash');
 
   DEBUG(sprintf("Untrashing thread '%s'", $self->{id}));
   return $self->api(uri => 'untrash', method => 'post');
@@ -83,7 +87,7 @@ sub untrash {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Thread ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting thread '%s'", $self->{id}));
   return $self->api(method => 'delete');

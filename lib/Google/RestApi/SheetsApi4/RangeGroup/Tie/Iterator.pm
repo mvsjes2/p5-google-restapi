@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -8,9 +8,12 @@ use parent qw(Google::RestApi::SheetsApi4::RangeGroup::Iterator);
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    tied    => HashRef,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      tied    => HashRef,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 

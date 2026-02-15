@@ -1,6 +1,6 @@
 package Google::RestApi::Request;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -30,7 +30,7 @@ sub requests_response_from_api {
   # we didn't ask for any requests, nothing more to do.
   return if @_ && !$self->{requests};
 
-  state $check = compile(ArrayRef, { optional => 1 });
+  state $check = signature(positional => [ArrayRef, { optional => 1 }]);
   my ($requests) = $check->(@_);
   return $self->{requests_response} if !$requests;
 

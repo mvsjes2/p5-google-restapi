@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -21,12 +21,15 @@ sub new {
   my $class = shift;
 
   my $self = merge_config_file(@_);
-  state $check = compile_named(
-    config_file  => ReadableFile, { optional => 1 },          # specify any of the below in a yaml file instead.
-    auth         => HashRef | HasMethods[qw(headers params)], # a string that will be used to construct an auth obj, or the obj itself.
-    throttle     => PositiveOrZeroInt, { default => 0 },      # mostly used for integration testing, to ensure we don't blow our rate limit.
-    timeout      => Int, { default => 120 },
-    max_attempts => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      config_file  => ReadableFile, { optional => 1 },          # specify any of the below in a yaml file instead.
+      auth         => HashRef | HasMethods[qw(headers params)], # a string that will be used to construct an auth obj, or the obj itself.
+      throttle     => PositiveOrZeroInt, { default => 0 },      # mostly used for integration testing, to ensure we don't blow our rate limit.
+      timeout      => Int, { default => 120 },
+      max_attempts => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
+    ],
   );
   $self = $check->(%$self);
 
@@ -40,12 +43,15 @@ sub new {
 sub api {
   my $self = shift;
 
-  state $check = compile_named(
-    uri     => StrMatch[qr(^https://)],
-    method  => StrMatch[qr/^(get|head|put|patch|post|delete)$/i], { default => 'get' },
-    params  => HashRef[Str|ArrayRef[Str]], { default => {} },   # uri param string.
-    headers => ArrayRef[Str], { default => [] },                # http headers.
-    content => 0,                                               # rest payload.
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => StrMatch[qr(^https://)],
+      method  => StrMatch[qr/^(get|head|put|patch|post|delete)$/i], { default => 'get' },
+      params  => HashRef[Str|ArrayRef[Str]], { default => {} },   # uri param string.
+      headers => ArrayRef[Str], { default => [] },                # http headers.
+      content => 0,                                               # rest payload.
+    ],
   );
   my $request = $check->(@_);
 
@@ -172,7 +178,7 @@ sub _api_callback {
 # sets the api callback code.
 sub api_callback {
   my $self = shift;
-  state $check = compile(CodeRef, { optional => 1 });
+  state $check = signature(positional => [CodeRef, { optional => 1 }]);
   my ($api_callback) = $check->(@_);
   my $prev_api_callback = delete $self->{api_callback};
   $self->{api_callback} = $api_callback if $api_callback;
@@ -243,7 +249,7 @@ sub _caller_external {
 # 0 sets and returns default value.
 sub max_attempts {
   my $self = shift;
-  state $check = compile(PositiveOrZeroInt->where(sub { $_ < 10; }), { optional => 1 });
+  state $check = signature(positional => [PositiveOrZeroInt->where(sub { $_ < 10; }), { optional => 1 }]);
   my ($max_attempts) = $check->(@_);
   $self->{max_attempts} = $max_attempts if $max_attempts;
   $self->{max_attempts} = 4 if defined $max_attempts && $max_attempts == 0;
@@ -256,12 +262,14 @@ __END__
 
 =head1 NAME
 
-Google::RestApi - Connection to Google REST APIs (currently Drive, Sheets, and Calendar).
+Google::RestApi - API to Google Drive API V3, Sheets API V4, Calendar API V3,
+Gmail API V1, Tasks API V1, and Docs API V1.
 
 =head1 SYNOPSIS
 
 =over
 
+  # create a new RestApi object to be used by the apis.
   use Google::RestApi;
   $rest_api = Google::RestApi->new(
     config_file   => <path_to_config_file>,
@@ -271,6 +279,8 @@ Google::RestApi - Connection to Google REST APIs (currently Drive, Sheets, and C
     api_callback  => <coderef>,
   );
 
+  # you can call the raw api directly, but usually the apis will take care of
+  # forming the correct API calls for you.
   $response = $rest_api->api(
     uri     => <google_api_url>,
     method  => get|head|put|patch|post|delete,
@@ -279,123 +289,107 @@ Google::RestApi - Connection to Google REST APIs (currently Drive, Sheets, and C
     content => <data_for_body>,
   );
 
-  use Google::RestApi::SheetsApi4;
-  $sheets_api = Google::RestApi::SheetsApi4->new(api => $rest_api);
-  $sheet = $sheets_api->open_spreadsheet(title => "payroll");
-
+  # --- Drive API ---
   use Google::RestApi::DriveApi3;
   $drive = Google::RestApi::DriveApi3->new(api => $rest_api);
   $file = $drive->file(id => 'xxxx');
   $copy = $file->copy(name => 'my-copy-of-xxx');
-  $file->update(description => 'Updated via API');
+  @files = $drive->list(filter => "name contains 'report'");
 
-  # permissions, comments, replies, revisions
-  $file->permission()->create(role => 'reader', type => 'anyone');
-  $comment = $file->comment()->create(content => 'Looks good!');
-  $comment->reply()->create(content => 'Thanks!');
-  @revisions = $file->revisions();
+  # --- Sheets API ---
+  use Google::RestApi::SheetsApi4;
+  $sheets = Google::RestApi::SheetsApi4->new(api => $rest_api);
+  $spreadsheet = $sheets->open_spreadsheet(name => 'My Sheet');
+  $worksheet = $spreadsheet->open_worksheet(name => 'Sheet1');
+  @values = $worksheet->col('A');
+  $worksheet->row(1, ['Name', 'Email', 'Phone']);
 
-  print YAML::Any::Dump($rest_api->stats());
+  # --- Calendar API ---
+  use Google::RestApi::CalendarApi3;
+  $calendar_api = Google::RestApi::CalendarApi3->new(api => $rest_api);
+  $calendar = $calendar_api->create_calendar(summary => 'Team Events');
+  $event = $calendar->event();
+  $event->create(
+    summary => 'Meeting',
+    start   => { dateTime => '2026-03-01T10:00:00-05:00' },
+    end     => { dateTime => '2026-03-01T11:00:00-05:00' },
+  );
+
+  # --- Gmail API ---
+  use Google::RestApi::GmailApi1;
+  $gmail = Google::RestApi::GmailApi1->new(api => $rest_api);
+  $gmail->send_message(
+    to => 'user@example.com', subject => 'Hello', body => 'Hi there',
+  );
+  @messages = $gmail->messages();
+
+  # --- Tasks API ---
+  use Google::RestApi::TasksApi1;
+  $tasks = Google::RestApi::TasksApi1->new(api => $rest_api);
+  $task_list = $tasks->create_task_list(title => 'My Tasks');
+  $task_list->create_task(title => 'Buy groceries', notes => 'Milk, eggs');
+
+  # --- Docs API ---
+  use Google::RestApi::DocsApi1;
+  $docs = Google::RestApi::DocsApi1->new(api => $rest_api);
+  $doc = $docs->create_document(title => 'My Document');
+  $doc->insert_text(text => 'Hello, world!');
+  $doc->submit_requests();
+
+See the individual PODs for the different apis for details on how to use each
+one.
 
 =back
 
 =head1 DESCRIPTION
 
-Google Rest API is the foundation class used by the included Drive (L<Google::RestApi::DriveApi3>), Sheets (L<Google::RestApi::SheetsApi4>),
-Calendar (L<Google::RestApi::CalendarApi3>), Gmail (L<Google::RestApi::GmailApi1>), Tasks (L<Google::RestApi::TasksApi1>), and Docs (L<Google::RestApi::DocsApi1>) APIs.
-It is used to send API requests to the Google API endpoint on behalf of the underlying API classes.
+Google::RestApi is a framework for interfacing with Google products, currently
+Drive (L<Google::RestApi::DriveApi3>), Sheets (L<Google::RestApi::SheetsApi4>),
+Calendar (L<Google::RestApi::CalendarApi3>), Gmail (L<Google::RestApi::GmailApi1>),
+Tasks (L<Google::RestApi::TasksApi1>), and Docs (L<Google::RestApi::DocsApi1>).
 
-=head1 NAVIGATION
+The biggest hurdle to using this library is actually setting up the authorization
+to access your Google account via a script. The Google development web space is
+huge and complex. All that's required here is an OAuth2 token to authorize your
+script that uses this library. See C<bin/google_restapi_oauth_token_creator> for
+instructions on how to do so. Once you've done it a couple of times it's
+straight forward.
 
-=over
+The synopsis above is a quick reference. For more detailed information, see the
+pods listed in the L</NAVIGATION> section below.
 
-=item * L<Google::RestApi::DriveApi3>
+Once you have successfully created your OAuth2 token, you can run the tutorials
+to ensure everything is working correctly. Set the environment variable
+C<GOOGLE_RESTAPI_CONFIG> to the path to your auth config file. See the
+C<tutorial/> directory for step-by-step tutorials covering Sheets, Drive,
+Calendar, Documents, Gmail, and Tasks. These will help you understand how the
+API interacts with Google.
 
-=item * L<Google::RestApi::DriveApi3::File>
+=head2 Chained API Calls
 
-=item * L<Google::RestApi::DriveApi3::About>
+Every Google API module has an C<api()> method. Sub-resource objects
+(see L<Google::RestApi::SubResource>) don't call the Google endpoint
+directly; instead, each C<api()> prepends its own URI segment and
+delegates to its parent's C<api()>. The calls chain upward until they
+reach the top-level API module (e.g. DriveApi3), which prepends the
+endpoint base URL and hands the fully-assembled URI to
+C<Google::RestApi> for the actual HTTP request.
 
-=item * L<Google::RestApi::DriveApi3::Changes>
+For example, deleting a reply on a comment on a file produces this chain:
 
-=item * L<Google::RestApi::DriveApi3::Drive>
+ $reply->api(method => 'delete')
+   # Reply prepends "replies/$reply_id"
+   -> $comment->api(uri => "replies/$reply_id", method => 'delete')
+     # Comment prepends "comments/$comment_id"
+     -> $file->api(uri => "comments/$comment_id/replies/$reply_id", ...)
+       # File prepends "files/$file_id"
+       -> $drive->api(uri => "files/$file_id/comments/$comment_id/replies/$reply_id", ...)
+         # DriveApi3 prepends "https://www.googleapis.com/drive/v3/"
+         -> $rest_api->api(uri => "https://...drive/v3/files/$file_id/comments/$comment_id/replies/$reply_id", method => 'delete')
 
-=item * L<Google::RestApi::DriveApi3::Permission>
-
-=item * L<Google::RestApi::DriveApi3::Comment>
-
-=item * L<Google::RestApi::DriveApi3::Reply>
-
-=item * L<Google::RestApi::DriveApi3::Revision>
-
-=item * L<Google::RestApi::SheetsApi4>
-
-=item * L<Google::RestApi::SheetsApi4::Spreadsheet>
-
-=item * L<Google::RestApi::SheetsApi4::Worksheet>
-
-=item * L<Google::RestApi::SheetsApi4::Range>
-
-=item * L<Google::RestApi::SheetsApi4::Range::All>
-
-=item * L<Google::RestApi::SheetsApi4::Range::Col>
-
-=item * L<Google::RestApi::SheetsApi4::Range::Row>
-
-=item * L<Google::RestApi::SheetsApi4::Range::Cell>
-
-=item * L<Google::RestApi::SheetsApi4::Range::Iterator>
-
-=item * L<Google::RestApi::SheetsApi4::RangeGroup>
-
-=item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
-
-=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie>
-
-=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator>
-
-=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet>
-
-=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet>
-
-=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range>
-
-=item * L<Google::RestApi::CalendarApi3>
-
-=item * L<Google::RestApi::CalendarApi3::Calendar>
-
-=item * L<Google::RestApi::CalendarApi3::Event>
-
-=item * L<Google::RestApi::CalendarApi3::Acl>
-
-=item * L<Google::RestApi::CalendarApi3::CalendarList>
-
-=item * L<Google::RestApi::CalendarApi3::Colors>
-
-=item * L<Google::RestApi::CalendarApi3::Settings>
-
-=item * L<Google::RestApi::GmailApi1>
-
-=item * L<Google::RestApi::GmailApi1::Message>
-
-=item * L<Google::RestApi::GmailApi1::Attachment>
-
-=item * L<Google::RestApi::GmailApi1::Thread>
-
-=item * L<Google::RestApi::GmailApi1::Draft>
-
-=item * L<Google::RestApi::GmailApi1::Label>
-
-=item * L<Google::RestApi::TasksApi1>
-
-=item * L<Google::RestApi::TasksApi1::TaskList>
-
-=item * L<Google::RestApi::TasksApi1::Task>
-
-=item * L<Google::RestApi::DocsApi1>
-
-=item * L<Google::RestApi::DocsApi1::Document>
-
-=back
+Each layer only knows about its own URI segment and its parent accessor.
+This pattern applies uniformly across all six APIs (Drive, Sheets,
+Calendar, Gmail, Tasks, Docs).
 
 =head1 SUBROUTINES
 
@@ -481,6 +475,151 @@ above, but can be accessed directly if you have no need to provide a callback.
 Returns some statistics on how many get/put/post etc calls were made. Useful for performance tuning during development.
 
 =back
+
+=head1 PAGE CALLBACKS
+
+Many list methods across the API support a C<page_callback> parameter for
+processing paginated results. The callback is called with the raw API result
+hashref after each page is fetched. Return a true value to continue fetching,
+or false to stop early.
+
+ # print progress while listing files:
+ my @files = $drive->list(
+   filter        => "name contains 'report'",
+   page_callback => sub {
+     my ($result) = @_;
+     print "Fetched a page of results...\n";
+     return 1;  # continue fetching
+   },
+ );
+
+ # stop after finding what you need:
+ my $target;
+ my @messages = $gmail_api->messages(
+   max_pages     => 0,       # allow unlimited pages
+   page_callback => sub {
+     my ($result) = @_;
+     foreach my $msg (@{ $result->{messages} || [] }) {
+       if ($msg->{id} eq $some_id) {
+         $target = $msg;
+         return 0;  # stop pagination
+       }
+     }
+     return 1;  # keep going
+   },
+ );
+
+=head1 NAVIGATION
+
+=over
+
+=item * L<Google::RestApi::DriveApi3>
+
+=item * L<Google::RestApi::DriveApi3::File>
+
+=item * L<Google::RestApi::DriveApi3::About>
+
+=item * L<Google::RestApi::DriveApi3::Changes>
+
+=item * L<Google::RestApi::DriveApi3::Drive>
+
+=item * L<Google::RestApi::DriveApi3::Permission>
+
+=item * L<Google::RestApi::DriveApi3::Comment>
+
+=item * L<Google::RestApi::DriveApi3::Reply>
+
+=item * L<Google::RestApi::DriveApi3::Revision>
+
+=item * L<Google::RestApi::SubResource>
+
+=item * L<Google::RestApi::SheetsApi4>
+
+=item * L<Google::RestApi::SheetsApi4::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Range>
+
+=item * L<Google::RestApi::SheetsApi4::Range::All>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Col>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Row>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Cell>
+
+=item * L<Google::RestApi::SheetsApi4::Range::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie>
+
+=item * L<Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet>
+
+=item * L<Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range>
+
+=item * L<Google::RestApi::CalendarApi3>
+
+=item * L<Google::RestApi::CalendarApi3::Calendar>
+
+=item * L<Google::RestApi::CalendarApi3::Event>
+
+=item * L<Google::RestApi::CalendarApi3::Acl>
+
+=item * L<Google::RestApi::CalendarApi3::CalendarList>
+
+=item * L<Google::RestApi::CalendarApi3::Colors>
+
+=item * L<Google::RestApi::CalendarApi3::Settings>
+
+=item * L<Google::RestApi::GmailApi1>
+
+=item * L<Google::RestApi::GmailApi1::Message>
+
+=item * L<Google::RestApi::GmailApi1::Attachment>
+
+=item * L<Google::RestApi::GmailApi1::Thread>
+
+=item * L<Google::RestApi::GmailApi1::Draft>
+
+=item * L<Google::RestApi::GmailApi1::Label>
+
+=item * L<Google::RestApi::TasksApi1>
+
+=item * L<Google::RestApi::TasksApi1::TaskList>
+
+=item * L<Google::RestApi::TasksApi1::Task>
+
+=item * L<Google::RestApi::DocsApi1>
+
+=item * L<Google::RestApi::DocsApi1::Document>
+
+=back
+
+=head1 STATUS
+
+Partial sheets and drive apis were hand-written by the author. Anthropic
+Claude was used to generate the missing api calls for these, and the rest of
+the google apis were added using Claude, based on the original hand-wrieetn
+patterns. If all works for you, it will be due to the author's stunning
+intellect. If it doesn't, or you see strange and wild code, it's all Claude's
+fault, nothing to do with the author.
+
+All mock exchanges were generated by running the unit tests and opening the
+live api to save the requests/responses for later playback. This process is
+used as an integration test. Because all the tests pass using this process,
+it's a pretty good indicator that the calls work.
+
+=head1 BUGS
+
+Please report a bug or missing api call by creating an issue at the git repo.
 
 =head1 AUTHORS
 

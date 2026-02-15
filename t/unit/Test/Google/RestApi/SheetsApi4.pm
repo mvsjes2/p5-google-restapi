@@ -27,11 +27,12 @@ sub api : Tests(1) {
   return;
 }
 
-sub ordered_tests : Tests(16) {
+sub ordered_tests : Tests(20) {
   my $self = shift;
   $self->create_spreadsheet;
   $self->copy_spreadsheet;
   $self->spreadsheets;
+  $self->page_callback;
   $self->delete_spreadsheet;
   $self->delete_all_spreadsheets_by_filters;
   return;
@@ -76,13 +77,36 @@ sub spreadsheets {
   my $self = shift;
   my $sheets_api = mock_sheets_api();
 
-  my @spreadsheets = $sheets_api->spreadsheets(mock_spreadsheet_name());
+  my @spreadsheets = $sheets_api->spreadsheets(name => mock_spreadsheet_name());
   ok scalar @spreadsheets >= 2, "There are two (or more) spreadsheets named " . mock_spreadsheet_name();
   my $qr_id = $Google::RestApi::SheetsApi4::Spreadsheet_Id;
   is_valid \@spreadsheets, ArrayRef[Dict[id => StrMatch[qr/$qr_id/], name => Str]], "Spreadsheets return";
 
-  @spreadsheets = $sheets_api->spreadsheets_by_filter("name contains 'mock_spreadsheet'");
+  @spreadsheets = $sheets_api->spreadsheets_by_filter(filter => "name contains 'mock_spreadsheet'");
   ok scalar @spreadsheets >= 4, "There are four (or more) spreadsheet names containing 'mock_spreadsheet'";
+
+  return;
+}
+
+sub page_callback {
+  my $self = shift;
+  my $sheets_api = mock_sheets_api();
+
+  my $callback_count = 0;
+  my @spreadsheets = $sheets_api->spreadsheets(
+    name          => mock_spreadsheet_name(),
+    page_callback => sub { $callback_count++; return 1; },
+  );
+  ok $callback_count > 0, "Page callback was called for spreadsheets()";
+  ok scalar @spreadsheets >= 1, "Spreadsheets returned with page callback";
+
+  $callback_count = 0;
+  @spreadsheets = $sheets_api->spreadsheets_by_filter(
+    filter        => "name contains 'mock_spreadsheet'",
+    page_callback => sub { $callback_count++; return 1; },
+  );
+  ok $callback_count > 0, "Page callback was called for spreadsheets_by_filter()";
+  ok scalar @spreadsheets >= 1, "Spreadsheets_by_filter returned with page callback";
 
   return;
 }

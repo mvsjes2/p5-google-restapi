@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -108,9 +108,12 @@ sub user_entered_format {
 sub repeat_cell {
   my $self = shift;
 
-  state $check = compile_named(
-    cell   => HashRef,
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      cell   => HashRef,
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -189,11 +192,14 @@ sub borders {
     return $self;
   }
 
-  state $check = compile_named(
-    border     =>
-      StrMatch[qr/^(top|bottom|left|right|around|vertical|horizontal|inner|all|)$/],
-      { default => 'around' },
-    properties => HashRef,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      border     =>
+        StrMatch[qr/^(top|bottom|left|right|around|vertical|horizontal|inner|all|)$/],
+        { default => 'around' },
+      properties => HashRef,
+    ],
   );
   my $p = $check->(@_);
   $p->{border} ||= 'around';
@@ -246,8 +252,11 @@ sub merge_both { merge_all(@_); }
 sub merge_cells {
   my $self = shift;
 
-  state $check = compile_named(
-    merge_type => DimColRow | DimAll,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      merge_type => DimColRow | DimAll,
+    ],
   );
   my $p = $check->(@_);
   $p->{merge_type} = dims_all($p->{merge_type});
@@ -277,9 +286,12 @@ sub insert_d { shift->insert_dimension(dimension => shift, inherit => shift); }
 sub insert_dimension {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension => Str,
-    inherit   => Bool, { default => 0 }
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension => Str,
+      inherit   => Bool, { default => 0 }
+    ],
   );
   my $p = $check->(@_);
 
@@ -297,8 +309,11 @@ sub insert_r { shift->insert_dimension(dimension => shift); }
 sub insert_range {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -316,9 +331,12 @@ sub move { shift->move_dimension(dimension => shift, destination => shift); }
 sub move_dimension {
   my $self = shift;
 
-  state $check = compile_named(
-    dimension   => Str,
-    destination => HasMethods['range_to_index'],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      dimension   => Str,
+      destination => HasMethods['range_to_index'],
+    ],
   );
   my $p = $check->(@_);
 
@@ -335,10 +353,13 @@ sub move_dimension {
 sub copy_paste {
   my $self = shift;
 
-  state $check = compile_named(
-    destination => HasMethods['range_to_index'],
-    type        => Str, { default => 'normal' },
-    orientation => Str, { default => 'normal' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      destination => HasMethods['range_to_index'],
+      type        => Str, { default => 'normal' },
+      orientation => Str, { default => 'normal' },
+    ],
   );
   my $p = $check->(@_);
   $p->{type} = "PASTE_" . uc($p->{type});
@@ -359,9 +380,12 @@ sub copy_paste {
 sub cut_paste {
   my $self = shift;
 
-  state $check = compile_named(
-    destination => HasMethods['range_to_index'],
-    type        => Str, { default => 'normal' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      destination => HasMethods['range_to_index'],
+      type        => Str, { default => 'normal' },
+    ],
   );
   my $p = $check->(@_);
   $p->{type} = "PASTE_" . uc($p->{type});
@@ -381,7 +405,7 @@ sub delete_d { shift->delete_dimension(dimension => shift); }
 sub delete_dimension {
   my $self = shift;
 
-  state $check = compile_named(dimension => Str);
+  state $check = signature(bless => !!0, named => [dimension => Str]);
   my $p = $check->(@_);
 
   $self->batch_requests(
@@ -397,7 +421,7 @@ sub delete_r { shift->delete_range(dimension => shift); }
 sub delete_range {
   my $self = shift;
 
-  state $check = compile_named(dimension => Str);
+  state $check = signature(bless => !!0, named => [dimension => Str]);
   my $p = $check->(@_);
 
   $self->batch_requests(
@@ -414,7 +438,7 @@ sub named_a { shift->add_named(name => shift); }
 sub add_named {
   my $self = shift;
 
-  state $check = compile_named(name => Str);
+  state $check = signature(bless => !!0, named => [name => Str]);
   my $p = $check->(@_);
 
   $self->batch_requests(
@@ -447,10 +471,13 @@ sub named_u { shift->update_named(@_); }
 sub update_named {
   my $self = shift;
 
-  state $check = compile_named(
-    name   => Optional[Str],
-    range  => Optional[HashRef],
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name   => Optional[Str],
+      range  => Optional[HashRef],
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -477,9 +504,12 @@ sub update_named {
 sub auto_fill {
   my $self = shift;
 
-  state $check = compile_named(
-    source       => HasMethods['range_to_index'],
-    use_template => Bool, { default => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      source       => HasMethods['range_to_index'],
+      use_template => Bool, { default => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -501,9 +531,12 @@ sub auto_fill {
 sub append_cells {
   my $self = shift;
 
-  state $check = compile_named(
-    rows   => ArrayRef,
-    fields => Str, { default => '*' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      rows   => ArrayRef,
+      fields => Str, { default => '*' },
+    ],
   );
   my $p = $check->(@_);
 
@@ -521,11 +554,14 @@ sub append_cells {
 sub paste_data {
   my $self = shift;
 
-  state $check = compile_named(
-    data      => Str,
-    delimiter => Str, { default => "\t" },
-    type      => Str, { default => 'PASTE_NORMAL' },
-    html      => Bool, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      data      => Str,
+      delimiter => Str, { default => "\t" },
+      type      => Str, { default => 'PASTE_NORMAL' },
+      html      => Bool, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -556,9 +592,12 @@ sub paste_data {
 sub text_to_columns {
   my $self = shift;
 
-  state $check = compile_named(
-    delimiter      => Optional[Str],
-    delimiter_type => Str, { default => 'AUTODETECT' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      delimiter      => Optional[Str],
+      delimiter_type => Str, { default => 'AUTODETECT' },
+    ],
   );
   my $p = $check->(@_);
 
@@ -576,13 +615,16 @@ sub text_to_columns {
 sub find_replace {
   my $self = shift;
 
-  state $check = compile_named(
-    find               => Str,
-    replacement        => Str, { default => '' },
-    match_case         => Bool, { default => 0 },
-    match_entire_cell  => Bool, { default => 0 },
-    search_by_regex    => Bool, { default => 0 },
-    include_formulas   => Bool, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      find               => Str,
+      replacement        => Str, { default => '' },
+      match_case         => Bool, { default => 0 },
+      match_entire_cell  => Bool, { default => 0 },
+      search_by_regex    => Bool, { default => 0 },
+      include_formulas   => Bool, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -604,8 +646,11 @@ sub find_replace {
 sub set_data_validation {
   my $self = shift;
 
-  state $check = compile_named(
-    rule => HashRef,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      rule => HashRef,
+    ],
   );
   my $p = $check->(@_);
 
@@ -634,11 +679,14 @@ sub clear_data_validation {
 sub data_validation_list {
   my $self = shift;
 
-  state $check = compile_named(
-    values        => ArrayRef,
-    strict        => Bool, { default => 1 },
-    show_custom   => Bool, { default => 0 },
-    input_message => Optional[Str],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      values        => ArrayRef,
+      strict        => Bool, { default => 1 },
+      show_custom   => Bool, { default => 0 },
+      input_message => Optional[Str],
+    ],
   );
   my $p = $check->(@_);
 
@@ -659,11 +707,14 @@ sub data_validation_list {
 sub data_validation_range {
   my $self = shift;
 
-  state $check = compile_named(
-    source        => HasMethods['range'],
-    strict        => Bool, { default => 1 },
-    show_custom   => Bool, { default => 0 },
-    input_message => Optional[Str],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      source        => HasMethods['range'],
+      strict        => Bool, { default => 1 },
+      show_custom   => Bool, { default => 0 },
+      input_message => Optional[Str],
+    ],
   );
   my $p = $check->(@_);
 
@@ -707,8 +758,11 @@ sub trim_whitespace {
 sub delete_duplicates {
   my $self = shift;
 
-  state $check = compile_named(
-    comparison_columns => Optional[ArrayRef],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      comparison_columns => Optional[ArrayRef],
+    ],
   );
   my $p = $check->(@_);
 
@@ -728,8 +782,11 @@ sub delete_duplicates {
 sub sort_range {
   my $self = shift;
 
-  state $check = compile_named(
-    sort_specs => ArrayRef,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      sort_specs => ArrayRef,
+    ],
   );
   my $p = $check->(@_);
 

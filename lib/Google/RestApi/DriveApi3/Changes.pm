@@ -6,8 +6,11 @@ use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    drive_api => HasApi,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      drive_api => HasApi,
+    ],
   );
   return bless $check->(@_), $class;
 }
@@ -23,9 +26,12 @@ sub api {
 
 sub get_start_page_token {
   my $self = shift;
-  state $check = compile_named(
-    drive_id            => Str, { optional => 1 },
-    supports_all_drives => Bool, { default => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      drive_id            => Str, { optional => 1 },
+      supports_all_drives => Bool, { default => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -39,18 +45,21 @@ sub get_start_page_token {
 
 sub list {
   my $self = shift;
-  state $check = compile_named(
-    page_token                    => Str,
-    spaces                        => Str, { default => 'drive' },
-    include_removed               => Bool, { default => 1 },
-    include_items_from_all_drives => Bool, { default => 1 },
-    supports_all_drives           => Bool, { default => 1 },
-    fields                        => Str, { optional => 1 },
-    page_size                     => PositiveInt, { default => 100 },
-    drive_id                      => Str, { optional => 1 },
-    max_pages                     => Int, { default => 0 },
-    page_callback                 => CodeRef, { optional => 1 },
-    _extra_                       => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      page_token                    => Str,
+      spaces                        => Str, { default => 'drive' },
+      include_removed               => Bool, { default => 1 },
+      include_items_from_all_drives => Bool, { default => 1 },
+      supports_all_drives           => Bool, { default => 1 },
+      fields                        => Str, { optional => 1 },
+      page_size                     => PositiveInt, { default => 100 },
+      drive_id                      => Str, { optional => 1 },
+      max_pages                     => Int, { default => 0 },
+      page_callback                 => CodeRef, { optional => 1 },
+      _extra_                       => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -90,13 +99,16 @@ sub list {
 
 sub watch {
   my $self = shift;
-  state $check = compile_named(
-    page_token => Str,
-    id         => Str,
-    type       => Str, { default => 'web_hook' },
-    address    => Str,
-    expiration => Int, { optional => 1 },
-    _extra_    => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      page_token => Str,
+      id         => Str,
+      type       => Str, { default => 'web_hook' },
+      address    => Str,
+      expiration => Int, { optional => 1 },
+      _extra_    => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -176,6 +188,7 @@ Options:
 - page_size: Number of changes per page (default: 100)
 - drive_id: Specific shared drive ID
 - max_pages: Maximum pages to fetch (default: 0 = unlimited)
+- page_callback: See L<Google::RestApi/PAGE CALLBACKS>
 
 In list context, returns array of changes.
 In scalar context, returns hashref with changes and newStartPageToken.

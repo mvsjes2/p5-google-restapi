@@ -1,35 +1,37 @@
 package Google::RestApi::CalendarApi3::Calendar;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
+
+use parent 'Google::RestApi::SubResource';
 
 use aliased 'Google::RestApi::CalendarApi3::Event';
 use aliased 'Google::RestApi::CalendarApi3::Acl';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar_api => HasApi,
-    id           => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar_api => HasApi,
+      id           => Str,
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "calendars/$self->{id}";
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->calendar_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'calendars' }
+sub _parent_accessor { 'calendar_api' }
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+      params => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -41,12 +43,15 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    summary     => Str, { optional => 1 },
-    description => Str, { optional => 1 },
-    location    => Str, { optional => 1 },
-    time_zone   => Str, { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      summary     => Str, { optional => 1 },
+      description => Str, { optional => 1 },
+      location    => Str, { optional => 1 },
+      time_zone   => Str, { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -77,8 +82,11 @@ sub clear {
 
 sub event {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Event->new(calendar => $self, %$p);
@@ -86,30 +94,35 @@ sub event {
 
 sub events {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'items(id, summary, start, end)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'events', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'events',
     result_key     => 'items',
+    default_fields => 'items(id, summary, start, end)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
 
 sub acl {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Acl->new(calendar => $self, %$p);
@@ -117,22 +130,24 @@ sub acl {
 
 sub acl_rules {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'items(id, role, scope)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'acl', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'acl',
     result_key     => 'items',
+    default_fields => 'items(id, role, scope)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -205,19 +220,21 @@ Clears all events from a calendar. Only works on the primary calendar.
 
 Returns an Event object. Without id, can be used to create new events.
 
-=head2 events(max_pages => $n)
+=head2 events(max_pages => $n, page_callback => $coderef)
 
 Lists all events on the calendar. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 acl(id => $id)
 
 Returns an Acl object. Without id, can be used to create new ACL rules.
 
-=head2 acl_rules(max_pages => $n)
+=head2 acl_rules(max_pages => $n, page_callback => $coderef)
 
 Lists all ACL rules on the calendar. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 calendar_id()
 

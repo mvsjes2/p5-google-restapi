@@ -4,34 +4,35 @@ our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    file => HasApi,
-    id   => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      file => HasApi,
+      id   => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "revisions";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->file()->api(%p, uri => $uri);
-}
+sub _uri_base { 'revisions' }
+sub _parent_accessor { 'file' }
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields            => Str, { optional => 1 },
-    acknowledge_abuse => Bool, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields            => Str, { optional => 1 },
+      acknowledge_abuse => Bool, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Revision ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -42,16 +43,19 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    keep_forever              => Bool, { optional => 1 },
-    publish_auto              => Bool, { optional => 1 },
-    published                 => Bool, { optional => 1 },
-    published_outside_domain  => Bool, { optional => 1 },
-    _extra_                   => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      keep_forever              => Bool, { optional => 1 },
+      publish_auto              => Bool, { optional => 1 },
+      published                 => Bool, { optional => 1 },
+      published_outside_domain  => Bool, { optional => 1 },
+      _extra_                   => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Revision ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content;
   $content{keepForever} = $p->{keep_forever} ? \1 : \0 if defined $p->{keep_forever};
@@ -70,7 +74,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Revision ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting revision '%s' from file '%s'", $self->{id}, $self->file()->file_id()));
   return $self->api(method => 'delete');

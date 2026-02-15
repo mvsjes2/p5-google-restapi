@@ -1,13 +1,16 @@
 package Google::RestApi::CalendarApi3::Colors;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    calendar_api => HasApi,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      calendar_api => HasApi,
+    ],
   );
   return bless $check->(@_), $class;
 }

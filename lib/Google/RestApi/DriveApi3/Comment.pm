@@ -4,34 +4,35 @@ our $VERSION = '1.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 use aliased 'Google::RestApi::DriveApi3::Reply';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    file => HasApi,
-    id   => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      file => HasApi,
+      id   => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "comments";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->file()->api(%p, uri => $uri);
-}
+sub _uri_base { 'comments' }
+sub _parent_accessor { 'file' }
 
 sub create {
   my $self = shift;
-  state $check = compile_named(
-    content        => Str,
-    anchor         => Str, { optional => 1 },
-    quoted_content => Str, { optional => 1 },
-    _extra_        => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      content        => Str,
+      anchor         => Str, { optional => 1 },
+      quoted_content => Str, { optional => 1 },
+      _extra_        => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -53,13 +54,16 @@ sub create {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields          => Str, { default => 'id,content,author,createdTime,modifiedTime' },
-    include_deleted => Bool, { default => 0 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields          => Str, { default => 'id,content,author,createdTime,modifiedTime' },
+      include_deleted => Bool, { default => 0 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Comment ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params = (
     fields => $p->{fields},
@@ -71,13 +75,16 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    content => Str,
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      content => Str,
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Comment ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content = (
     content => delete $p->{content},
@@ -93,7 +100,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Comment ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting comment '%s' from file '%s'", $self->{id}, $self->file()->file_id()));
   return $self->api(method => 'delete');
@@ -101,38 +108,44 @@ sub delete {
 
 sub reply {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Comment ID required for reply()" unless $self->{id};
+  $self->require_id('reply');
 
   return Reply->new(comment => $self, %$p);
 }
 
 sub replies {
   my $self = shift;
-  state $check = compile_named(
-    fields          => Str, { optional => 1 },
-    include_deleted => Bool, { default => 0 },
-    max_pages       => Int, { default => 0 },
-    page_callback   => CodeRef, { optional => 1 },
-    params          => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields          => Str, { optional => 1 },
+      include_deleted => Bool, { default => 0 },
+      max_pages       => Int, { default => 0 },
+      page_callback   => CodeRef, { optional => 1 },
+      params          => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Comment ID required for replies()" unless $self->{id};
+  $self->require_id('replies');
 
-  my $params = $p->{params};
-  $params->{fields} //= 'replies(id, content, author, createdTime)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-  $params->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
+  $p->{params}->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
 
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'replies', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'replies',
     result_key     => 'replies',
+    default_fields => 'replies(id, content, author, createdTime)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -203,10 +216,11 @@ Deletes the comment. Requires comment ID.
 
 Returns a Reply object. Without id, can create new replies.
 
-=head2 replies(include_deleted => $bool, max_pages => $n)
+=head2 replies(include_deleted => $bool, max_pages => $n, page_callback => $coderef)
 
 Lists all replies to the comment. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 comment_id()
 

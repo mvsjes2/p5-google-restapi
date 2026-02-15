@@ -7,7 +7,7 @@ response:
   code: 200
   content: |
     {
-      "spreadsheetId": "19isgSD0A2lS2RHOJwlfHjmTS44U8yuFxHgAq3KmDV_w",
+      "spreadsheetId": "1KFHQDZULX_X9zJ2ej5FqbQb0_D4qEjRRXIh_1vLzzMY",
       "properties": {
         "title": "mock_spreadsheet1",
         "locale": "en_GB",
@@ -153,35 +153,35 @@ response:
           }
         }
       ],
-      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/19isgSD0A2lS2RHOJwlfHjmTS44U8yuFxHgAq3KmDV_w/edit"
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1KFHQDZULX_X9zJ2ej5FqbQb0_D4qEjRRXIh_1vLzzMY/edit"
     }
   headers:
+    - x-l2-request-path
+    - l2-managed-6
+    - x-frame-options
+    - SAMEORIGIN
+    - content-type
+    - application/json; charset=UTF-8
+    - date
+    - 'Sun, 15 Feb 2026 20:51:11 GMT'
+    - accept-ranges
+    - none
+    - transfer-encoding
+    - chunked
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - server
-    - ESF
-    - accept-ranges
-    - none
-    - x-content-type-options
-    - nosniff
-    - content-type
-    - application/json; charset=UTF-8
-    - x-xss-protection
-    - 0
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-frame-options
-    - SAMEORIGIN
-    - x-l2-request-path
-    - l2-managed-6
-    - date
-    - 'Sat, 10 Jan 2026 16:33:37 GMT'
   message: OK
 source: Test::Unit::TestBase::startup
 
@@ -248,32 +248,32 @@ response:
       }
     }
   headers:
-    - vary
-    - 'Origin, X-Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - server
-    - ESF
-    - accept-ranges
-    - none
-    - content-type
-    - application/json; charset=UTF-8
-    - x-content-type-options
-    - nosniff
-    - pragma
-    - no-cache
-    - x-xss-protection
-    - 0
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-frame-options
-    - SAMEORIGIN
     - cache-control
     - 'no-cache, no-store, max-age=0, must-revalidate'
+    - server
+    - ESF
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - accept-ranges
+    - none
+    - transfer-encoding
+    - chunked
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - x-frame-options
+    - SAMEORIGIN
+    - content-type
+    - application/json; charset=UTF-8
+    - pragma
+    - no-cache
     - date
-    - 'Sat, 10 Jan 2026 16:33:39 GMT'
+    - 'Sun, 15 Feb 2026 20:51:13 GMT'
   message: OK
 source: Test::Google::RestApi::DriveApi3::About::export_formats
 
@@ -289,16 +289,16 @@ response:
       "user": {
         "kind": "drive#user",
         "displayName": "Test User",
-        "photoLink": "://photo.example.com/placeholder",
+        "photoLink": "https://photo.example.com/placeholder",
         "me": true,
         "permissionId": "00000000000000000000",
         "emailAddress": "test.user@gmail.com"
       },
       "storageQuota": {
         "limit": "107374182400",
-        "usage": "67439052622",
-        "usageInDrive": "56607566233",
-        "usageInDriveTrash": "183975"
+        "usage": "67464615165",
+        "usageInDrive": "56609063332",
+        "usageInDriveTrash": "0"
       },
       "importFormats": {
         "application/x-vnd.oasis.opendocument.presentation": [
@@ -393,6 +393,9 @@ response:
         ],
         "application/vnd.ms-powerpoint.presentation.macroenabled.12": [
           "application/vnd.google-apps.presentation"
+        ],
+        "text/comma-separated-values": [
+          "application/vnd.google-apps.spreadsheet"
         ],
         "image/pjpeg": [
           "application/vnd.google-apps.document"
@@ -854,32 +857,32 @@ response:
       "canCreateDrives": false
     }
   headers:
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - pragma
+    - no-cache
+    - date
+    - 'Sun, 15 Feb 2026 20:51:15 GMT'
     - x-frame-options
     - SAMEORIGIN
-    - date
-    - 'Sat, 10 Jan 2026 16:33:41 GMT'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - content-type
+    - application/json; charset=UTF-8
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - vary
     - 'Origin, X-Origin,Accept-Encoding'
     - expires
     - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - transfer-encoding
-    - chunked
-    - x-content-type-options
-    - nosniff
-    - content-type
-    - application/json; charset=UTF-8
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
     - server
     - ESF
-    - accept-ranges
-    - none
+    - x-content-type-options
+    - nosniff
     - x-xss-protection
     - 0
-    - pragma
-    - no-cache
+    - accept-ranges
+    - none
+    - transfer-encoding
+    - chunked
   message: OK
 source: Test::Google::RestApi::DriveApi3::About::get
 
@@ -893,38 +896,38 @@ response:
     {
       "storageQuota": {
         "limit": "107374182400",
-        "usage": "67439052622",
-        "usageInDrive": "56607566233",
-        "usageInDriveTrash": "183975"
+        "usage": "67464615165",
+        "usageInDrive": "56609063332",
+        "usageInDriveTrash": "0"
       }
     }
   headers:
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sat, 10 Jan 2026 16:33:43 GMT'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-content-type-options
-    - nosniff
-    - accept-ranges
-    - none
-    - server
-    - ESF
-    - x-xss-protection
-    - 0
     - pragma
     - no-cache
+    - date
+    - 'Sun, 15 Feb 2026 20:51:18 GMT'
+    - x-frame-options
+    - SAMEORIGIN
+    - content-type
+    - application/json; charset=UTF-8
     - vary
     - 'Origin, X-Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
     - expires
     - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - server
+    - ESF
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - accept-ranges
+    - none
+    - transfer-encoding
+    - chunked
   message: OK
 source: Test::Google::RestApi::DriveApi3::About::storage_quota
 
@@ -939,72 +942,72 @@ response:
       "user": {
         "kind": "drive#user",
         "displayName": "Test User",
-        "photoLink": "://photo.example.com/placeholder",
+        "photoLink": "https://photo.example.com/placeholder",
         "me": true,
         "permissionId": "00000000000000000000",
         "emailAddress": "test.user@gmail.com"
       }
     }
   headers:
-    - server
-    - ESF
-    - accept-ranges
-    - none
-    - x-content-type-options
-    - nosniff
-    - content-type
-    - application/json; charset=UTF-8
-    - pragma
-    - no-cache
     - x-xss-protection
     - 0
-    - vary
-    - 'Origin, X-Origin,Accept-Encoding'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
     - transfer-encoding
     - chunked
-    - x-frame-options
-    - SAMEORIGIN
+    - accept-ranges
+    - none
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - vary
+    - 'Origin, X-Origin,Accept-Encoding'
+    - server
+    - ESF
     - cache-control
     - 'no-cache, no-store, max-age=0, must-revalidate'
     - date
-    - 'Sat, 10 Jan 2026 16:33:45 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - 'Sun, 15 Feb 2026 20:51:20 GMT'
+    - pragma
+    - no-cache
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
   message: OK
 source: Test::Google::RestApi::DriveApi3::About::user
 
 ---
-request: DELETE /drive/v3/files/19isgSD0A2lS2RHOJwlfHjmTS44U8yuFxHgAq3KmDV_w
+request: DELETE /drive/v3/files/1KFHQDZULX_X9zJ2ej5FqbQb0_D4qEjRRXIh_1vLzzMY
 response:
   code: 204
   content: ''
   headers:
-    - date
-    - 'Sat, 10 Jan 2026 16:33:48 GMT'
-    - content-length
-    - 0
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
     - x-frame-options
     - SAMEORIGIN
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-xss-protection
-    - 0
-    - pragma
-    - no-cache
-    - content-type
-    - text/html
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
     - vary
     - 'Origin, X-Origin'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - content-type
+    - text/html
+    - pragma
+    - no-cache
+    - date
+    - 'Sun, 15 Feb 2026 20:51:22 GMT'
+    - content-length
+    - 0
+    - server
+    - ESF
   message: No Content
 source: Test::Unit::TestBase::shutdown
 
@@ -1017,30 +1020,30 @@ response:
   code: 200
   content: "{\n  \"files\": []\n}\n"
   headers:
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - pragma
+    - no-cache
     - date
-    - 'Sat, 10 Jan 2026 16:33:49 GMT'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
+    - 'Sun, 15 Feb 2026 20:51:24 GMT'
     - x-frame-options
     - SAMEORIGIN
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - content-type
+    - application/json; charset=UTF-8
+    - x-content-type-options
+    - nosniff
+    - x-xss-protection
+    - 0
+    - accept-ranges
+    - none
     - transfer-encoding
     - chunked
     - vary
     - 'Origin, X-Origin,Accept-Encoding'
-    - x-xss-protection
-    - 0
-    - pragma
-    - no-cache
-    - x-content-type-options
-    - nosniff
-    - content-type
-    - application/json; charset=UTF-8
-    - accept-ranges
-    - none
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - expires
+    - 'Mon, 01 Jan 1990 00:00:00 GMT'
+    - cache-control
+    - 'no-cache, no-store, max-age=0, must-revalidate'
     - server
     - ESF
   message: OK

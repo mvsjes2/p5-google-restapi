@@ -1,36 +1,37 @@
 package Google::RestApi::TasksApi1::Task;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
+use parent 'Google::RestApi::SubResource';
+
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    task_list => HasApi,
-    id        => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      task_list => HasApi,
+      id        => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "lists/" . $self->task_list()->task_list_id() . "/tasks";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->tasks_api()->api(%p, uri => $uri);
-}
+sub _uri_base { "lists/" . $_[0]->task_list()->task_list_id() . "/tasks" }
+sub _parent_accessor { 'tasks_api' }
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Task ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my %params;
   $params{fields} = $p->{fields} if defined $p->{fields};
@@ -40,16 +41,19 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    title   => Str, { optional => 1 },
-    notes   => Str, { optional => 1 },
-    due     => Str, { optional => 1 },
-    status  => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str, { optional => 1 },
+      notes   => Str, { optional => 1 },
+      due     => Str, { optional => 1 },
+      status  => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "Task ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content;
   $content{title} = delete $p->{title} if defined $p->{title};
@@ -67,7 +71,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "Task ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting task '%s'", $self->{id}));
   return $self->api(method => 'delete');
@@ -75,14 +79,17 @@ sub delete {
 
 sub move {
   my $self = shift;
-  state $check = compile_named(
-    parent                => Str, { optional => 1 },
-    previous              => Str, { optional => 1 },
-    destination_tasklist   => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      parent                => Str, { optional => 1 },
+      previous              => Str, { optional => 1 },
+      destination_tasklist   => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "Task ID required for move()" unless $self->{id};
+  $self->require_id('move');
 
   my %params;
   $params{parent} = $p->{parent} if defined $p->{parent};
@@ -100,7 +107,7 @@ sub move {
 sub complete {
   my $self = shift;
 
-  LOGDIE "Task ID required for complete()" unless $self->{id};
+  $self->require_id('complete');
 
   DEBUG(sprintf("Completing task '%s'", $self->{id}));
   return $self->api(
@@ -112,7 +119,7 @@ sub complete {
 sub uncomplete {
   my $self = shift;
 
-  LOGDIE "Task ID required for uncomplete()" unless $self->{id};
+  $self->require_id('uncomplete');
 
   DEBUG(sprintf("Uncompleting task '%s'", $self->{id}));
   return $self->api(

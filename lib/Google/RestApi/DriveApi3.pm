@@ -1,6 +1,6 @@
 package Google::RestApi::DriveApi3;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -18,18 +18,24 @@ Readonly our $Drive_Id       => '[a-zA-Z0-9-_]+';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    api      => HasApi,
-    endpoint => Str, { default => $Drive_Endpoint },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      api      => HasApi,
+      endpoint => Str, { default => $Drive_Endpoint },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   my $uri = "$self->{endpoint}/";
@@ -39,23 +45,26 @@ sub api {
 
 sub list {
   my $self = shift;
-  state $check = compile_named(
-    filter        => Str,
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      filter        => Str,
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{q} = $p->{filter};
-  $params->{fields} = 'files(id, name)' unless $params->{fields};
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
+  $p->{params}->{q} = $p->{filter};
 
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'files', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'files',
     result_key     => 'files',
+    default_fields => 'files(id, name)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -77,8 +86,11 @@ sub changes { Changes->new(drive_api => shift); }
 
 sub shared_drive {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Drive->new(drive_api => $self, %$p);
@@ -86,31 +98,36 @@ sub shared_drive {
 
 sub list_drives {
   my $self = shift;
-  state $check = compile_named(
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'drives(id, name)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'drives', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'drives',
     result_key     => 'drives',
+    default_fields => 'drives(id, name)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
 
 sub create_drive {
   my $self = shift;
-  state $check = compile_named(
-    name       => Str,
-    request_id => Str,
-    _extra_    => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name       => Str,
+      request_id => Str,
+      _extra_    => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -126,9 +143,12 @@ sub create_drive {
 
 sub generate_ids {
   my $self = shift;
-  state $check = compile_named(
-    count => PositiveInt, { default => 10 },
-    space => Str, { default => 'drive' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      count => PositiveInt, { default => 10 },
+      space => Str, { default => 'drive' },
+    ],
   );
   my $p = $check->(@_);
 
@@ -148,6 +168,9 @@ sub empty_trash {
 }
 
 sub rest_api { shift->{api}; }
+sub transaction { shift->rest_api()->transaction(); }
+sub stats { shift->rest_api()->stats(); }
+sub reset_stats { shift->rest_api->reset_stats(); }
 
 1;
 
@@ -489,7 +512,7 @@ Lists files matching the given query filter.
 =item * C<max_pages> <int>: Optional. Limits the number of pages fetched (default 0 = unlimited).
 
 =item * C<page_callback> <coderef>: Optional. Called after each page with the API result hashref.
-Return true to continue fetching, false to stop.
+Return true to continue fetching, false to stop. See L<Google::RestApi/PAGE CALLBACKS>.
 
 =item * C<params> <hashref>: Optional. Additional query parameters.
 
@@ -562,6 +585,7 @@ Lists all shared drives accessible to the user.
  );
 
 C<max_pages> limits the number of pages fetched (default 0 = unlimited).
+Supports C<page_callback>, see L<Google::RestApi/PAGE CALLBACKS>.
 
 Returns a list of drive hashrefs.
 
@@ -619,6 +643,10 @@ Returns the API response (empty on success).
 =head2 upload_endpoint()
 
 Returns the upload endpoint URL for file uploads. Used internally.
+
+=head2 rest_api()
+
+Returns the underlying L<Google::RestApi> instance.
 
 =head1 QUERY SYNTAX
 

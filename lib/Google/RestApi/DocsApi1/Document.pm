@@ -1,6 +1,6 @@
 package Google::RestApi::DocsApi1::Document;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -9,9 +9,12 @@ use parent "Google::RestApi::Request";
 sub new {
   my $class = shift;
 
-  state $check = compile_named(
-    docs_api => HasApi,
-    id       => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      docs_api => HasApi,
+      id       => Str,
+    ],
   );
   my $self = $check->(@_);
 
@@ -20,9 +23,12 @@ sub new {
 
 sub api {
   my $self = shift;
-  state $check = compile_named(
-    uri     => Str, { default => '' },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      uri     => Str, { default => '' },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   $p->{uri} = $self->{id} . ($p->{uri} ? "/$p->{uri}" : '');
@@ -33,9 +39,12 @@ sub document_id { shift->{id}; }
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields  => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields  => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   my %params;
@@ -68,10 +77,13 @@ sub submit_requests {
 
 sub insert_text {
   my $self = shift;
-  state $check = compile_named(
-    text     => Str,
-    index    => Int, { optional => 1 },
-    segment_id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      text     => Str,
+      index    => Int, { optional => 1 },
+      segment_id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -90,8 +102,11 @@ sub insert_text {
 
 sub delete_content {
   my $self = shift;
-  state $check = compile_named(
-    range => HashRef,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range => HashRef,
+    ],
   );
   my $p = $check->(@_);
 
@@ -105,10 +120,13 @@ sub delete_content {
 
 sub replace_all_text {
   my $self = shift;
-  state $check = compile_named(
-    find        => Str,
-    replacement => Str,
-    match_case  => Bool, { default => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      find        => Str,
+      replacement => Str,
+      match_case  => Bool, { default => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -126,10 +144,13 @@ sub replace_all_text {
 
 sub update_text_style {
   my $self = shift;
-  state $check = compile_named(
-    range  => HashRef,
-    style  => HashRef,
-    fields => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range  => HashRef,
+      style  => HashRef,
+      fields => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -145,10 +166,13 @@ sub update_text_style {
 
 sub update_paragraph_style {
   my $self = shift;
-  state $check = compile_named(
-    range  => HashRef,
-    style  => HashRef,
-    fields => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range  => HashRef,
+      style  => HashRef,
+      fields => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -164,11 +188,14 @@ sub update_paragraph_style {
 
 sub insert_table {
   my $self = shift;
-  state $check = compile_named(
-    index   => Int,
-    rows    => Int,
-    columns => Int,
-    segment_id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      index   => Int,
+      rows    => Int,
+      columns => Int,
+      segment_id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -187,12 +214,15 @@ sub insert_table {
 
 sub insert_inline_image {
   my $self = shift;
-  state $check = compile_named(
-    index      => Int,
-    uri        => Str,
-    width      => HashRef, { optional => 1 },
-    height     => HashRef, { optional => 1 },
-    segment_id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      index      => Int,
+      uri        => Str,
+      width      => HashRef, { optional => 1 },
+      height     => HashRef, { optional => 1 },
+      segment_id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -216,9 +246,12 @@ sub insert_inline_image {
 
 sub create_paragraph_bullets {
   my $self = shift;
-  state $check = compile_named(
-    range         => HashRef,
-    bullet_preset => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range         => HashRef,
+      bullet_preset => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -233,8 +266,11 @@ sub create_paragraph_bullets {
 
 sub delete_paragraph_bullets {
   my $self = shift;
-  state $check = compile_named(
-    range => HashRef,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      range => HashRef,
+    ],
   );
   my $p = $check->(@_);
 
@@ -248,9 +284,12 @@ sub delete_paragraph_bullets {
 
 sub create_named_range {
   my $self = shift;
-  state $check = compile_named(
-    name  => Str,
-    range => HashRef,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name  => Str,
+      range => HashRef,
+    ],
   );
   my $p = $check->(@_);
 
@@ -265,7 +304,7 @@ sub create_named_range {
 
 sub delete_named_range {
   my $self = shift;
-  state $check = compile(Str);
+  state $check = signature(positional => [Str]);
   my ($named_range_id) = $check->(@_);
 
   $self->batch_requests(
@@ -278,9 +317,12 @@ sub delete_named_range {
 
 sub create_header {
   my $self = shift;
-  state $check = compile_named(
-    type                   => Str,
-    section_break_location => HashRef, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      type                   => Str,
+      section_break_location => HashRef, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -294,9 +336,12 @@ sub create_header {
 
 sub create_footer {
   my $self = shift;
-  state $check = compile_named(
-    type                   => Str,
-    section_break_location => HashRef, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      type                   => Str,
+      section_break_location => HashRef, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -310,7 +355,7 @@ sub create_footer {
 
 sub delete_header {
   my $self = shift;
-  state $check = compile(Str);
+  state $check = signature(positional => [Str]);
   my ($header_id) = $check->(@_);
   $self->batch_requests(deleteHeader => { headerId => $header_id });
   return $self;
@@ -318,7 +363,7 @@ sub delete_header {
 
 sub delete_footer {
   my $self = shift;
-  state $check = compile(Str);
+  state $check = signature(positional => [Str]);
   my ($footer_id) = $check->(@_);
   $self->batch_requests(deleteFooter => { footerId => $footer_id });
   return $self;
@@ -326,9 +371,12 @@ sub delete_footer {
 
 sub insert_page_break {
   my $self = shift;
-  state $check = compile_named(
-    index      => Int,
-    segment_id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      index      => Int,
+      segment_id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -345,10 +393,13 @@ sub insert_page_break {
 
 sub insert_section_break {
   my $self = shift;
-  state $check = compile_named(
-    index      => Int,
-    type       => Str,
-    segment_id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      index      => Int,
+      type       => Str,
+      segment_id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
 
@@ -366,9 +417,12 @@ sub insert_section_break {
 
 sub update_document_style {
   my $self = shift;
-  state $check = compile_named(
-    style  => HashRef,
-    fields => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      style  => HashRef,
+      fields => Str,
+    ],
   );
   my $p = $check->(@_);
 

@@ -1,8 +1,10 @@
 package Google::RestApi::DriveApi3::File;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
+
+use parent 'Google::RestApi::SubResource';
 
 use aliased 'Google::RestApi::DriveApi3';
 use aliased 'Google::RestApi::DriveApi3::Permission';
@@ -12,29 +14,29 @@ use aliased 'Google::RestApi::DriveApi3::Comment';
 sub new {
   my $class = shift;
   my $qr_id = $Google::RestApi::DriveApi3::Drive_File_Id;
-  state $check = compile_named(
-    drive => HasApi,
-    id    => StrMatch[qr/$qr_id/],
+  state $check = signature(
+    bless => !!0,
+    named => [
+      drive => HasApi,
+      id    => StrMatch[qr/$qr_id/],
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "files/$self->{id}";
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->drive()->api(%p, uri => $uri);
-}
+sub _uri_base { 'files' }
+sub _parent_accessor { 'drive' }
 
 sub copy {
   my $self = shift;
 
-  state $check = compile_named(
-    name    => Str, { optional => 1 },
-    title   => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name    => Str, { optional => 1 },
+      title   => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
   $p->{name} //= $p->{title};
@@ -60,9 +62,12 @@ sub delete {
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+      params => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
@@ -74,13 +79,16 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    name        => Str, { optional => 1 },
-    description => Str, { optional => 1 },
-    mime_type   => Str, { optional => 1 },
-    add_parents    => Str, { optional => 1 },
-    remove_parents => Str, { optional => 1 },
-    _extra_     => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      name        => Str, { optional => 1 },
+      description => Str, { optional => 1 },
+      mime_type   => Str, { optional => 1 },
+      add_parents    => Str, { optional => 1 },
+      remove_parents => Str, { optional => 1 },
+      _extra_     => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -103,8 +111,11 @@ sub update {
 
 sub export {
   my $self = shift;
-  state $check = compile_named(
-    mime_type => Str,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      mime_type => Str,
+    ],
   );
   my $p = $check->(@_);
 
@@ -117,12 +128,15 @@ sub export {
 
 sub watch {
   my $self = shift;
-  state $check = compile_named(
-    id         => Str,
-    type       => Str, { default => 'web_hook' },
-    address    => Str,
-    expiration => Int, { optional => 1 },
-    _extra_    => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id         => Str,
+      type       => Str, { default => 'web_hook' },
+      address    => Str,
+      expiration => Int, { optional => 1 },
+      _extra_    => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
@@ -143,8 +157,11 @@ sub watch {
 
 sub permission {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Permission->new(file => $self, %$p);
@@ -152,30 +169,35 @@ sub permission {
 
 sub permissions {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'permissions(id, role, type, emailAddress)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'permissions', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'permissions',
     result_key     => 'permissions',
+    default_fields => 'permissions(id, role, type, emailAddress)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
 
 sub revision {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Revision->new(file => $self, %$p);
@@ -183,30 +205,35 @@ sub revision {
 
 sub revisions {
   my $self = shift;
-  state $check = compile_named(
-    fields        => Str, { optional => 1 },
-    max_pages     => Int, { default => 0 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields        => Str, { optional => 1 },
+      max_pages     => Int, { default => 0 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'revisions(id, modifiedTime, keepForever)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'revisions', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'revisions',
     result_key     => 'revisions',
+    default_fields => 'revisions(id, modifiedTime, keepForever)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
 
 sub comment {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Comment->new(file => $self, %$p);
@@ -214,24 +241,27 @@ sub comment {
 
 sub comments {
   my $self = shift;
-  state $check = compile_named(
-    fields          => Str, { optional => 1 },
-    include_deleted => Bool, { default => 0 },
-    max_pages       => Int, { default => 0 },
-    page_callback   => CodeRef, { optional => 1 },
-    params          => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields          => Str, { optional => 1 },
+      include_deleted => Bool, { default => 0 },
+      max_pages       => Int, { default => 0 },
+      page_callback   => CodeRef, { optional => 1 },
+      params          => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  my $params = $p->{params};
-  $params->{fields} //= 'comments(id, content, author, createdTime)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-  $params->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
+  $p->{params}->{includeDeleted} = $p->{include_deleted} ? 'true' : 'false';
 
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->api(uri => 'comments', params => $params); },
+  return paginated_list(
+    api            => $self,
+    uri            => 'comments',
     result_key     => 'comments',
+    default_fields => 'comments(id, content, author, createdTime)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
@@ -319,28 +349,31 @@ Sets up a notification channel for file changes.
 Returns a Permission object. If id is provided, represents that permission.
 Without id, can be used to create new permissions.
 
-=head2 permissions(max_pages => $n)
+=head2 permissions(max_pages => $n, page_callback => $coderef)
 
 Lists all permissions on the file. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 revision(id => $id)
 
 Returns a Revision object for the given revision ID.
 
-=head2 revisions(max_pages => $n)
+=head2 revisions(max_pages => $n, page_callback => $coderef)
 
 Lists all revisions of the file. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 comment(id => $id)
 
 Returns a Comment object. Without id, can be used to create new comments.
 
-=head2 comments(include_deleted => $bool, max_pages => $n)
+=head2 comments(include_deleted => $bool, max_pages => $n, page_callback => $coderef)
 
 Lists all comments on the file. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head1 AUTHORS
 

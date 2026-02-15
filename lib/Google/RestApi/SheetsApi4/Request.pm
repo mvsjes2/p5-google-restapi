@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Request;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -13,7 +13,7 @@ use parent "Google::RestApi::Request";
 sub merge_request {
   my $self = shift;
 
-  state $check = compile(HashRef);
+  state $check = signature(positional => [HashRef]);
   my ($request) = $check->(@_);
 
   my $requests = $self->{requests} or return;

@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
 
@@ -26,19 +26,22 @@ sub new {
   resolve_config_file_path(\%p, 'token_file');
 
   my $self = merge_config_file(%p);
-  state $check = compile_named(
-    config_dir        => ReadableDir, { optional => 1 },
-    config_file       => ReadableFile, { optional => 1 },
-    token_file        => ReadableFile, { optional => 1 },
-    client_id         => Str,
-    client_secret     => Str,
-    scope             => ArrayRef[Str], { optional => 1 },
-    state             => Str, { default => '' },
-    redirect_uri      => Str, { default => 'urn:ietf:wg:oauth:2.0:oob' },
-    site              => Str, { default => 'https://accounts.google.com' },
-    authorize_path    => Str, { default => '/o/oauth2/auth' },
-    access_token_path => Str, { default => '/o/oauth2/token' },
-    userinfo_url      => Str, { default => 'https://www.googleapis.com/oauth2/v1/userinfo' },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      config_dir        => ReadableDir, { optional => 1 },
+      config_file       => ReadableFile, { optional => 1 },
+      token_file        => ReadableFile, { optional => 1 },
+      client_id         => Str,
+      client_secret     => Str,
+      scope             => ArrayRef[Str], { optional => 1 },
+      state             => Str, { default => '' },
+      redirect_uri      => Str, { default => 'urn:ietf:wg:oauth:2.0:oob' },
+      site              => Str, { default => 'https://accounts.google.com' },
+      authorize_path    => Str, { default => '/o/oauth2/auth' },
+      access_token_path => Str, { default => '/o/oauth2/token' },
+      userinfo_url      => Str, { default => 'https://www.googleapis.com/oauth2/v1/userinfo' },
+    ],
   );
   $self = $check->(%$self);
 
@@ -79,15 +82,18 @@ sub access_token {
   my $self = shift;
 
   if (scalar @_ == 1) {
-    state $check = compile(Str);
+    state $check = signature(positional => [Str]);
     my ($code) = $check->(@_);
     my $server = $self->oauth2_webserver();
     $self->{access_token} = $server->get_access_token($code);
     DEBUG("Created access token:\n", Dump($self->{access_token}));
   } elsif (@_) {
-    state $check = compile_named(
-      refresh_token => Str,
-      auto_refresh  => Bool,
+    state $check = signature(
+      bless => !!0,
+      named => [
+        refresh_token => Str,
+        auto_refresh  => Bool,
+      ],
     );
     my $p = $check->(@_);
     $p->{profile} = $self->oauth2_webserver();

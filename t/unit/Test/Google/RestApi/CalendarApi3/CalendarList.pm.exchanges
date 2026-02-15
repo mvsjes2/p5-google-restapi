@@ -37,34 +37,34 @@ response:
   headers:
     - server
     - ESF
-    - transfer-encoding
-    - chunked
-    - date
-    - 'Sun, 15 Feb 2026 02:31:40 GMT'
-    - accept-ranges
-    - none
-    - x-frame-options
-    - SAMEORIGIN
-    - x-l2-request-path
-    - l2-managed-14
-    - x-xss-protection
-    - 0
     - cache-control
     - 'private, max-age=0, must-revalidate, no-transform'
-    - content-type
-    - application/json; charset=UTF-8
     - expires
-    - 'Sun, 15 Feb 2026 02:31:40 GMT'
-    - x-content-type-options
-    - nosniff
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - 'Sun, 15 Feb 2026 21:01:06 GMT'
     - vary
     - X-Origin
     - vary
     - Referer
     - vary
     - 'Origin,Accept-Encoding'
+    - alt-svc
+    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+    - transfer-encoding
+    - chunked
+    - accept-ranges
+    - none
+    - x-xss-protection
+    - 0
+    - x-content-type-options
+    - nosniff
+    - content-type
+    - application/json; charset=UTF-8
+    - x-frame-options
+    - SAMEORIGIN
+    - date
+    - 'Sun, 15 Feb 2026 21:01:06 GMT'
+    - x-l2-request-path
+    - l2-managed-14
   message: OK
 source: Test::Google::RestApi::CalendarApi3::CalendarList::get
 

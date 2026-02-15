@@ -1,39 +1,40 @@
 package Google::RestApi::TasksApi1::TaskList;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 use Google::RestApi::Setup;
+
+use parent 'Google::RestApi::SubResource';
 
 use aliased 'Google::RestApi::TasksApi1::Task';
 
 sub new {
   my $class = shift;
-  state $check = compile_named(
-    tasks_api => HasApi,
-    id        => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      tasks_api => HasApi,
+      id        => Str, { optional => 1 },
+    ],
   );
   return bless $check->(@_), $class;
 }
 
-sub api {
-  my $self = shift;
-  my %p = @_;
-  my $uri = "users/\@me/lists";
-  $uri .= "/$self->{id}" if $self->{id};
-  $uri .= "/$p{uri}" if $p{uri};
-  delete $p{uri};
-  return $self->tasks_api()->api(%p, uri => $uri);
-}
+sub _uri_base { 'users/@me/lists' }
+sub _parent_accessor { 'tasks_api' }
 
 sub get {
   my $self = shift;
-  state $check = compile_named(
-    fields => Str, { optional => 1 },
-    params => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      fields => Str, { optional => 1 },
+      params => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "TaskList ID required for get()" unless $self->{id};
+  $self->require_id('get');
 
   my $params = $p->{params};
   $params->{fields} = $p->{fields} if defined $p->{fields};
@@ -43,13 +44,16 @@ sub get {
 
 sub update {
   my $self = shift;
-  state $check = compile_named(
-    title   => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "TaskList ID required for update()" unless $self->{id};
+  $self->require_id('update');
 
   my %content;
   $content{title} = delete $p->{title} if defined $p->{title};
@@ -64,7 +68,7 @@ sub update {
 sub delete {
   my $self = shift;
 
-  LOGDIE "TaskList ID required for delete()" unless $self->{id};
+  $self->require_id('delete');
 
   DEBUG(sprintf("Deleting task list '%s'", $self->{id}));
   return $self->api(method => 'delete');
@@ -72,8 +76,11 @@ sub delete {
 
 sub task {
   my $self = shift;
-  state $check = compile_named(
-    id => Str, { optional => 1 },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      id => Str, { optional => 1 },
+    ],
   );
   my $p = $check->(@_);
   return Task->new(task_list => $self, %$p);
@@ -81,38 +88,43 @@ sub task {
 
 sub tasks {
   my $self = shift;
-  state $check = compile_named(
-    max_pages     => Int, { default => 1 },
-    page_callback => CodeRef, { optional => 1 },
-    params        => HashRef, { default => {} },
+  state $check = signature(
+    bless => !!0,
+    named => [
+      max_pages     => Int, { default => 1 },
+      page_callback => CodeRef, { optional => 1 },
+      params        => HashRef, { default => {} },
+    ],
   );
   my $p = $check->(@_);
 
-  LOGDIE "TaskList ID required for tasks()" unless $self->{id};
+  $self->require_id('tasks');
 
-  my $params = $p->{params};
-  $params->{fields} //= 'items(id, title, status, due)';
-  $params->{fields} = 'nextPageToken, ' . $params->{fields};
-
-  return paginate_api(
-    api_call       => sub { $params->{pageToken} = $_[0] if $_[0]; $self->tasks_api()->api(uri => "lists/$self->{id}/tasks", params => $params); },
+  return paginated_list(
+    api            => $self->tasks_api(),
+    uri            => "lists/$self->{id}/tasks",
     result_key     => 'items',
+    default_fields => 'items(id, title, status, due)',
     max_pages      => $p->{max_pages},
+    params         => $p->{params},
     ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
   );
 }
 
 sub create_task {
   my $self = shift;
-  state $check = compile_named(
-    title   => Str,
-    notes   => Str, { optional => 1 },
-    due     => Str, { optional => 1 },
-    _extra_ => slurpy Any,
+  state $check = signature(
+    bless => !!0,
+    named => [
+      title   => Str,
+      notes   => Str, { optional => 1 },
+      due     => Str, { optional => 1 },
+      _extra_ => slurpy HashRef,
+    ],
   );
   my $p = named_extra($check->(@_));
 
-  LOGDIE "TaskList ID required for create_task()" unless $self->{id};
+  $self->require_id('create_task');
 
   my %content = (
     title => delete $p->{title},
@@ -132,7 +144,7 @@ sub create_task {
 sub clear {
   my $self = shift;
 
-  LOGDIE "TaskList ID required for clear()" unless $self->{id};
+  $self->require_id('clear');
 
   DEBUG(sprintf("Clearing completed tasks from task list '%s'", $self->{id}));
   return $self->tasks_api()->api(
@@ -199,10 +211,11 @@ Permanently deletes the task list. Requires task list ID.
 
 Returns a Task object. Without id, can be used to create new tasks.
 
-=head2 tasks(max_pages => $n)
+=head2 tasks(max_pages => $n, page_callback => $coderef)
 
 Lists all tasks on the task list. Requires task list ID. C<max_pages> limits
 the number of pages fetched (default 1). Set to 0 for unlimited.
+Supports C<page_callback>, see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 create_task(title => $title, notes => $notes, due => $due)
 
