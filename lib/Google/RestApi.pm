@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '1.2.0';
+our $VERSION = '2.0.0';
 
 use Google::RestApi::Setup;
 
@@ -481,11 +481,6 @@ above, but can be accessed directly if you have no need to provide a callback.
 Returns some statistics on how many get/put/post etc calls were made. Useful for performance tuning during development.
 
 =back
-
-=head1 STATUS
-
-This api is currently in beta status. It is incomplete. There may be design flaws that need to be addressed in later releases. Later
-releases may break this release. Not all api calls have been implemented.
 
 =head1 AUTHORS
 
