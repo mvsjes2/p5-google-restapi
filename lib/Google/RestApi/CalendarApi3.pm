@@ -429,6 +429,8 @@ Queries free/busy information for a set of calendars.
 
 =item * L<Google::RestApi::TasksApi1> - Google Tasks API (related module)
 
+=item * L<Google::RestApi::DocsApi1> - Google Docs API (related module)
+
 =item * L<https://developers.google.com/calendar/api/v3/reference> - Google Calendar API Reference
 
 =back

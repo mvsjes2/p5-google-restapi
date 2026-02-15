@@ -63,4 +63,12 @@ for my $tl (@task_lists) {
 }
 end_go("Task list delete complete, deleted $tasks_count task list(s).");
 
+# clean up docs documents.
+my $docs_name = docs_document_name();
+start("Now we will delete any documents named '$docs_name'.");
+my $docs = docs_api();
+$docs->rest_api()->api_callback(\&show_api);
+my $docs_count = $docs->delete_all_documents($docs_name);
+end_go("Docs delete complete, deleted $docs_count document(s).");
+
 message('blue', "We are done, here are some api stats:\n", Dump($sheets_api->stats()));

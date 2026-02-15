@@ -302,7 +302,7 @@ Google::RestApi - Connection to Google REST APIs (currently Drive, Sheets, and C
 =head1 DESCRIPTION
 
 Google Rest API is the foundation class used by the included Drive (L<Google::RestApi::DriveApi3>), Sheets (L<Google::RestApi::SheetsApi4>),
-Calendar (L<Google::RestApi::CalendarApi3>), Gmail (L<Google::RestApi::GmailApi1>), and Tasks (L<Google::RestApi::TasksApi1>) APIs.
+Calendar (L<Google::RestApi::CalendarApi3>), Gmail (L<Google::RestApi::GmailApi1>), Tasks (L<Google::RestApi::TasksApi1>), and Docs (L<Google::RestApi::DocsApi1>) APIs.
 It is used to send API requests to the Google API endpoint on behalf of the underlying API classes.
 
 =head1 NAVIGATION
@@ -390,6 +390,10 @@ It is used to send API requests to the Google API endpoint on behalf of the unde
 =item * L<Google::RestApi::TasksApi1::TaskList>
 
 =item * L<Google::RestApi::TasksApi1::Task>
+
+=item * L<Google::RestApi::DocsApi1>
+
+=item * L<Google::RestApi::DocsApi1::Document>
 
 =back
 
