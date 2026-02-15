@@ -319,28 +319,31 @@ Sets up a notification channel for file changes.
 Returns a Permission object. If id is provided, represents that permission.
 Without id, can be used to create new permissions.
 
-=head2 permissions(max_pages => $n)
+=head2 permissions(max_pages => $n, page_callback => $coderef)
 
 Lists all permissions on the file. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 revision(id => $id)
 
 Returns a Revision object for the given revision ID.
 
-=head2 revisions(max_pages => $n)
+=head2 revisions(max_pages => $n, page_callback => $coderef)
 
 Lists all revisions of the file. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head2 comment(id => $id)
 
 Returns a Comment object. Without id, can be used to create new comments.
 
-=head2 comments(include_deleted => $bool, max_pages => $n)
+=head2 comments(include_deleted => $bool, max_pages => $n, page_callback => $coderef)
 
 Lists all comments on the file. C<max_pages> limits the number of pages
-fetched (default 0 = unlimited).
+fetched (default 0 = unlimited). Supports C<page_callback>,
+see L<Google::RestApi/PAGE CALLBACKS>.
 
 =head1 AUTHORS
 

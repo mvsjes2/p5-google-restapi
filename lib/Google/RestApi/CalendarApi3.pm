@@ -390,6 +390,7 @@ Lists all calendars visible to the user.
  my @calendars = $cal_api->list_calendars(max_pages => 2);
 
 C<max_pages> limits the number of pages fetched (default 0 = unlimited).
+Supports C<page_callback>, see L<Google::RestApi/PAGE CALLBACKS>.
 
 Returns a list of calendar hashrefs with id and summary.
 
@@ -414,6 +415,10 @@ Queries free/busy information for a set of calendars.
 =item * C<items> <arrayref>: Required. List of calendar IDs to query.
 
 =back
+
+=head2 rest_api()
+
+Returns the underlying L<Google::RestApi> instance.
 
 =head1 SEE ALSO
 

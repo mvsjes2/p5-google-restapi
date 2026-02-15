@@ -105,7 +105,7 @@ sub delete_all_spreadsheets_by_filters {
 
   my $count = 0;
   foreach my $filter (@$filter) {
-    my @spreadsheets = $self->spreadsheets_by_filter($filter);
+    my @spreadsheets = $self->spreadsheets_by_filter(filter => $filter);
     $count += scalar @spreadsheets;
     DEBUG(sprintf("Deleting %d spreadsheets for filter '$filter'", scalar @spreadsheets));
     $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
@@ -116,27 +116,46 @@ sub delete_all_spreadsheets_by_filters {
 sub delete_all_spreadsheets {
   my $self = shift;
   my @names = @_;
-  @names = map { "name = '$_"; } @names;
+  @names = map { "name = '$_'"; } @names;
   return $self->delete_all_spreadsheets_by_filters(@names);
 }
 
 sub spreadsheets_by_filter {
   my $self = shift;
 
-  state $check = compile(Optional[Str]);
-  my ($extra_filter) = $check->(@_);
+  state $check = compile_named(
+    filter        => Str, { optional => 1 },
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
+  );
+  my $p = $check->(@_);
 
   my $drive = $self->drive();
   my $filter = $Spreadsheet_Filter;
-  $filter .= " and ($extra_filter)" if $extra_filter;
-  return $drive->list(filter => $filter);
+  $filter .= " and ($p->{filter})" if $p->{filter};
+  return $drive->list(
+    filter    => $filter,
+    max_pages => $p->{max_pages},
+    params    => $p->{params},
+    ($p->{page_callback} ? (page_callback => $p->{page_callback}) : ()),
+  );
 }
 
 sub spreadsheets {
   my $self = shift;
-  my ($name) = @_;
-  $name = "name = '$name'" if $name;
-  return $self->spreadsheets_by_filter($name);
+
+  state $check = compile_named(
+    name          => Str, { optional => 1 },
+    max_pages     => Int, { default => 0 },
+    page_callback => CodeRef, { optional => 1 },
+    params        => HashRef, { default => {} },
+  );
+  my $p = $check->(@_);
+
+  my $name = delete $p->{name};
+  $p->{filter} = "name = '$name'" if $name;
+  return $self->spreadsheets_by_filter(%$p);
 }
 
 sub drive {
@@ -425,9 +444,52 @@ Deletes all spreadsheets with the given names from Google Drive.
 
 Returns the number of spreadsheets deleted.
 
-=item spreadsheets();
+=item spreadsheets(%args);
 
-Returns a list of spreadsheets in Google Drive.
+Lists spreadsheets in Google Drive, optionally filtered by name.
+
+%args consists of:
+
+=over
+
+=item * C<name> <string>: Optional. Filter by spreadsheet name.
+
+=item * C<max_pages> <int>: Optional. Maximum pages to fetch (default 0 = unlimited).
+
+=item * C<page_callback> <coderef>: Optional. Called with the result hashref for each page. Return false to stop pagination. See L<Google::RestApi/PAGE CALLBACKS>.
+
+=item * C<params> <hashref>: Optional. Additional query parameters passed to the Drive API.
+
+=back
+
+Returns a list of spreadsheet hashrefs.
+
+=item spreadsheets_by_filter(%args);
+
+Lists spreadsheets matching the given Drive query filter, combined with the
+spreadsheet MIME type filter.
+
+%args consists of:
+
+=over
+
+=item * C<filter> <string>: Optional. A Drive query filter string.
+
+=item * C<max_pages> <int>: Optional. Maximum pages to fetch (default 0 = unlimited).
+
+=item * C<page_callback> <coderef>: Optional. Called with the result hashref for each page. Return false to stop pagination. See L<Google::RestApi/PAGE CALLBACKS>.
+
+=item * C<params> <hashref>: Optional. Additional query parameters passed to the Drive API.
+
+=back
+
+Returns a list of spreadsheet hashrefs.
+
+=item delete_all_spreadsheets(name<string>, ...);
+
+Deletes all spreadsheets with the given names from Google Drive.
+
+Returns the number of spreadsheets deleted.
 
 =item drive();
 
@@ -438,6 +500,22 @@ Returns an instance of Google Drive that shares the same RestApi as this SheetsA
 Opens a new spreadsheet from the given id, uri, or name.
 
 %args consists of any args passed to Spreadsheet->new routine (which see).
+
+=item transaction();
+
+Returns the last API transaction details (delegates to L<Google::RestApi>).
+
+=item stats();
+
+Returns API call statistics (delegates to L<Google::RestApi>).
+
+=item reset_stats();
+
+Resets API call statistics (delegates to L<Google::RestApi>).
+
+=item rest_api();
+
+Returns the underlying L<Google::RestApi> instance.
 
 =back
 

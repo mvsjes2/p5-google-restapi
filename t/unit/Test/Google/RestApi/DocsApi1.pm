@@ -49,4 +49,27 @@ sub create_document : Tests(2) {
   return;
 }
 
+sub page_callback : Tests(4) {
+  my $self = shift;
+  my $docs = mock_docs_api();
+
+  my $callback_count = 0;
+  my @documents = $docs->documents(
+    name          => 'Test Document',
+    page_callback => sub { $callback_count++; return 1; },
+  );
+  ok $callback_count > 0, "Page callback was called for documents()";
+  ok scalar @documents >= 1, "Documents returned with page callback";
+
+  $callback_count = 0;
+  @documents = $docs->documents_by_filter(
+    filter        => "name contains 'Test'",
+    page_callback => sub { $callback_count++; return 1; },
+  );
+  ok $callback_count > 0, "Page callback was called for documents_by_filter()";
+  ok scalar @documents >= 1, "Documents_by_filter returned with page callback";
+
+  return;
+}
+
 1;
