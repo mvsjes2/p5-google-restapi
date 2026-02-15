@@ -49,6 +49,7 @@ on test => sub {
     requires 'Test::Deep';
     requires 'Test::Most';
     requires 'Test::Pod';
+    requires 'Test::Pod::Coverage';
     requires 'Test::Perl::Critic';
     requires 'Perl::Critic::TooMuchCode';
 };
