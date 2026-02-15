@@ -199,7 +199,7 @@ response:
         "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "://photo.example.com/placeholder"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0bNmv2c",
       "createdTime": "2026-02-15T20:53:41.055Z",
@@ -282,7 +282,7 @@ response:
         "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "://photo.example.com/placeholder"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0bNmv2g",
       "createdTime": "2026-02-15T20:53:45.666Z",
@@ -365,7 +365,7 @@ response:
         "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "://photo.example.com/placeholder"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0bNmv2k",
       "createdTime": "2026-02-15T20:53:49.904Z",
@@ -416,7 +416,7 @@ response:
       "author": {
         "kind": "drive#user",
         "displayName": "Test User",
-        "photoLink": "://photo.example.com/placeholder",
+        "photoLink": "//photo.example.com/placeholder",
         "me": true
       },
       "content": "Test reply from unit tests"
@@ -466,7 +466,7 @@ response:
       "author": {
         "kind": "drive#user",
         "displayName": "Test User",
-        "photoLink": "://photo.example.com/placeholder",
+        "photoLink": "//photo.example.com/placeholder",
         "me": true
       },
       "content": "Test reply from unit tests"
@@ -581,7 +581,7 @@ response:
         "displayName": "Test User",
         "kind": "drive#user",
         "me": true,
-        "photoLink": "://photo.example.com/placeholder"
+        "photoLink": "//photo.example.com/placeholder"
       },
       "id": "AAAB0bNmv2s",
       "createdTime": "2026-02-15T20:53:58.889Z",
