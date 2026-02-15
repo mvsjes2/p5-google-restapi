@@ -27,7 +27,7 @@ our @EXPORT_OK = qw(
   merge_config_file resolve_config_file_path
   flatten_range
   bool
-  dim_any dims_any dims_all
+  dims_any dims_all
   cl_black cl_white
   strip
   paginate_api
