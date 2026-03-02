@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.1.1';
 
 use Google::RestApi::Setup;
 
@@ -842,12 +842,12 @@ and Google::RestApi::SheetsApi4.
 
 =item
 
-Test User mvsjes@cpan.org
+Robin Murray mvsjes@cpan.org
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright (c) 2019-2026 Test User. All rights reserved.
+Copyright (c) 2019-2026 Robin Murray. All rights reserved.
 
 This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.
