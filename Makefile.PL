@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => 'Google::RestApi',
-    AUTHOR            => 'Test User <mvsjes@cpan.org>',
+    AUTHOR            => 'Robin Murray <mvsjes@cpan.org>',
     ABSTRACT_FROM     => 'lib/Google/RestApi.pm',
     VERSION_FROM      => 'lib/Google/RestApi.pm',
     PREREQ_PM         => {
