@@ -74,6 +74,10 @@ sub merge_config_file {
   my $config_from_file = eval { LoadFile($config_file); };
   LOGDIE "Unable to load config file '$config_file': $@" if $@;
 
+  # Support an optional 'google_restapi' top-level key so the config file can
+  # be shared with other apps. Use that section if present, else use the root.
+  $config_from_file = $config_from_file->{google_restapi} // $config_from_file;
+
   # left_precedence, the passed config wins over anything in the file.
   # can't merge coderefs, error comes from Storable buried deep in hash::merge.
   my $merged_config = Hash::Merge::merge($passed_config, $config_from_file);
