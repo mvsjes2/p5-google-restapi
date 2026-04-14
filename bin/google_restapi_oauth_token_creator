@@ -15,17 +15,6 @@ use YAML::Any qw( Dump LoadFile );
 
 use Google::RestApi::Auth::OAuth2Client ();
 
-# set the scope for the project you are working one.
-# for this package, drive and spreadsheets are required.
-my @scope = (
-  'https://www.googleapis.com/auth/calendar',
-  'https://www.googleapis.com/auth/documents',
-  'https://www.googleapis.com/auth/drive',
-  'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/spreadsheets',
-  'https://www.googleapis.com/auth/tasks',
-);
-
 my $config_file = $ARGV[0] or die "A config file name must be provided. See 'perldoc $0'.\n";
 my $config = eval { LoadFile($config_file); };
 die "Unable to load YAML config file '$config_file': $@\n" if $@;
@@ -46,7 +35,7 @@ $check->(%{ $config->{auth} });
 my $oauth2 = Google::RestApi::Auth::OAuth2Client->new(
   client_id     => $config->{auth}->{client_id},
   client_secret => $config->{auth}->{client_secret},
-  scope         => \@scope,
+  defined $config->{auth}->{scope} ? (scope => $config->{auth}->{scope}) : (),
 );
 
 # We need to set these parameters this way in order to ensure 
@@ -271,6 +260,19 @@ Create a YAML file with your credentials:
         client_id: <client-id-from-google>
         client_secret: <client-secret-from-google>
         token_file: <filename-for-the-stored-token>  # filename only, not a path
+        scope:
+            - https://www.googleapis.com/auth/drive
+            - https://www.googleapis.com/auth/spreadsheets
+            # add further scopes as needed:
+            # - https://www.googleapis.com/auth/calendar
+            # - https://www.googleapis.com/auth/documents
+            # - https://www.googleapis.com/auth/gmail.modify
+            # - https://www.googleapis.com/auth/tasks
+
+The C<scope> list controls which Google APIs the token is authorised to access.
+Only include the scopes for APIs you actually use — requesting unnecessary scopes
+may cause Google to show a warning during authorisation. If omitted, a minimal
+default scope is used (userinfo only).
 
 The token file will be written to the same directory as this config file. The
 same config file is used by this package at runtime to access the Google APIs.
