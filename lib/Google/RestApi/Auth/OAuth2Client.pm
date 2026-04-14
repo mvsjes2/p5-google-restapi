@@ -243,6 +243,12 @@ OAuth2 redirect url. 'urn:ietf:wg:oauth:2.0:oob' will be used if you don't speci
 
 See L<https://developers.google.com/accounts/docs/OAuth2> for details.
 
+=head2 refresh_headers
+
+Called automatically by RestApi when a 401 Unauthorized response is received.
+Clears the cached authorization headers and fetches a new OAuth access token
+by refreshing the stored refresh token.
+
 =head1 OAUTH2 SETUP
 
 This class depends on first creating an OAuth2 token session file
