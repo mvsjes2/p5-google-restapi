@@ -23,14 +23,45 @@ sub startup : Tests(startup) {
   return;
 }
 
-sub _constructor : Tests(3) {
+sub _constructor : Tests(6) {
   my $self = shift;
 
   throws_ok sub { RestApi->new(config_file => 'x'); }, qr/did not pass type constraint/i, 'Constructor from bad config file should throw';
   ok my $api = RestApi->new(config_file => mock_config_file()), 'Constructor from proper config_file should succeed';
   isa_ok $api, RestApi, 'Constructor returns';
 
+  # config file with google_restapi key and extra app-level keys should work.
+  my $google_restapi_config = _write_temp_config({
+    my_app         => { db => 'mydb' },
+    google_restapi => {
+      auth => {
+        class         => 'OAuth2Client',
+        client_id     => 'x',
+        client_secret => 'x',
+        token_file    => 'rest_config.token',
+      },
+      log_file  => '/tmp/test.log',
+      log_level => 'DEBUG',
+    },
+  });
+  ok $api = RestApi->new(config_file => $google_restapi_config),
+    'Constructor with google_restapi key and extra keys should succeed';
+  isa_ok $api->auth(), OAuth2Client, 'Auth resolved from google_restapi config';
+  ok !exists $api->{my_app}, 'App-level keys outside google_restapi are not passed through';
+
   return;
+}
+
+sub _write_temp_config {
+  my ($data) = @_;
+  require File::Basename;
+  require File::Temp;
+  require YAML::Any;
+  my $dir = File::Basename::dirname(mock_config_file());
+  my ($fh, $fname) = File::Temp::tempfile(SUFFIX => '.yaml', DIR => $dir);
+  print $fh YAML::Any::Dump($data);
+  close $fh;
+  return $fname;
 }
 
 sub auth : Tests(4) {
