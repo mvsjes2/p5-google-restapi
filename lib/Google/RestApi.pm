@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.0';
 
 use Google::RestApi::Setup;
 
@@ -106,7 +106,11 @@ sub api {
 
   if (!$response || !$response->is_success()) {
     $self->_stat('error');
-    LOGDIE("Rest API failure:\n", Dump( $self->transaction() ));
+    my $activation_url = _activation_url($self->transaction());
+    LOGDIE(
+      ($activation_url ? "API not enabled in Google Cloud Console. Visit:\n  $activation_url\n" : ()),
+      "Rest API failure:\n", Dump( $self->transaction() ),
+    );
   }
 
   # used for to avoid google 403's and 429's as with integration tests.
@@ -122,6 +126,7 @@ sub _api {
   # default is exponential backoff, initial delay 1.
   my $tries = 0;
   my $last_error;
+  my $refreshed_auth = 0;
   my $response = retry sub { $self->{ua}->request($req); },
     retry_if => sub {
       my $h = shift;
@@ -132,6 +137,15 @@ sub _api {
         return 1;
       }
       $last_error = $r->status_line() if !$r->is_success();
+      if ($r->code() == 401 && !$refreshed_auth) {
+        $refreshed_auth = 1;
+        WARN("Got 401, refreshing auth token and retrying");
+        my @new_auth = @{ $self->auth()->refresh_headers() };
+        while (my ($name, $val) = splice(@new_auth, 0, 2)) {
+          $req->header($name => $val);
+        }
+        return 1;
+      }
       if ($r->code() =~ /^(403|429|50[0234])$/) {
         WARN("Retrying: $last_error");
         return 1;
@@ -242,6 +256,18 @@ sub _caller_external {
     ($package, undef, $line, $subroutine) = caller(++$i);
   } while($package && $package =~ m[^(Google::RestApi|Cache|Try)]);
   return "$package:$line => $subroutine";
+}
+
+# extract the activation URL from a 403 "API not enabled" error response, if present.
+sub _activation_url {
+  my ($transaction) = @_;
+  my $details = eval { $transaction->{decoded_response}{error}{details} };
+  return unless ref $details eq 'ARRAY';
+  for my $detail (@$details) {
+    my $url = eval { $detail->{metadata}{activationUrl} };
+    return $url if $url;
+  }
+  return;
 }
 
 # the maximum number of attempts to call the google api endpoint before giving up.

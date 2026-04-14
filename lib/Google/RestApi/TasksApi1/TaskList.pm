@@ -1,6 +1,6 @@
 package Google::RestApi::TasksApi1::TaskList;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.0';
 
 use Google::RestApi::Setup;
 

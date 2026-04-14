@@ -11,7 +11,7 @@ package Google::RestApi::SheetsApi4::Types;
 use strict;
 use warnings;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.0';
 
 use feature qw( state );
 

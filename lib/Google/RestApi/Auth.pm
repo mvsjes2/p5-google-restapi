@@ -1,11 +1,12 @@
 package Google::RestApi::Auth;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.0';
 
 use Google::RestApi::Setup;
 
 sub params {{}}
 sub headers {[]};
+sub refresh_headers {[]};
 
 1;
 

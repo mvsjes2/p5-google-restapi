@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.0';
 
 use Google::RestApi::Setup;
 
@@ -110,6 +110,13 @@ sub refresh_token {
   my $server = $self->oauth2_webserver();
   $server->update_access_token($self->access_token());
   return $self->access_token()->refresh();
+}
+
+sub refresh_headers {
+  my $self = shift;
+  INFO("Refreshing auth headers after 401");
+  delete $self->{headers};
+  return $self->headers();
 }
 
 sub oauth2_client {
