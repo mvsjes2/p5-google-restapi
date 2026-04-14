@@ -657,6 +657,32 @@ Robin Murray mvsjes@cpan.org
 
 =back
 
+=head1 CONTRIBUTORS
+
+=over
+
+=item
+
+Dimitrios Kechagias
+
+=item
+
+Mohammad S Anwar
+
+=item
+
+qorron
+
+=item
+
+rocketgithub
+
+=item
+
+Todd Wade
+
+=back
+
 =head1 COPYRIGHT
 
 Copyright (c) 2019-2026 Robin Murray. All rights reserved.

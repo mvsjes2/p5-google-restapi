@@ -289,6 +289,14 @@ Please report a bug or missing api call by creating an issue at the git repo.
 
 - Robin Murray mvsjes@cpan.org
 
+# CONTRIBUTORS
+
+- Dimitrios Kechagias
+- Mohammad S Anwar
+- qorron
+- rocketgithub
+- Todd Wade
+
 # COPYRIGHT
 
 Copyright (c) 2019-2026 Robin Murray. All rights reserved.
