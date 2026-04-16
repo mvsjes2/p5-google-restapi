@@ -40,8 +40,6 @@ sub _constructor : Tests(8) {
         client_secret => 'x',
         token_file    => mock_token_file(),
       },
-      log_file  => '/tmp/test.log',
-      log_level => 'DEBUG',
     },
   });
   ok $api = RestApi->new(config_file => $google_restapi_config),

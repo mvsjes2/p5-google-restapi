@@ -31,10 +31,9 @@ sub new {
       throttle        => PositiveOrZeroInt, { default => 0 },      # mostly used for integration testing, to ensure we don't blow our rate limit.
       timeout         => Int, { default => 120 },
       max_attempts    => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
-      _extra_         => slurpy HashRef,                           # ignore unknown keys so shared config files don't cause errors.
     ],
   );
-  $self = named_extra($check->(%$self));
+  $self = $check->(%$self);
 
   if ($self->{log4perl_config} && !Log::Log4perl->initialized()) {
     Log::Log4perl->init($self->{log4perl_config});
