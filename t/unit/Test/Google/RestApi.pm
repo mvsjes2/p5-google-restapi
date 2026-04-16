@@ -50,9 +50,10 @@ sub _constructor : Tests(8) {
   ok !exists $api->{my_app}, 'App-level keys outside google_restapi are not passed through';
 
   # log4perl_config in the config file should be accepted and resolved.
+  # Use a quiet config so initializing Log4perl here doesn't spam subsequent tests.
   require FindBin;
   require File::Spec;
-  my $log4perl_conf = File::Spec->catfile($FindBin::RealBin, 'etc', 'log4perl.conf');
+  my $log4perl_conf = File::Spec->catfile($FindBin::RealBin, 'etc', 'log4perl_quiet.conf');
   my $log4perl_config = _write_temp_config({
     google_restapi => {
       auth => {
