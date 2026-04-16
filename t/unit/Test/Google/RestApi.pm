@@ -23,7 +23,7 @@ sub startup : Tests(startup) {
   return;
 }
 
-sub _constructor : Tests(6) {
+sub _constructor : Tests(8) {
   my $self = shift;
 
   throws_ok sub { RestApi->new(config_file => 'x'); }, qr/did not pass type constraint/i, 'Constructor from bad config file should throw';
@@ -38,7 +38,7 @@ sub _constructor : Tests(6) {
         class         => 'OAuth2Client',
         client_id     => 'x',
         client_secret => 'x',
-        token_file    => 'rest_config.token',
+        token_file    => mock_token_file(),
       },
       log_file  => '/tmp/test.log',
       log_level => 'DEBUG',
@@ -49,19 +49,43 @@ sub _constructor : Tests(6) {
   isa_ok $api->auth(), OAuth2Client, 'Auth resolved from google_restapi config';
   ok !exists $api->{my_app}, 'App-level keys outside google_restapi are not passed through';
 
+  # log4perl_config in the config file should be accepted and resolved.
+  require FindBin;
+  require File::Spec;
+  my $log4perl_conf = File::Spec->catfile($FindBin::RealBin, 'etc', 'log4perl.conf');
+  my $log4perl_config = _write_temp_config({
+    google_restapi => {
+      auth => {
+        class         => 'OAuth2Client',
+        client_id     => 'x',
+        client_secret => 'x',
+        token_file    => mock_token_file(),
+      },
+      log4perl_config => $log4perl_conf,
+    },
+  });
+  ok $api = RestApi->new(config_file => $log4perl_config),
+    'Constructor with log4perl_config should succeed';
+  ok Log::Log4perl::initialized(), 'Log4perl initialized from log4perl_config';
+
   return;
 }
+
+my @_temp_configs;
 
 sub _write_temp_config {
   my ($data) = @_;
   require File::Basename;
   require File::Temp;
   require YAML::Any;
-  my $dir = File::Basename::dirname(mock_config_file());
-  my ($fh, $fname) = File::Temp::tempfile(SUFFIX => '.yaml', DIR => $dir);
+  require FindBin;
+  require File::Spec;
+  my $dir = File::Spec->catdir($FindBin::RealBin, 'etc');
+  my $fh = File::Temp->new(SUFFIX => '.yaml', DIR => $dir, UNLINK => 1);
   print $fh YAML::Any::Dump($data);
-  close $fh;
-  return $fname;
+  $fh->flush();
+  push @_temp_configs, $fh;  # keep object alive; deleted at program end
+  return $fh->filename();
 }
 
 sub auth : Tests(4) {
