@@ -74,13 +74,13 @@ sub _constructor : Tests(8) {
 my @_temp_configs;
 
 sub _write_temp_config {
-  my ($data) = @_;
+  my ($data, $dir) = @_;
   require File::Basename;
   require File::Temp;
   require YAML::Any;
   require FindBin;
   require File::Spec;
-  my $dir = File::Spec->catdir($FindBin::RealBin, 'etc');
+  $dir //= File::Spec->catdir($FindBin::RealBin, 'etc');
   my $fh = File::Temp->new(SUFFIX => '.yaml', DIR => $dir, UNLINK => 1);
   print $fh YAML::Any::Dump($data);
   $fh->flush();
@@ -122,6 +122,66 @@ sub auth : Tests(4) {
 
   $api = RestApi->new(%auth);
   throws_ok sub { $api->auth()->account_file() }, qr/unable to resolve/i, 'Bad account file should throw';
+
+  return;
+}
+
+# token_file path resolution: absolute paths pass through, bare names resolve
+# against the auth config_file's dir first, then the main config_file's dir.
+sub auth_token_file_paths : Tests(4) {
+  my $self = shift;
+
+  require File::Basename;
+  require File::Spec;
+  my $token_name = File::Basename::basename(mock_token_file());
+
+  my $main_abs = _write_temp_config({
+    auth => {
+      class         => 'OAuth2Client',
+      client_id     => 'x',
+      client_secret => 'x',
+      token_file    => mock_token_file(),
+    },
+  });
+  isa_ok RestApi->new(config_file => $main_abs)->auth(), OAuth2Client,
+    'Absolute token_file in main YAML resolves';
+
+  my $main_rel = _write_temp_config({
+    auth => {
+      class         => 'OAuth2Client',
+      client_id     => 'x',
+      client_secret => 'x',
+      token_file    => $token_name,
+    },
+  });
+  isa_ok RestApi->new(config_file => $main_rel)->auth(), OAuth2Client,
+    'Relative token_file in main YAML resolves against main config dir';
+
+  # Separate auth config_file in same dir as the token; main config elsewhere.
+  # Token must resolve against the auth config_file's dir.
+  my $auth_with_token = _write_temp_config({
+    client_id     => 'x',
+    client_secret => 'x',
+    token_file    => $token_name,
+  });
+  my $main_elsewhere = _write_temp_config({
+    auth => { class => 'OAuth2Client', config_file => $auth_with_token },
+  }, File::Spec->tmpdir);
+  isa_ok RestApi->new(config_file => $main_elsewhere)->auth(), OAuth2Client,
+    'Relative token_file resolves against auth config_file dir';
+
+  # Separate auth config_file in a dir that does NOT contain the token; main
+  # config in the dir that does. Token must fall back to main config dir.
+  my $auth_elsewhere = _write_temp_config({
+    client_id     => 'x',
+    client_secret => 'x',
+    token_file    => $token_name,
+  }, File::Spec->tmpdir);
+  my $main_with_token = _write_temp_config({
+    auth => { class => 'OAuth2Client', config_file => $auth_elsewhere },
+  });
+  isa_ok RestApi->new(config_file => $main_with_token)->auth(), OAuth2Client,
+    'Relative token_file falls back to main config dir when auth dir lacks it';
 
   return;
 }
