@@ -73,7 +73,7 @@ sub api {
   my $request_json = defined $request_content ? encode_json($request_content) : (),
 
   my @headers;
-  push(@headers, 'Content-Type' => 'application/json') if $request_json;
+  push(@headers, 'Content-Type' => 'application/json; charset=utf-8') if $request_json;
   push(@headers, @{ $request->{headers} });
   push(@headers, @{ $self->auth()->headers() });
 
