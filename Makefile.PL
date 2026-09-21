@@ -59,6 +59,7 @@ WriteMakefile(
     EXE_FILES         => [qw(bin/google_restapi_oauth_token_creator)],
     META_MERGE        => {
       "meta-spec" => { version => 2 },
+      no_index    => { directory => ['tutorial'] },
       resources   => {
         repository => {
           type => 'git',
